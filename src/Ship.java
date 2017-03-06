@@ -1,3 +1,5 @@
+import be.kuleuven.cs.som.annotate.Basic;
+
 /**
  * A class for dealing with ships that have a certain position, radius, speed and orientation.
  * 
@@ -9,64 +11,97 @@
 
 public class Ship {
 
-//Constructors 
+//Constructors: #2
 	/**
 	 * Initialize this new ship with given position,radius, speed and orientation.
 	 * 
 	 * 
 	 * 
-	 * @param  position
-	 *         The position of this new ship.
+	 * @param  xPosition
+	 *         The position of this ship, according to the x-axis.
+	 *         
+	 * @param  yPosition
+	 *         The position of this ship,according to the y-axis.
 	 *         
 	 * @param  radius
 	 * 		   The radius of this new ship.
 	 * 
-	 * @param  speed
-	 *         The speed of this vessel.
+	 * @param  xVelocity 
+	 *         The velocity of this vessel, in the x-direction.
+	 *         
+	 * @param  yVelocity 
+	 * 		   The velocity of the vessel, in the y-direction. 
 	 *         
 	 * @param  orientation
 	 * 		   The orientation of this vessel, i.e., it's direction.
 	 *       
-	 * @post   The lowest possible speed is zero, it can only move forward.
+	 * @post   The lowest possible velocity is zero, it can only move forward.
 	 * 		  
-	 * @post   The lowest possible radius is 10 km.
+	 * @post   The lowest possible radius is 10 km. (This minimum can easily be changed).
 	 * 
 	 * @post   The hightest possible speed is 300000 (km/s) it can never exceed this.
 	 * 		   digital clock is equal to 23.
 	 * 
-	 * @post   The orientation of the ship will always be a value between 0 and 2PI.
+	 * @post   The orientation of the ship will always be a value between 0(Right) and 2PI(Right).
 	 * 
 // NOG GEEN FORMELE IMPLEMENTATIE VAN VOORGAANDE POST-condities 
 	 *      
 	 * 
 	 */
-// NOG NIET JUIST, Position is geen INT maar een tuple. Ik weet alleen niet hoe je dat precies implementeert.
-	public Ship(double position, double radius, double speed, double orientation){
-	
-	}
-	
-
-	
-	public Ship(){
+// Position X and Y are described seperatly, this proves to be the easiest to work with. Same goes for speed.
+	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation){
+		// At this point we can invoke our mutators, because the range is known.
+		setPosition(xPosition,yPosition);
+		setVelocity(xVelocity,yVelocity);
+		setRadius(radius);
+		setOrientation(orientation);
 		
 	}
+	
+	
+
+	/**
+	 * Initialize this new ship with their parameters (position,speed,radius,orientation) set to their lowest possible Value.
+	 * 
+	 * @effect This new ship is initialized in the center of the grid: (0,0)
+	 * 			xPosition = 0
+	 * 			yPosition = 0
+	 * 			It's radius will be set to it's lowest possible value.
+	 * 			It's velocity will be set to 0. The ship will not be moving.
+	 * 			It's orientation is to the right, i.e.: it has an angle of 0° to the x-axis.
+	 * 
+	 * 			
+	 */
+	public Ship(){
+		this(0.0,0.0,0.0,0.0,Ship.getMinRadius(),0.0);
+	}
+	 
+	
 
 // The inspectors 
-	public getSpeed(){
+	public double getVelocity(){
 		
 	}
 	
-	public getPosition(){
+	public double getPosition(){
 		
 	}	
-	public getOrientation(){
+	public double getOrientation(){
 		
 		
 	}	
-	public getRadius(){
+	public double getRadius(){
 		
 	}
 	
-// The setters...
+	/**
+	 * 
+	 * @return
+	 */
+	@Basic
+	public static double getMinRadius() {
+		return 10; 
+	}
+// The Mutators...
 	
 }
