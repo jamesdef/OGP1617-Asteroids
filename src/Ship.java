@@ -41,7 +41,7 @@ public class Ship {
 	 * 
 	 */
 // NOG NIET JUIST, Position is geen INT maar een tuple. Ik weet alleen niet hoe je dat precies implementeert.
-	public Ship(int position, int radius, int speed, int orientation){
+	public Ship(double position, double radius, double speed, double orientation){
 	
 	}
 	
