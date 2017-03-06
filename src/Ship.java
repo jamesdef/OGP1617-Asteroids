@@ -1,3 +1,11 @@
+/**
+ * A class for dealing with ships that have a certain position, radius, speed and orientation.
+ * 
+ * 		-	Work In Progress
+ * 
+ * @author James Defauw & Michiel De Koninck
+ *
+ */
 
 public class Ship {
 
@@ -15,6 +23,7 @@ public class Ship {
 	 * 
 	 * @param  speed
 	 *         The speed of this vessel.
+	 *         
 	 * @param  orientation
 	 * 		   The orientation of this vessel, i.e., it's direction.
 	 *       
@@ -27,33 +36,37 @@ public class Ship {
 	 * 
 	 * @post   The orientation of the ship will always be a value between 0 and 2PI.
 	 * 
-	 * 
+// NOG GEEN FORMELE IMPLEMENTATIE VAN VOORGAANDE POST-condities 
 	 *      
-	 * @post   If the given hours are in the range 0..23, the hours of
-	 *         this new digital clock are equal to the given hours.
-	 *         If the given hours exceed 23, the hours for this new
-	 *         digital clock are equal to the given hours modulo 24.
-	 *         If the given hours are negative, the hours for  this new
-	 *         digital clock are equal to 0.
-	 *       | if ( (hours >= 0) && (hours <= 23) )
-	 *       |   then new.getHours() == hours
-	 *       | else if (hours > 23)
-	 *       |   then new.getHours() == (hours % 24)
-	 *       | else if (hours < 0)
-	 *       |   then new.getHours() == 0
-	 * @effect The given minutes are set as the minutes of this
-	 *         new digital clock.
-	 *       | setMinutes(minutes)
-	 * @note   We cannot use the mutator setHours(int) in the specification,
-	 *         because the range for the hours of this new digital clock is
-	 *         0..0 upon entry to this constructor. We could introduce a more
-	 *         general method setHours(hours,minHours,maxHours) to avoid
-	 *         a duplication of the specification of setting the hours.
-	 *         We prefer not to do so to keep things simple at this
-	 *         stage of the course.
+	 * 
 	 */
+// NOG NIET JUIST, Position is geen INT maar een tuple. Ik weet alleen niet hoe je dat precies implementeert.
+	public Ship(int position, int radius, int speed, int orientation){
+	
+	}
+	
+
+	
 	public Ship(){
 		
 	}
 
+// The inspectors 
+	public getSpeed(){
+		
+	}
+	
+	public getPosition(){
+		
+	}	
+	public getOrientation(){
+		
+		
+	}	
+	public getRadius(){
+		
+	}
+	
+// The setters...
+	
 }

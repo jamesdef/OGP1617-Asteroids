@@ -3,9 +3,6 @@ package asteroids.part1;
 import asteroids.part1.facade.IFacade;
 import asteroids.part1.internal.AsteroidsFrame;
 
-//hallo michiel
-//hallo James, dit is echt epic
-
 public class Part1 {
 	public static void main(String[] args) {
 		boolean tryFullscreen = false;
