@@ -39,7 +39,7 @@ public class Ship {
 	 * 		  
 	 * @post   The lowest possible radius is 10 km. (This minimum can easily be changed).
 	 * 
-	 * @post   The hightest possible speed is 300000 (km/s) it can never exceed this.
+	 * @post   The highest possible speed is 300000 (km/s) it can never exceed this.
 	 * 		   digital clock is equal to 23.
 	 * 
 	 * @post   The orientation of the ship will always be a value between 0(Right) and 2PI(Right).
@@ -68,7 +68,7 @@ public class Ship {
 	 * 			yPosition = 0
 	 * 			It's radius will be set to it's lowest possible value.
 	 * 			It's velocity will be set to 0. The ship will not be moving.
-	 * 			It's orientation is to the right, i.e.: it has an angle of 0° to the x-axis.
+	 * 			It's orientation is to the right, i.e.: it has an angle of 0ï¿½ to the x-axis.
 	 * 
 	 * 			
 	 */
@@ -102,6 +102,31 @@ public class Ship {
 	public static double getMinRadius() {
 		return 10; 
 	}
+	
+	//thrust is total programming
+	public void thrust(double acceleration){
+		double xVelocity = 0 + Math.cos(a)
+
+	      System.out.format("The value of pi is %.4f%n", Math.PI);
+	      System.out.format("The sine of %.1f degrees is %.4f%n", degrees, Math.sin(radians));
+	}
+	
+	/**
+	 * 
+	 * @param duration
+	 * 			The duration of the movement
+	 * @post The duration is non-negative 
+	 */
+	
+	public void move( double duration){
+		
+		
+	}
+	
+	public void turn(double angle){
+		
+	}
 // The Mutators...
+	
 	
 }
