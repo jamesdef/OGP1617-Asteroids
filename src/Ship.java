@@ -105,10 +105,12 @@ public class Ship {
 	
 	//thrust is total programming
 	public void thrust(double acceleration){
-		double xVelocity = 0 + Math.cos(a)
-
-	      System.out.format("The value of pi is %.4f%n", Math.PI);
-	      System.out.format("The sine of %.1f degrees is %.4f%n", degrees, Math.sin(radians));
+		double a = Math.max(0, acceleration);
+		double xVelocity = 0 + a*(Math.cos(this.getOrientation()));
+		double yVelocity = 0 + a*(Math.sin(this.getOrientation()));
+		
+		this.setVelocity(xVelocity, yVelocity);
+		
 	}
 	
 	/**
