@@ -230,6 +230,8 @@ public class Ship {
 		return this.radius;
 	}
 	
+// STEPHEN HUANG: Toch best om geen getMethodes aan te maken voor zulk een simpele dingen. Gewoon variabele maken.
+	
 	/**
 	 * Returns the minimum Radius that a ship needs to have.
 	 * 
