@@ -1,5 +1,3 @@
-import java.util.Set;
-
 import be.kuleuven.cs.som.annotate.*;
 
 /**
@@ -96,7 +94,6 @@ public class Ship {
 	}
 	
 	
-
 	/**
 	 * Initialize this new ship with their parameters (position,speed,radius,orientation) set to their lowest possible Value.
 	 * 
@@ -497,7 +494,7 @@ public class Ship {
 	}
 
 	
-//  COLLISION PREDICTION 
+//  COLLISION PREDICTION  : DEFENSIVE
 	
 	public double getDistanceBetween(Ship ship){
 		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2.0)+ Math.pow((this.getyPosition()-ship.yPosition), 2.0));
@@ -518,6 +515,8 @@ public class Ship {
 	 * 
 	 * @return Returns in how many seconds 2 spacecrafts will collide.
 	 * 		   If they never collide it wil return Double.POSITIVE_INFINITY
+	 * 
+	 * @throws If two ships overlap, this method does not apply.
 	 */
 	public double getTimeToCollision(Ship ship){
 		double sigma = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2.0)+ Math.pow((this.getyPosition()-ship.yPosition), 2.0));
