@@ -274,6 +274,19 @@ public class Ship {
 	private static double Max_Velocity = 300000;
 
 	
+	/**
+	 * @return the x and y coordinate as an array.
+	 * 
+	 */
+	public double[] getPosition(){
+		
+		double[] position = {this.getxPosition(),this.getyPosition()};	
+		return position;
+	
+				
+	}
+	
+	
 // ------------------------------------ SETTERS --------------------------
 	
 	/** DEFENSIVE PROGRAMMING
@@ -529,8 +542,11 @@ public class Ship {
 	
 	public double[] getCollisionPosition(Ship ship){
 		
+		//Using the time to collision, we now compute the position of the collision.
+		//For this we first calculate where the two ships are at, at the time of collision.
+		//Then we calculate where exactly they collide.
 		
-		
+		double 
 		
 		
 	}
