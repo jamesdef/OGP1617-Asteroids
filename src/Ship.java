@@ -546,9 +546,30 @@ public class Ship {
 		//For this we first calculate where the two ships are at, at the time of collision.
 		//Then we calculate where exactly they collide.
 		
-		double 
+		double T = getTimeToCollision(ship);
 		
+		if (T == Double.POSITIVE_INFINITY){
+			return null;
+		}
 		
+		//Where are the ships after time T?
+		
+		double[] FirstShipPosition = {this.getxPosition() + this.getxVelocity()*T, this.getyPosition() + this.getyVelocity()*T};
+		double[] SecondShipPosition = {ship.getxPosition() + ship.getxVelocity()*T, ship.getyPosition() + ship.getyVelocity()*T};
+		
+		//The position of the first ship, incremented with it's radius (in the right direction = direction to the center of the other ship) gives the answer
+		
+		double[] CenterDistance = {SecondShipPosition[0] - FirstShipPosition[0], SecondShipPosition[1]- FirstShipPosition[1]};
+		
+		double Norm = Math.sqrt(Math.pow(CenterDistance[0],2.0)+ Math.pow(CenterDistance[1],2.0));
+		
+		double[] NormedCenterDistance = {(SecondShipPosition[0] - FirstShipPosition[0])/Norm, (SecondShipPosition[1]- FirstShipPosition[1])/Norm};
+		
+		double[]RadiusWithDirection = {this.getRadius()*NormedCenterDistance[0],this.getRadius()*NormedCenterDistance[1]};
+		
+		double[] CollisionCoordinates = {FirstShipPosition[0]+RadiusWithDirection[0], FirstShipPosition[1]+RadiusWithDirection[1]};
+		
+		return CollisionCoordinates;
 	}
 	
 }
