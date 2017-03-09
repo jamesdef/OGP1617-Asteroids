@@ -1,3 +1,5 @@
+import java.util.Set;
+
 import be.kuleuven.cs.som.annotate.*;
 
 /**
@@ -207,7 +209,7 @@ public class Ship {
 	 */
 	@Basic
 	public double getVelocity(){
-		return Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2));
+		return Math.sqrt(Math.pow(getyVelocity(),2.0)+Math.pow(getxVelocity(),2.0));
 		
 	}
 	
@@ -348,29 +350,25 @@ public class Ship {
 				this.scaleVelocity(xVelocity, yVelocity);
 			}
 			
-		} else {
-			//neg
 		}
 		
-		
-		
-		
-		
-		// For readability, we computed total_velocity seperatly
-		double total_velocity = (Math.sqrt(Math.pow(getyVelocity(),2)+ Math.pow(getxVelocity(),2)));
-		
-		if ((total_velocity >= Min_Velocity) &&
-			(total_velocity <= Max_Velocity))
-					xVelocity = getxVelocity();
-					yVelocity = getyVelocity();
-		if (total_velocity > Max_Velocity)
-					xVelocity = 150000*Math.sqrt(2);
-					yVelocity = 150000*Math.sqrt(2);
-		this.xVelocity = xVelocity;
-		this.yVelocity = yVelocity;
+	} 
+	
+//		// For readability, we computed total_velocity seperatly
+//		double total_velocity = (Math.sqrt(Math.pow(getyVelocity(),2)+ Math.pow(getxVelocity(),2)));
+//		
+//		if ((total_velocity >= Min_Velocity) &&
+//			(total_velocity <= Max_Velocity))
+//					xVelocity = getxVelocity();
+//					yVelocity = getyVelocity();
+//		if (total_velocity > Max_Velocity)
+//					xVelocity = 150000*Math.sqrt(2);
+//					yVelocity = 150000*Math.sqrt(2);
+//		this.xVelocity = xVelocity;
+//		this.yVelocity = yVelocity;
 					
 		
-	}
+	
 	
 	public boolean hasPositiveComponents(double xVelocity, double yVelocity){
 		return (xVelocity >=0) && (xVelocity >=0);
@@ -382,8 +380,8 @@ public class Ship {
 	}
 	
 	public void scaleVelocity(double xVelocity, double yVelocity ){
-		double scaledxVelocity = (xVelocity*this.Max_Velocity)/this.getVelocity();
-		double scaledyVelocity = (yVelocity*this.Max_Velocity)/this.getVelocity();
+		double scaledxVelocity = (xVelocity*Max_Velocity)/this.getVelocity();
+		double scaledyVelocity = (yVelocity*Max_Velocity)/this.getVelocity();
 		
 		this.xVelocity = scaledxVelocity;
 		this.yVelocity = scaledyVelocity;
@@ -446,7 +444,7 @@ public class Ship {
     			
  
     
- //-----------------JAMES----------------------------------------------------------------------
+ //----------------- Moving, turning and accelerating----------------------------------------------------------------------
 	
 	public void thrust(double acceleration){
 		double a = Math.max(0, acceleration);
@@ -486,20 +484,55 @@ public class Ship {
 	}
 
 	
-	
-	
+//  COLLISION PREDICTION 
 	
 	public double getDistanceBetween(Ship ship){
-		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2)+ Math.pow((this.getyPosition()-ship.yPosition), 2));
-		
+		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2.0)+ Math.pow((this.getyPosition()-ship.yPosition), 2.0));
 		return centerDistance - this.getRadius() - ship.radius;
 	}
 	
 	public boolean overlap(Ship ship){
-		
-		return (this.getDistanceBetween(ship) < 0);
-		
+		return (this.getDistanceBetween(ship) < 0);	
 	}
 	
+	
+	/**
+	 * 
+	 * @param ship
+	 * 
+	 * @pre d > 0
+	 * @pre DvDr > 0
+	 * 
+	 * @return Returns in how many seconds 2 spacecrafts will collide.
+	 * 		   If they never collide it wil return Double.POSITIVE_INFINITY
+	 */
+	public double getTimeToCollision(Ship ship){
+		double sigma = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2.0)+ Math.pow((this.getyPosition()-ship.yPosition), 2.0));
+		double[] Dv= {ship.getxVelocity() - this.getxVelocity(), ship.getyVelocity() - this.getyVelocity()};
+		double[] Dr= {ship.getxPosition() - this.getxPosition(), ship.getyPosition() - this.getyPosition()};
+		
+		// Avoided scalair multiplication by implementing this 'fake multiplication' to guarantee easy computing.
+		double DrDr = Math.pow(Dr[0], 2.0)+Math.pow(Dr[1], 2.0);
+		double DvDr = Dv[0]*Dr[0] + Dv[1]*Dr[1];
+		double DvDv = Math.pow(Dv[0], 2.0)+Math.pow(Dv[1], 2.0);
+		
+		double d = Math.pow(DvDr, 2.0) - (DvDv)*(DrDr-Math.pow(sigma, 2.0));
+		
+		if ((d <= 0) || (DvDr >= 0)){
+			return Double.POSITIVE_INFINITY;
+		}
+		
+		else{
+		return - (DvDr + Math.sqrt(d))/(DvDv);}
+	}
+	
+	
+	public double[] getCollisionPosition(Ship ship){
+		
+		
+		
+		
+		
+	}
 	
 }
