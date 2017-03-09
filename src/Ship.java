@@ -108,7 +108,7 @@ public class Ship {
 	 * 			
 	 */
 	public Ship(){
-		this(0.0,0.0,getMinVelocity(),getMaxVelocity(),Ship.getMinRadius(),Minimum_Orientation);
+		this(0.0,0.0,Min_Velocity,Max_Velocity,Min_Radius,Minimum_Orientation);
 	}
 	 
 	/**
@@ -125,13 +125,13 @@ public class Ship {
 	/**
 	 * Variable registering the xVelocity of this Ship.
 	 */
-	private double xVelocity = getMinVelocity();
+	private double xVelocity = Min_Velocity;
 	
 	
 	/**
 	 * Variable registering the yVelocity of this Ship.
 	 */
-	private double yVelocity = getMinVelocity();
+	private double yVelocity = Min_Velocity;
 	
 	/**
 	 * Variable registering the orientation of this Ship.
@@ -141,7 +141,7 @@ public class Ship {
 	/**
 	 * Variable registering the radius of this Ship.
 	 */
-	private double radius = getMinRadius();
+	private double radius = Min_Radius;
 	
 	/**
 	 * Variable registering the maximum allowed orientation
@@ -232,40 +232,47 @@ public class Ship {
 	
 // STEPHEN HUANG: Toch best om geen getMethodes aan te maken voor zulk een simpele dingen. Gewoon variabele maken.
 	
-	/**
-	 * Returns the minimum Radius that a ship needs to have.
-	 * 
-	 * @return The lowest possible radius for each ship must be non-negative.
-	 * 			| result >= 0
-	 * 
-	 * @note We have chosen to make this a static method,
-	 * 		 because all ships must have this boundary.
-	 * 		 
-	 */
-	@Basic
-	public static  double getMinRadius() {
-		return 10; 
-	}
+//	/**
+//	 * Returns the minimum Radius that a ship needs to have.
+//	 * 
+//	 * @return The lowest possible radius for each ship must be non-negative.
+//	 * 			| result >= 0
+//	 * 
+//	 * @note We have chosen to make this a static method,
+//	 * 		 because all ships must have this boundary.
+//	 * 		 
+//	 */
+//	@Basic
+//	public static  double getMinRadius() {
+//		return 10; 
+//	}
+//	
+//	/**
+//	 * Returns the minimum velocity that a ship can have.
+//	 * @return the minimum velocity that a ship can have.
+//	 */
+//	@Basic
+//	public static double getMinVelocity() {
+//		return 0;
+//	}
+//	
+//	/**
+//	 * Returns the maximum velocity that a ship can have.
+//	 * @return the maximum velocity that a ship can have.
+//	 */
+//	@Basic
+//	public static double getMaxVelocity() {
+//		return 300000;
+//	}
 	
-	/**
-	 * Returns the minimum velocity that a ship can have.
-	 * @return the minimum velocity that a ship can have.
-	 */
-	@Basic
-	public static double getMinVelocity() {
-		return 0;
-	}
+	private static double Min_Radius = 10;
 	
-	/**
-	 * Returns the maximum velocity that a ship can have.
-	 * @return the maximum velocity that a ship can have.
-	 */
-	@Basic
-	public static double getMaxVelocity() {
-		return 300000;
-	}
+	private static double Min_Velocity = 0;
 	
+	private static double Max_Velocity = 300000;
+
 	
+// ------------------------------------ SETTERS --------------------------
 	
 	/** DEFENSIVE PROGRAMMING
 	 * 
@@ -330,19 +337,56 @@ public class Ship {
 	 * 		 Everything that is not changed within the method is left  untouched.
 	 */
 	public void setVelocity(double xVelocity, double yVelocity){
+		
+		
+		if(this.hasPositiveComponents(xVelocity, yVelocity)){
+			
+			this.xVelocity = xVelocity;
+			this.yVelocity = yVelocity;
+			
+			if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
+				this.scaleVelocity(xVelocity, yVelocity);
+			}
+			
+		} else {
+			//neg
+		}
+		
+		
+		
+		
+		
 		// For readability, we computed total_velocity seperatly
 		double total_velocity = (Math.sqrt(Math.pow(getyVelocity(),2)+ Math.pow(getxVelocity(),2)));
 		
-		if ((total_velocity >= getMinVelocity()) &&
-			(total_velocity <= getMaxVelocity()))
+		if ((total_velocity >= Min_Velocity) &&
+			(total_velocity <= Max_Velocity))
 					xVelocity = getxVelocity();
 					yVelocity = getyVelocity();
-		if (total_velocity > getMaxVelocity())
+		if (total_velocity > Max_Velocity)
 					xVelocity = 150000*Math.sqrt(2);
 					yVelocity = 150000*Math.sqrt(2);
 		this.xVelocity = xVelocity;
 		this.yVelocity = yVelocity;
 					
+		
+	}
+	
+	public boolean hasPositiveComponents(double xVelocity, double yVelocity){
+		return (xVelocity >=0) && (xVelocity >=0);
+	}
+	
+	public boolean exceedsMaxVelocity(double xVelocity, double yVelocity){
+		return (Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2)) > Max_Velocity);
+		
+	}
+	
+	public void scaleVelocity(double xVelocity, double yVelocity ){
+		double scaledxVelocity = (xVelocity*this.Max_Velocity)/this.getVelocity();
+		double scaledyVelocity = (yVelocity*this.Max_Velocity)/this.getVelocity();
+		
+		this.xVelocity = scaledxVelocity;
+		this.yVelocity = scaledyVelocity;
 		
 	}
 	
@@ -366,7 +410,7 @@ public class Ship {
 	}
 	
 	public static boolean isValidRadius(double radius){
-		return radius >= Ship.getMinRadius();
+		return radius >= Min_Radius;
 	}
 	
 	
@@ -404,12 +448,14 @@ public class Ship {
     
  //-----------------JAMES----------------------------------------------------------------------
 	
-    //thrust is total programming
 	public void thrust(double acceleration){
 		double a = Math.max(0, acceleration);
 		double xVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()));
 		double yVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()));
+		
+		
 		this.setVelocity(xVelocity, yVelocity);
+		
 		
 	}
 	
