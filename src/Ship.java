@@ -433,7 +433,7 @@ public class Ship {
     /**
      * 
      * @param orientations
-     * 		  The orientation of which we need to check wether it is legal.
+     * 		  The orientation of which we need to check whether it is legal.
      * 
      * @return True if and only if the given orientation is within the boundaries opposed upon orientation.
      * 		   |result == (Minimum_Orientation <= orientation) && (orientation < Maximum_Orientation)
@@ -462,7 +462,7 @@ public class Ship {
 	/** Defensive programming
 	 * 
 	 * @param duration
-	 * 			The duration of the movement
+	 * 			The duration of the movement, given in seconds
 	 * @pre The duration is non-negative 
 	 */
 	public void move(double duration){
@@ -485,6 +485,21 @@ public class Ship {
 		this.setOrientation(newAngle);
 	}
 
+	
+	
+	
+	
+	public double getDistanceBetween(Ship ship){
+		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2)+ Math.pow((this.getyPosition()-ship.yPosition), 2));
+		
+		return centerDistance - this.getRadius() - ship.radius;
+	}
+	
+	public boolean overlap(Ship ship){
+		
+		return (this.getDistanceBetween(ship) < 0);
+		
+	}
 	
 	
 }
