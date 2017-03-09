@@ -12,10 +12,10 @@ import be.kuleuven.cs.som.annotate.*;
  * @invar	The orientation of the ship must be a valid value.
  * 			|isValidOrientation(getOrientation())
  * 
- * @Invar 	The radius of each ship must be a valid value.
+ * @invar 	The radius of each ship must be a valid value.
  * 			|isValidRadius(getRadius())
  * 
- * @Invar   The coordinates of a ship have to be finit numbers.
+ * @invar   The coordinates of a ship have to be finit numbers.
  * 			|isValidCoordinate(getxPosition);
  * 			|isValidCoordinate(getyPosition);       
  *       
@@ -407,27 +407,36 @@ public class Ship {
     //thrust is total programming
 	public void thrust(double acceleration){
 		double a = Math.max(0, acceleration);
-		double xVelocity = 0 + a*(Math.cos(this.getOrientation()));
-		double yVelocity = 0 + a*(Math.sin(this.getOrientation()));
-		
+		double xVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()));
+		double yVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()));
 		this.setVelocity(xVelocity, yVelocity);
 		
 	}
 	
-	/**
+	/** Defensive programming
 	 * 
 	 * @param duration
 	 * 			The duration of the movement
-	 * @post The duration is non-negative 
+	 * @pre The duration is non-negative 
 	 */
-	
 	public void move(double duration){
 		
+		double newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
+		double newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
+		
+		this.setPosition(newxPosition, newyPosition);
 		
 	}
 	
+	
+	/** Nominal programming
+	 * 
+	 * 
+	 * @param angle
+	 */
 	public void turn(double angle){
-		
+		double newAngle = this.getOrientation() + angle;
+		this.setOrientation(newAngle);
 	}
 
 	
