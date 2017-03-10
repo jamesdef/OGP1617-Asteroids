@@ -264,6 +264,8 @@ public class Ship {
 //		return 300000;
 //	}
 	
+	//final maken 
+	
 	private static double Min_Radius = 10;
 	
 	private static double Min_Velocity = 0;
@@ -363,6 +365,8 @@ public class Ship {
 		}
 		
 	} 
+	
+	
 	
 //		// For readability, we computed total_velocity seperatly
 //		double total_velocity = (Math.sqrt(Math.pow(getyVelocity(),2)+ Math.pow(getxVelocity(),2)));
@@ -569,6 +573,10 @@ public class Ship {
 		double[] CollisionCoordinates = {FirstShipPosition[0]+RadiusWithDirection[0], FirstShipPosition[1]+RadiusWithDirection[1]};
 		
 		return CollisionCoordinates;
-	}
+		
+		}
+		// TIP: Maak een klasse position aan met argumenten x en y zodat je er zeker van bent dat een position altijd 2ledig is.
+		// In deze klasse zou je dan bv een methode kunnen maken voor de optelling van een position en een vector voor het maken van een nieuwe position.
+		
 	
 }

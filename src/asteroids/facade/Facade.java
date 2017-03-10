@@ -5,6 +5,10 @@ import asteroids.part1.facade.IFacade;
 import asteroids.util.ModelException;
 
 public class Facade implements IFacade {
+	
+	//Je moet de ModelException enkel gebruiken indien de methode waarop ze van toepassing is defensief werd geprogrammeerd.
+	//In dat geval ziet je body er bv als volgt uit: try{....Body waarin je de methode van je klasse oproept...} catch{ throw argumentexception}
+	// In try probeer je die methode uit je klasse te doorlopen, gooit die methode een exception, dan vang je die dus hier op met catch.
 
 	@Override
 	public Ship createShip() throws ModelException {
