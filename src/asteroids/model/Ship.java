@@ -225,6 +225,11 @@ public class Ship {
 		
 	}
 	
+	public double[] getVelocity(){
+		double[] Velocity = {getxVelocity(),getyVelocity()};
+		return Velocity;
+	}
+	
 	/**
 	 * Return the total velocity of this ship.
 	 * @return the total velocity of this ship.
@@ -234,7 +239,7 @@ public class Ship {
 	 * 		-> sqrt(Vx^2+Vy^2)
 	 */
 	@Basic
-	public double getVelocity(){
+	public double getTotalVelocity(){
 		return Math.sqrt(Math.pow(getyVelocity(),2.0)+Math.pow(getxVelocity(),2.0));	
 	}
 	
@@ -289,6 +294,10 @@ public class Ship {
 	 */
 	public void setPosition(double xPosition, double yPosition) 
 			throws IllegalPositionException{
+//		if(xPosition == null){
+//			throw new NullPointerException(xPosition);
+//		}
+//		yPosition is null
 		if (!isValidPosition(xPosition,yPosition))
 			throw new IllegalPositionException(xPosition,yPosition);
 		this.xPosition = xPosition;
@@ -328,7 +337,7 @@ public class Ship {
 	 * 
 	 * @post If the given velocity has negative components, nothing is changed.
 	 * 		|if !hasPositiveComponents(xVelocity, yVelocity)
-	 * 		|    then new.getVelocity() = this.getVelocity()
+	 * 		|    then new.getTotalVelocity() = this.getTotalVelocity()
 	 * 
 	 * @note The last postcondition is not really necessary.
 	 * 		 Everything that is not changed within the method is left  untouched.
@@ -396,12 +405,12 @@ public class Ship {
 	 * 		 
 	 * @post The velocities are changed to their scaled values. 
 	 * 		 The velocity no longer exceeds the limit.
-	 * 		| new.xVelocity = (xVelocity*Max_Velocity)/this.getVelocity();
-	 *      | new.yVelocity = (yVelocity*Max_Velocity)/this.getVelocity();	     
+	 * 		| new.xVelocity = (xVelocity*Max_Velocity)/this.getTotalVelocity();
+	 *      | new.yVelocity = (yVelocity*Max_Velocity)/this.getTotalVelocity();	     
 	 */
 	public void scaleVelocity(double xVelocity, double yVelocity ){
-		double scaledxVelocity = (xVelocity*Max_Velocity)/this.getVelocity();
-		double scaledyVelocity = (yVelocity*Max_Velocity)/this.getVelocity();
+		double scaledxVelocity = (xVelocity*Max_Velocity)/this.getTotalVelocity();
+		double scaledyVelocity = (yVelocity*Max_Velocity)/this.getTotalVelocity();
 		
 		this.xVelocity = scaledxVelocity;
 		this.yVelocity = scaledyVelocity;
@@ -426,7 +435,7 @@ public class Ship {
 		this.radius = radius;
 	}
 	
-	/** 
+	/** Checks whether the given radius has a valid value.
 	 * 
 	 * @param  radius
 	 * 		   The radius of the ship.
@@ -441,7 +450,7 @@ public class Ship {
 	
 	
 	
-	/** Nominal Programming
+	/** Sets the orientation to the given angle, if this is a valid angle.
 	 * 
 	 * @param orientation
 	 * 		  The new, given orientation of the ship.
@@ -456,7 +465,7 @@ public class Ship {
 	}
 	
         
-    /**
+    /** Check whether the given orientaton is a valid value.
      * 
      * @param orientations
      * 		  The orientation of which we need to check whether it is legal.
@@ -545,26 +554,25 @@ public class Ship {
 		return duration >= 0;	
 	}
 	
-	/** Nominal programming
-	 * Adjust the orientation of the ship by a given angle
+	/** Adjust the orientation of the ship by a given angle
 	 * 
 	 * @param angle
 	 * 		  The angle to add to the orientation of the ship
 	 * 
 	 * @post  The scaledangle is calculated by a seperate method
-	 * 		  | scaleAngle = scaleAngle(this.getOrientation() + angle)
+	 * 		  | scaledAngle = scaleAngle(this.getOrientation() + angle)
 	 * 
 	 * @post   The new orientation is equal to the calculated scaled angle.
-	 * 		  |new.getOrientation()== scaledAngle
+	 * 		  |new.getOrientation() == scaledAngle
 	 * 
 	 * @effect The given angle is first added to the orientation and then scaled.
 	 * 		   The new orientation is then asserted to be within 0-2PI range in the setOrientation() method.
-	 * 
+	 * 		   |this.setOrientation(scaledAngle);
 	 */
 	public void turn(double angle){
 		double newAngle = this.getOrientation() + angle;
-		double scaledAngle = scaleangle(newAngle);
-		this.setOrientation(scaledAngle);
+		double ScaledAngle = scaleangle(newAngle);
+		this.setOrientation(ScaledAngle);
 	}
 	
 	/** Scales the given angle so that it is within 0<= angle < 2*PI
@@ -572,57 +580,79 @@ public class Ship {
 	 * @param angle
 	 * 		  The angle to scale 
 	 * @return returns the angle scaled to fit the boundaries of the orientation.
+	 *         | result = angle % Max_Orientation;
 	 */
 	public double scaleangle(double angle){
-		double scaledAngle = angle % Max_Orientation;
-		return scaledAngle;
+		double ScaledAngle = angle % Max_Orientation;
+		return ScaledAngle;
 	}
 
 	
 //  COLLISION PREDICTION  : DEFENSIVE
 	
-	/**
+	/** Return the distance betwheen two ships.
 	 * 
-	 * @param ship
-	 * @return
+	 * @param other
+	 *        The other ship of which we want to know the distance to this ship.
+	 * 
+	 * @return The distance between the two ships. Computed as below:
+	 * 		   | centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+ Math.pow((this.getyPosition()-other.yPosition), 2.0));
+	 * 		   | result  == centerDistance - this.getRadius() - other.radius;
 	 */
-	public double getDistanceBetween(Ship ship){
-		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2.0)+ Math.pow((this.getyPosition()-ship.yPosition), 2.0));
-		return centerDistance - this.getRadius() - ship.radius;
+	public double getDistanceBetween(Ship other){
+		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+ Math.pow((this.getyPosition()-other.yPosition), 2.0));
+		return centerDistance - this.getRadius() - other.radius;
 	}
 	
 	
 	/**Check whether two ships overlap.
 	 * 
-	 * @param ship
-	 * @return
+	 * @param other
+	 * 		  The other ship of which we want to check if it overlaps with this ship.
+	 * @return True if and only if the distance between the two ships is less than zero.
+	 * 		   | getDistanceBetween(other) < 0
 	 */
-	public boolean overlap(Ship ship){
-		return (this.getDistanceBetween(ship) < 0);	
+	public boolean overlap(Ship other){
+		return (this.getDistanceBetween(other) < 0);	
 	}
 	
 	
-	/**
+	/** Calculates the time to the point where the two given ships collide.
+	 * 	If they never collide, it returns positive infinity.
 	 * 
-	 * @param ship
+	 * @param other
+	 * 		  The other ship with which this ship might collide
 	 * 
-	 * @pre d > 0
-	 * @pre DvDr > 0
+	 * @post 
+	 * 		  The returned time will be positive (or zero if the ships already 'touch') at all times.
+	 * 		   | getTimeToCollision >= 0
 	 * 
 	 * @return Returns in how many seconds 2 spacecrafts will collide.
 	 * 		   If they never collide it wil return Double.POSITIVE_INFINITY
-	 * 
-	 * @throws If two ships overlap, this method does not apply.
+	 * 		   |if ((d <= 0) || (DvDr >= 0))
+	 *		   |     then getTimeToCollision(this,other) = Double.POSITIVE_INFINITY;
+	 *		   
+ 	 *		   Otherwise it wil first compute sigma: the distance between 
+	 *		   the two centres of the ships at the moment of collision.
+	 *		   For this we compute the position at which they are at after travelling a certain time T.
+	 *		   By substituting these expressions for the coordinates into the sigma equation, we get a quadratic equation.
+	 *		   By solving this we get a certain expression for T. 
+	 *		   Finally calculating this expression(which is done in the body below) asks for a lot of scalar products.
+	 *		   To simplify this, the scalar products are calculated seperatly.
+	 *		   
+	 *	   	
+	 * @throws IllegalCollisionException
+	 * 		   If two ships overlap, this method does not apply.
 	 */
-	public double getTimeToCollision(Ship ship){
-		if (overlap(ship)){
-			throw IllegalOverlapException(ship);
+	public double getTimeToCollision(Ship other) throws IllegalCollisionException {
+		if (overlap(other)){
+			throw new IllegalCollisionException(this,other);
 		}
-		double sigma = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2.0)+ Math.pow((this.getyPosition()-ship.yPosition), 2.0));
-		double[] Dv= {ship.getxVelocity() - this.getxVelocity(), ship.getyVelocity() - this.getyVelocity()};
-		double[] Dr= {ship.getxPosition() - this.getxPosition(), ship.getyPosition() - this.getyPosition()};
+		double sigma = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+ Math.pow((this.getyPosition()-other.yPosition), 2.0));
+		double[] Dv= {other.getxVelocity() - this.getxVelocity(), other.getyVelocity() - this.getyVelocity()};
+		double[] Dr= {other.getxPosition() - this.getxPosition(), other.getyPosition() - this.getyPosition()};
 		
-		// Avoided scalair multiplication by implementing this 'fake multiplication' to guarantee easy computing.
+		// Avoided scalair product by implementing this 'fake multiplication' to guarantee easy computing.
 		double DrDr = Math.pow(Dr[0], 2.0)+Math.pow(Dr[1], 2.0);
 		double DvDr = Dv[0]*Dr[0] + Dv[1]*Dr[1];
 		double DvDv = Math.pow(Dv[0], 2.0)+Math.pow(Dv[1], 2.0);
@@ -637,14 +667,39 @@ public class Ship {
 		return - (DvDr + Math.sqrt(d))/(DvDv);}
 	}
 	
-	
-	public double[] getCollisionPosition(Ship ship){
+	/** Returns the position on which two ships collide, if they ever collide. Otherwise it returns null.
+	 * 
+	 * @param other
+	 * 		  The other ship with which this ship might collide.
+	 * 
+	 * @return The Position (an array) on which two ships collide (if they ever collide).
+	 * 		   Computation starts from initial positions and calculates the difference in positions at the time of collision.
+	 * 		   This information is used to return the Collision coordinates.
+	 * 		   Null if they never collide.
+	 * 		   |if (getTimeToCollision(other) == Double.POSITIVE_INFINITY){
+	 *					then return null;
+	 *         |else:
+	 *		    |double[] FirstShipPosition = {this.getxPosition() + this.getxVelocity()*T, this.getyPosition() + this.getyVelocity()*T};
+	 *			|double[] SecondShipPosition = {other.getxPosition() + other.getxVelocity()*T, other.getyPosition() + other.getyVelocity()*T};
+	 *		    |double[] CenterDistance = {SecondShipPosition[0] - FirstShipPosition[0], SecondShipPosition[1]- FirstShipPosition[1]};
+	 *			|double Norm = Math.sqrt(Math.pow(CenterDistance[0],2.0)+ Math.pow(CenterDistance[1],2.0));
+	 *			|double[] NormedCenterDistance = {(SecondShipPosition[0] - FirstShipPosition[0])/Norm, (SecondShipPosition[1]- FirstShipPosition[1])/Norm};
+	 *			|double[]RadiusWithDirection = {this.getRadius()*NormedCenterDistance[0],this.getRadius()*NormedCenterDistance[1]};
+	 *			|double[] CollisionCoordinates = {FirstShipPosition[0]+RadiusWithDirection[0], FirstShipPosition[1]+RadiusWithDirection[1]};
+	 *			|getCollisionPosition = CollisionCoordinates
+	 *		
+	 * 
+	 * @throws IllegalCollisionException
+	 * 		   Created within getTimeToCollision(other)
+	 * 		   We cannot calculate the collision position of two overlapping ships.
+	 */
+	public double[] getCollisionPosition(Ship other) throws IllegalCollisionException{
 		
 		//Using the time to collision, we now compute the position of the collision.
-		//For this we first calculate where the two ships are at, at the time of collision.
+		//For this we first calculate where the two others are at, at the time of collision.
 		//Then we calculate where exactly they collide.
 		
-		double T = getTimeToCollision(ship);
+		double T = getTimeToCollision(other);
 		
 		if (T == Double.POSITIVE_INFINITY){
 			return null;
@@ -653,25 +708,16 @@ public class Ship {
 		//Where are the ships after time T?
 		
 		double[] FirstShipPosition = {this.getxPosition() + this.getxVelocity()*T, this.getyPosition() + this.getyVelocity()*T};
-		double[] SecondShipPosition = {ship.getxPosition() + ship.getxVelocity()*T, ship.getyPosition() + ship.getyVelocity()*T};
+		double[] SecondShipPosition = {other.getxPosition() + other.getxVelocity()*T, other.getyPosition() + other.getyVelocity()*T};
 		
 		//The position of the first ship, incremented with it's radius (in the right direction = direction to the center of the other ship) gives the answer
 		
 		double[] CenterDistance = {SecondShipPosition[0] - FirstShipPosition[0], SecondShipPosition[1]- FirstShipPosition[1]};
-		
 		double Norm = Math.sqrt(Math.pow(CenterDistance[0],2.0)+ Math.pow(CenterDistance[1],2.0));
-		
 		double[] NormedCenterDistance = {(SecondShipPosition[0] - FirstShipPosition[0])/Norm, (SecondShipPosition[1]- FirstShipPosition[1])/Norm};
-		
 		double[]RadiusWithDirection = {this.getRadius()*NormedCenterDistance[0],this.getRadius()*NormedCenterDistance[1]};
-		
 		double[] CollisionCoordinates = {FirstShipPosition[0]+RadiusWithDirection[0], FirstShipPosition[1]+RadiusWithDirection[1]};
 		
 		return CollisionCoordinates;
-		
-		}
-		// TIP: Maak een klasse position aan met argumenten x en y zodat je er zeker van bent dat een position altijd 2ledig is.
-		// In deze klasse zou je dan bv een methode kunnen maken voor de optelling van een position en een vector voor het maken van een nieuwe position.
-		
-	
+		}	
 }

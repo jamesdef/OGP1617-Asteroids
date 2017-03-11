@@ -14,17 +14,12 @@ public class Facade implements IFacade {
 	@Override
 	public Ship createShip(){
 		// TODO Auto-generated method stub
-		Ship ship = new Ship();
 		return null;
 	}
 
 	@Override
 	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation)
 			throws ModelException {
-		
-		if(negatieve snelhied){
-			throw new ModelException();
-		}
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -32,19 +27,19 @@ public class Facade implements IFacade {
 	@Override
 	public double[] getShipPosition(Ship ship) throws ModelException {
 		// TODO Auto-generated method stub
-		Ship.getPosition()
+		return ship.getPosition();
 	}
 
 	@Override
 	public double[] getShipVelocity(Ship ship) throws ModelException {
 		// TODO Auto-generated method stub
-		
+		return ship.getVelocity();
 	}
 
 	@Override
 	public double getShipRadius(Ship ship) throws ModelException {
 		// TODO Auto-generated method stub
-		return 0;
+		return ship.getRadius();
 	}
 
 	@Override
@@ -68,7 +63,6 @@ public class Facade implements IFacade {
 	@Override
 	public void turn(Ship ship, double angle) throws ModelException {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
