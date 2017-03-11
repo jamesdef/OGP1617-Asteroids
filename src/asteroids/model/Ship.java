@@ -57,7 +57,14 @@ public class Ship {
 	 * 		   Expressed in radians.    
 	 * 
 	 * @throws IllegalPositionException 
-	 * @throws IllegalRadiusException 
+	 * 		   Handled within setPosition()
+	 * 		   This position is not valid
+	 * 		   |!isValidPosition(xPosition,yPosition)
+	 * 
+	 * @throws IllegalRadiusException
+	 * 		   Handled within setRadius() 
+	 * 		   This radius is not valid.
+	 * 		   |!isValidRadius(radius)
 	 * 
 	 * @effect The given parameters are set as the properties of the new ship.
 	 * 		   |setPosition(xPosition,yPosition);
@@ -83,7 +90,14 @@ public class Ship {
 	/**
 	 * Initialize this new ship with their parameters (position,speed,radius,orientation) set to their lowest possible values.
 	 * @throws IllegalPositionException 
-	 * @throws IllegalRadiusException 
+	 * 		   Handled within setPosition()
+	 * 		   This position is not valid
+	 * 		   |!isValidPosition(xPosition,yPosition)
+	 * 
+	 * @throws IllegalRadiusException
+	 * 		   Handled within setRadius() 
+	 * 		   This radius is not valid.
+	 * 		   |!isValidRadius(radius)
 	 * 
 	 * @effect 	This new ship is initialized in the center of the grid: (0,0)
 	 * 			It's radius will be set to it's lowest possible value.
@@ -95,11 +109,12 @@ public class Ship {
 	 * 			|this.getyVelocity = Max_Velocity
 	 * 			|this.getOrientation = Min_Orientation
 	 * 			|this.getRadius = Min_Radius
-	 * i.e. :   |this(0.0,0.0,Min_Velocity,Max_Velocity,Min_Radius,Minimum_Orientation);
-	 * 			
+	 * i.e. :   |this(0.0,0.0,Min_Velocity,Max_Velocity,Min_Radius,Min_Orientation);
+	 * 
+	 * @note We know that the exceptions can never be thorwn in this default case, but JAVA makes us throw them anyway.
 	 */
 	public Ship() throws IllegalPositionException, IllegalRadiusException{
-		this(0.0,0.0,Min_Velocity,Max_Velocity,Min_Radius,Minimum_Orientation);
+		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation);
 	}
 	 
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) ----------------------------------- 
@@ -140,18 +155,18 @@ public class Ship {
 	/**
 	 * Variable registering the orientation of this Ship.
 	 */
-	private double orientation = Minimum_Orientation;
+	private double orientation = Min_Orientation;
 	
 	/**
 	 * Variable registering the minimum allowed orientation
 	 */
-	private static final double Minimum_Orientation = 0.0;
+	private static final double Min_Orientation = 0.0;
 	
 	
 	/**
 	 * Variable registering the maximum allowed orientation
 	 */
-	private static final double Maximum_Orientation = 2.0*Math.PI;
+	private static final double Max_Orientation = 2.0*Math.PI;
 	
 	
 	/**
@@ -447,19 +462,18 @@ public class Ship {
      * 		  The orientation of which we need to check whether it is legal.
      * 
      * @return True if and only if the given orientation is within the boundaries opposed upon orientation.
-     * 		   |result == (Minimum_Orientation <= orientation) && (orientation < Maximum_Orientation)
+     * 		   |result == (Min_Orientation <= orientation) && (orientation < Max_Orientation)
      * 
      */
     public static boolean isValidOrientation(double orientation){
-    	return (Minimum_Orientation <= orientation) && (orientation <= Maximum_Orientation);	
+    	return (Min_Orientation <= orientation) && (orientation <= Max_Orientation);	
     }
     	
-    			
- 
+    		
     
  //----------------- Moving, turning and accelerating----------------------------------------------------------------------
     
-	/** Total Programming
+	/** Raises the velocity of the ship based on a certain, given acceleration and the ship's orientation.
 	 * 
 	 * @param acceleration
 	 * 
@@ -470,7 +484,7 @@ public class Ship {
 	 * 	     | 		then new.getyVelocity() = getyVelocity()
 	 * 
 	 * @post if the given acceleration is greater than zero, the new velocities
-	 * 		 are computed as follows:
+	 * 		 are computed according to the given acceleration and the ship's orientaton.
 	 * 		 |NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()));
 		     |NewyVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()));
 		
@@ -489,17 +503,30 @@ public class Ship {
 		this.setVelocity(NewxVelocity, NewyVelocity);	
 	}
 	
-	/** Defensive programming
+	/** Move the ship, given a certain duration.
 	 * 
 	 * @param duration
 	 * 		  The duration of the movement, given in seconds
 	 * 
-	 * @throws isValidDuration
+	 * @throws IllegalDurationException
+	 * 		   If the duration is not valid, the method throws an exception
+	 * 		 | !isValidDuration(duration)
+	 * 		   
 	 * @throws IllegalPositionException 
+	 * 		   If the position is not valid, the method throws an exception.
+	 * 		   | !isValidPosition(newxPosition, newyPosition)
+	 * 
+	 * @effect The new position of the ship is calculated by adding the duration multiplied with the velocity, 
+	 *         to the positon of the ship.
+	 *         |newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
+	 *	       |newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
+	 *	       |this.setPosition(newxPosition, newyPosition);
 	 * 
 	 */
-	public void move(double duration) throws IllegalPositionException{
-		
+	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
+		if (!isValidDuration(duration)){
+			throw new IllegalDurationException(duration);
+		}
 		double newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
 		double newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
 		
@@ -507,28 +534,69 @@ public class Ship {
 		
 	}
 	
-	
+	/** Check whether the given duration is legal.
+	 * 
+	 * @param duration
+	 * 		  The duration of the specific movement of the ship
+	 * @return true if the duration is non-negative
+	 * 		   | return duration >= 0
+	 */			
+	public boolean isValidDuration(double duration){
+		return duration >= 0;	
+	}
 	
 	/** Nominal programming
-	 * 
+	 * Adjust the orientation of the ship by a given angle
 	 * 
 	 * @param angle
+	 * 		  The angle to add to the orientation of the ship
 	 * 
-	 * @pre
+	 * @post  The scaledangle is calculated by a seperate method
+	 * 		  | scaleAngle = scaleAngle(this.getOrientation() + angle)
+	 * 
+	 * @post   The new orientation is equal to the calculated scaled angle.
+	 * 		  |new.getOrientation()== scaledAngle
+	 * 
+	 * @effect The given angle is first added to the orientation and then scaled.
+	 * 		   The new orientation is then asserted to be within 0-2PI range in the setOrientation() method.
+	 * 
 	 */
 	public void turn(double angle){
 		double newAngle = this.getOrientation() + angle;
-		this.setOrientation(newAngle);
+		double scaledAngle = scaleangle(newAngle);
+		this.setOrientation(scaledAngle);
+	}
+	
+	/** Scales the given angle so that it is within 0<= angle < 2*PI
+	 * 
+	 * @param angle
+	 * 		  The angle to scale 
+	 * @return returns the angle scaled to fit the boundaries of the orientation.
+	 */
+	public double scaleangle(double angle){
+		double scaledAngle = angle % Max_Orientation;
+		return scaledAngle;
 	}
 
 	
 //  COLLISION PREDICTION  : DEFENSIVE
 	
+	/**
+	 * 
+	 * @param ship
+	 * @return
+	 */
 	public double getDistanceBetween(Ship ship){
 		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2.0)+ Math.pow((this.getyPosition()-ship.yPosition), 2.0));
 		return centerDistance - this.getRadius() - ship.radius;
 	}
 	
+	
+	/**Check whether two ships overlap.
+	 * 
+	 * @param ship
+	 * @return
+	 */
 	public boolean overlap(Ship ship){
 		return (this.getDistanceBetween(ship) < 0);	
 	}
@@ -547,6 +615,9 @@ public class Ship {
 	 * @throws If two ships overlap, this method does not apply.
 	 */
 	public double getTimeToCollision(Ship ship){
+		if (overlap(ship)){
+			throw IllegalOverlapException(ship);
+		}
 		double sigma = Math.sqrt(Math.pow((this.getxPosition()-ship.xPosition), 2.0)+ Math.pow((this.getyPosition()-ship.yPosition), 2.0));
 		double[] Dv= {ship.getxVelocity() - this.getxVelocity(), ship.getyVelocity() - this.getyVelocity()};
 		double[] Dr= {ship.getxPosition() - this.getxPosition(), ship.getyPosition() - this.getyPosition()};

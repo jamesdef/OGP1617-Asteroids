@@ -13,7 +13,7 @@ public class Facade implements IFacade {
 	@Override
 	public Ship createShip() throws ModelException {
 		// TODO Auto-generated method stub
-		return null;
+		Ship();
 	}
 
 	@Override
@@ -26,13 +26,13 @@ public class Facade implements IFacade {
 	@Override
 	public double[] getShipPosition(Ship ship) throws ModelException {
 		// TODO Auto-generated method stub
-		return null;
+		Ship.getPosition()
 	}
 
 	@Override
 	public double[] getShipVelocity(Ship ship) throws ModelException {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override

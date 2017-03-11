@@ -12,11 +12,21 @@ import be.kuleuven.cs.som.annotate.Immutable;
  */
 public class IllegalPositionException extends Exception {
 
+	
+	/**
+	 * Variable registering the xPosition involved in this illegal position
+	 * exception.
+	 */
 	private double xPosition;
+	
+	/**
+	 * Variable registering the yPosition involved in this illegal position
+	 * exception.
+	 */
 	private double yPosition;
 
 	/**
-	 * Initialize this new illegal position exception with given value.
+	 * Initialize this new illegal position exception with given position.
 	 * 
 	 * @param xPosition
 	 * 		  The xPosition for this new illegal position exception.
@@ -24,7 +34,7 @@ public class IllegalPositionException extends Exception {
 	 * 		  The yPosition for this new illegal position exception.
 	 * @post The position of this new illegal position exception is equal to
 	 * 		 the given positions.
-	 * 		| new.getValue()==Value()	
+	 * 		| new.getRadius()==Value	
 	 */
 
 	public IllegalPositionException(double xPosition, double yPosition){
@@ -33,7 +43,7 @@ public class IllegalPositionException extends Exception {
 	}
 	
 	/**
-	 * Return the xPosition registered for this illegal denominator exception.
+	 * Return the xPosition registered for this illegal position exception.
 	 */
 	@Basic @Immutable
 	public double getxPositon() {
@@ -41,7 +51,7 @@ public class IllegalPositionException extends Exception {
 	}
 	
 	/**
-	 * Return the yPosition registered for this illegal denominator exception.
+	 * Return the yPosition registered for this illegal position exception.
 	 */
 	@Basic @Immutable
 	public double getyPositon() {
