@@ -12,31 +12,31 @@ import be.kuleuven.cs.som.annotate.Immutable;
  */
 
 public class IllegalOverlapException extends Exception {
-	/**
-	 * Variable registering the radius involved in this illegal radius
-	 * exception.
-	 */
-	private double radius;
 
-	/**Initialize this new illegal radius exception with given radius.
+
+	/**Initialize this new illegal ship exception with given ship.
 	 * 
-	 * @param radius
-	 * 		  The radius for this new illegal radius exception.
-	 * @post The radius of this new illegal radius exception is esaul
-	 * 		 to the given radius.
-	 * 		 | new.getRadius() == Radius
+	 * @param ship
+	 * 		  The ship for this new illegal ship exception.
+	 * @post The ship of this new illegal ship exception is esaul
+	 * 		 to the given ship.
+	 * 		 | new.getship() == ship
 	 */
-	public IllegalRadiusException(double radius){
-		this.radius = radius;
+	public IllegalOverlapException(ship){
+		this.ship = ship;
 	}
 	
 	/**
-	 * Return the radius registered for this illegal radius exception.
+	 * Return the overlap registered for this illegal overlap exception.
 	 */
 	@Basic @Immutable
-	public double radius() {
-		return this.radius;
+	public boolean overlap() {
+		return this.overlap();
 	}
 	
+	/**
+	 * Java API recommends defining a version number for classes that implement the interface Serializable.
+	 */
+	private static final long serialVersionUID = 6325402349817617717L;
 
 }

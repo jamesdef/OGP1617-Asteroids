@@ -1,6 +1,13 @@
 package asteroids.model;
 import be.kuleuven.cs.som.annotate.*;
 
+/**
+ * A class for signaling illegal radii for ships.
+ * 
+ * @version 1.0
+ * @author Michiel
+ *
+ */
 public class IllegalRadiusException extends Exception{
  
 	/**

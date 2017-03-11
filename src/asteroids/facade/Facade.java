@@ -14,12 +14,8 @@ public class Facade implements IFacade {
 	@Override
 	public Ship createShip(){
 		// TODO Auto-generated method stub
-<<<<<<< HEAD
-		Ship();
-=======
 		Ship ship = new Ship();
 		return null;
->>>>>>> 05c36e4d3fda2ae4ecb754033e156006460ac378
 	}
 
 	@Override

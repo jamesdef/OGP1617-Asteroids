@@ -12,6 +12,7 @@ import be.kuleuven.cs.som.annotate.Immutable;
  */
 
 public class IllegalDurationException extends Exception{
+
 	/**
 	 * Variable registering the duration involved in this illegal duration
 	 * exception.
@@ -37,6 +38,11 @@ public class IllegalDurationException extends Exception{
 	public double duration() {
 		return this.duration;
 	}
+	
+	/**
+	 * Java API recommends defining a version number for classes that implement the interface Serializable.
+	 */
+	private static final long serialVersionUID = 3521683031467143975L;
 	
 
 }
