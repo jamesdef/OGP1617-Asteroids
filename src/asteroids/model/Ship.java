@@ -4,12 +4,9 @@ import be.kuleuven.cs.som.annotate.Basic;
 /**
  * A class for dealing with ships that have a certain position, radius, speed and orientation.
  * 
- * @invar 	The lowest possible velocity is zero, it can only move forward.
- * 			|getxVelocity() >= 0
- * 			|getyVelocity() >= 0
  * 
- * @invar   The highest possible velocity is 300000 (km/s) the ship can never exceed this speed.
- * 	      	|!=exceedsMaxVelocity(getxVelocity(), getyVelocity())
+ * @invar   The highest possible absolute, total velocity is 300000 (km/s) the ship can never exceed this speed.
+ * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
  *  *
  * @invar	The orientation of the ship must be a valid value.
  * 			|isValidOrientation(getOrientation())
@@ -334,43 +331,20 @@ public class Ship {
 	 * 		|if (new.exceedsMaxVelocity()) 
 	 * 		|   then new.scaleVelocity()
 	 * 
-	 * @post If the given velocity has negative components, nothing is changed.
-	 * 		|if !hasPositiveComponents(xVelocity, yVelocity)
-	 * 		|    then new.getTotalVelocity() = this.getTotalVelocity()
-	 * 
 	 * @note The last postcondition is not really necessary.
 	 * 		 Everything that is not changed within the method is left  untouched.
 	 */
 	public void setVelocity(double xVelocity, double yVelocity){
 
+		this.xVelocity = xVelocity;
+		this.yVelocity = yVelocity;
 
-		if(this.hasPositiveComponents(xVelocity, yVelocity)){
-
-			this.xVelocity = xVelocity;
-			this.yVelocity = yVelocity;
-
-			if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
-				this.scaleVelocity(xVelocity, yVelocity);
-			}
+		if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
+			this.scaleVelocity(xVelocity, yVelocity);
 		}
-	} 
-
-
-
-	/**
-	 * Check whether the velocity has only positive components.
-	 * @param xVelocity
-	 * 		  The velocity in the x-direction
-	 * @param yVelocity
-	 * 		  The velocity in the y-direction
-	 * 
-	 * @return If either of the velocities is negative, the method returns false.
-	 * 		   Otherwise it will return true.
-	 * 		   |(xVelocity >=0) && (yVelocity >=0); 
-	 */
-	public boolean hasPositiveComponents(double xVelocity, double yVelocity){
-		return (xVelocity >=0) && (yVelocity >=0);
 	}
+
+
 
 	/**
 	 * Check whether the velocity exceeds the maximum allowed velocity.
@@ -699,7 +673,7 @@ public class Ship {
 
 		//Using the time to collision, we now compute the position of the collision.
 		//For this we first calculate where the two others are at, at the time of collision.
-		//Then we calculate where exactly they collide.
+		//Then we calculate where exactly they collide. 
 
 		double T = getTimeToCollision(other);
 
@@ -712,7 +686,8 @@ public class Ship {
 		double[] FirstShipPosition = {this.getxPosition() + this.getxVelocity()*T, this.getyPosition() + this.getyVelocity()*T};
 		double[] SecondShipPosition = {other.getxPosition() + other.getxVelocity()*T, other.getyPosition() + other.getyVelocity()*T};
 
-		//The position of the first ship, incremented with it's radius (in the right direction = direction to the center of the other ship) gives the answer
+		//The position of the first ship, incremented with it's radius 
+		// (in the right direction = direction to the center of the other ship) results in the answer.
 
 		double[] CenterDistance = {SecondShipPosition[0] - FirstShipPosition[0], SecondShipPosition[1]- FirstShipPosition[1]};
 		double Norm = Math.sqrt(Math.pow(CenterDistance[0],2.0)+ Math.pow(CenterDistance[1],2.0));

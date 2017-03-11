@@ -4,6 +4,7 @@ package asteroids.facade;
 import asteroids.model.IllegalCollisionException;
 import asteroids.model.IllegalDurationException;
 import asteroids.model.IllegalPositionException;
+import asteroids.model.IllegalRadiusException;
 import asteroids.model.Ship;
 import asteroids.part1.facade.IFacade;
 import asteroids.util.ModelException;
@@ -17,17 +18,26 @@ public class Facade implements IFacade {
 	@Override
 	public Ship createShip()throws ModelException{
 		// TODO Auto-generated method stub
-		Ship(0.0,0.0,0,0.0,0.0,0.0);
+		try {
+			return new Ship();
+		} catch (IllegalPositionException exc) {
+			throw new ModelException("ILLEGAL POSITION");
+		} catch (IllegalRadiusException exc) {
+			throw new ModelException("ILLEGAL RADIUS");
+		}
 	}
 
 	@Override
 	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation)
 			throws ModelException {
 		// TODO Auto-generated method stub
-		ship.setPosition(xPosition,yPosition);
-		this.setVelocity(xVelocity,yVelocity);
-		this.setRadius(radius);
-		this.setOrientation(orientation);	
+		try {
+			return new Ship(x, y, xVelocity, yVelocity, radius, orientation);
+		} catch (IllegalPositionException exc) {
+			throw new ModelException("ILLEGAL POSITION");
+		} catch (IllegalRadiusException exc) {
+			throw new ModelException("ILLEGAL RADIUS");
+		}
 	}
 
 	@Override
@@ -57,13 +67,13 @@ public class Facade implements IFacade {
 	@Override
 	public void move(Ship ship, double dt) throws ModelException {
 		// TODO Auto-generated method stub
-		try {
-			ship.move(dt);
-		} catch (IllegalPositionException | IllegalDurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+			try {
+				ship.move(dt);
+			} catch (IllegalPositionException e) {
+				throw new ModelException("ILLEGAL POSITION");
+			} catch (IllegalDurationException e) {
+				throw new ModelException("ILLEGAL DURATION");
+			}
 	}
 
 	@Override
@@ -97,11 +107,9 @@ public class Facade implements IFacade {
 		// TODO Auto-generated method stub
 		try {
 			return ship1.getTimeToCollision(ship2);
-		} catch (IllegalCollisionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IllegalCollisionException exc) {
+			throw new ModelException("Ships overlap");
 		}
-		return 0;
 	}
 
 	@Override
@@ -109,10 +117,8 @@ public class Facade implements IFacade {
 		// TODO Auto-generated method stub
 		try {
 			return ship1.getCollisionPosition(ship2);
-		} catch (IllegalCollisionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IllegalCollisionException exc) {
+			throw new ModelException("Ships overlap");
 		}
 	}
-	
 }
