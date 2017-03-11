@@ -1,5 +1,6 @@
 package asteroids.facade;
 
+
 import asteroids.model.Ship;
 import asteroids.part1.facade.IFacade;
 import asteroids.util.ModelException;
@@ -11,14 +12,23 @@ public class Facade implements IFacade {
 	// In try probeer je die methode uit je klasse te doorlopen, gooit die methode een exception, dan vang je die dus hier op met catch.
 
 	@Override
-	public Ship createShip() throws ModelException {
+	public Ship createShip(){
 		// TODO Auto-generated method stub
+<<<<<<< HEAD
 		Ship();
+=======
+		Ship ship = new Ship();
+		return null;
+>>>>>>> 05c36e4d3fda2ae4ecb754033e156006460ac378
 	}
 
 	@Override
 	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation)
 			throws ModelException {
+		
+		if(negatieve snelhied){
+			throw new ModelException();
+		}
 		// TODO Auto-generated method stub
 		return null;
 	}
