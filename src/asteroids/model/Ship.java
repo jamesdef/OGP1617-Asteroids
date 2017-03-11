@@ -292,8 +292,9 @@ public class Ship {
 	 */
 	public void setPosition(double xPosition, double yPosition) 
 			throws IllegalPositionException{
-		if (!isValidPosition(xPosition,yPosition))
-			throw new IllegalPositionException(xPosition,yPosition);
+		if (!isValidPosition(xPosition,yPosition)){
+			throw new IllegalPositionException(xPosition,yPosition);}
+		
 		this.xPosition = xPosition;
 		this.yPosition = yPosition;
 	}
@@ -335,7 +336,7 @@ public class Ship {
 	 * 		 Everything that is not changed within the method is left  untouched.
 	 */
 	public void setVelocity(double xVelocity, double yVelocity){
-
+		
 		this.xVelocity = xVelocity;
 		this.yVelocity = yVelocity;
 
@@ -404,8 +405,8 @@ public class Ship {
 	 * 		   | ! isValidRadius(radius)
 	 */
 	public void setRadius(double radius) throws IllegalRadiusException{
-		if (!isValidRadius(radius))
-			throw new IllegalRadiusException(radius);
+		if (!isValidRadius(radius)){
+			throw new IllegalRadiusException(radius);}
 		this.radius = radius;
 	}
 

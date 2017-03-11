@@ -1,17 +1,24 @@
 package asteroids.tests;
 import static org.junit.Assert.*;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import asteroids.model.IllegalDurationException;
+import asteroids.model.IllegalPositionException;
+import asteroids.model.IllegalRadiusException;
 import asteroids.model.Ship;
-
+import asteroids.facade.Facade;
+import asteroids.part1.facade.IFacade;
+import asteroids.util.ModelException;
 public class ShipTest {
 
 	private static final double EPSILON = 0.0001;
 
 	@Test
-	public void testCreateDefaultShip(){
+	public void testCreateDefaultShip() throws IllegalPositionException, IllegalRadiusException{
 		
 		Ship ship = new Ship();
 		
@@ -38,7 +45,7 @@ public class ShipTest {
 	}
 	
 	@Test
-	public void testPosition(){
+	public void testPosition() throws IllegalPositionException, IllegalRadiusException{
 		Ship ship = new Ship(100, 200, 10, 10, 10, 0);
 		
 		double[] position = ship.getPosition();
@@ -57,7 +64,7 @@ public class ShipTest {
 	}
 	
 	@Test
-	public void testOrientation(){
+	public void testOrientation() throws IllegalPositionException, IllegalRadiusException{
 		Ship ship = new Ship(0, 0, 10, 10, 10, 0.5);
 		double orientation = ship.getOrientation();
 		assertNotNull(orientation);
@@ -68,7 +75,7 @@ public class ShipTest {
 	}
 	
 	@Test
-	public void testVelocity(){
+	public void testVelocity() throws IllegalPositionException, IllegalRadiusException{
 		Ship ship = new Ship(0, 0, 10, 10, 10, 0);
 		
 		double xVelocity = ship.getxVelocity();
@@ -86,34 +93,35 @@ public class ShipTest {
 		
 	}
 	
-	@Test
-	public void testMove() throws ModelException {
+	@Test (expected = IllegalDurationException.class)
+	public void testMove() throws ModelException, IllegalPositionException, IllegalRadiusException, IllegalDurationException {
 		Ship ship = new Ship(100, 100, 30, -15, 20, 0);
 		
 		ship.move(1);		
-		double[] position = ship.getShipPosition(ship);
+		double[] position = ship.getPosition();
 		assertNotNull(position);
 		assertEquals(130, position[0], EPSILON);
 		assertEquals(85, position[1], EPSILON);
 		
-		//test negative value
+		//test negative value --> We expect this part to give an IllegalDurationExcpetion)
 		ship.move(-3);		
-		double[] position = ship.getShipPosition(ship);
-		assertNotNull(position);
-		assertEquals(130, position[0], EPSILON);
-		assertEquals(85, position[1], EPSILON);
+		double[] position1 = ship.getPosition();
+		
+		assertNotNull(position1);
+		assertEquals(130, position1[0], EPSILON);
+		assertEquals(85, position1[1], EPSILON);
 		
 	}
 	
 	@Test
-	public void testThrust(){
+	public void testThrust() throws IllegalPositionException, IllegalRadiusException{
 		Ship ship = new Ship(100, 100, 30, -15, 20, 0);
 
 		
 	}
 	
 	@Test
-	public void testTurn(){
+	public void testTurn() throws IllegalPositionException, IllegalRadiusException{
 		Ship ship = new Ship(0, 0, 10, 10, 10, 0);
 		ship.turn(0.5);
 		double newOrientation = ship.getOrientation();
