@@ -1,5 +1,6 @@
 package asteroids.facade;
 
+
 import asteroids.model.Ship;
 import asteroids.part1.facade.IFacade;
 import asteroids.util.ModelException;
@@ -7,14 +8,19 @@ import asteroids.util.ModelException;
 public class Facade implements IFacade {
 
 	@Override
-	public Ship createShip() throws ModelException {
+	public Ship createShip(){
 		// TODO Auto-generated method stub
+		Ship ship = new Ship();
 		return null;
 	}
 
 	@Override
 	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation)
 			throws ModelException {
+		
+		if(negatieve snelhied){
+			throw new ModelException();
+		}
 		// TODO Auto-generated method stub
 		return null;
 	}
