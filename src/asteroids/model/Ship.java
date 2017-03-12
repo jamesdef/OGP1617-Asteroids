@@ -435,6 +435,9 @@ public class Ship {
 	 *		|new.getOrientation()== orientation
 	 */
 	public void setOrientation(double orientation){
+		if (orientation < 0){
+			orientation = 2.0*Math.PI + orientation;
+		}
 		assert isValidOrientation(orientation);
 		this.orientation = orientation;	
 	}
@@ -450,7 +453,7 @@ public class Ship {
 	 * 
 	 */
 	public static boolean isValidOrientation(double orientation){
-		return (Min_Orientation <= orientation) && (orientation <= Max_Orientation);	
+		return (Min_Orientation <= (orientation)) && (orientation <= Max_Orientation);	
 	}
 
 
