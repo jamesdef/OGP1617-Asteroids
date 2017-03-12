@@ -3,16 +3,14 @@ import static org.junit.Assert.*;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import asteroids.model.IllegalDurationException;
 import asteroids.model.IllegalPositionException;
 import asteroids.model.IllegalRadiusException;
 import asteroids.model.Ship;
-import asteroids.facade.Facade;
-import asteroids.part1.facade.IFacade;
 import asteroids.util.ModelException;
+
 public class ShipTest {
 
 	private static final double EPSILON = 0.0001;

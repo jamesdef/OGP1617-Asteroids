@@ -293,7 +293,8 @@ public class Ship {
 	 */
 	public void setPosition(double xPosition, double yPosition) 
 			throws IllegalPositionException{
-		if (!isValidPosition(xPosition,yPosition)){	
+		if (!isValidPosition(xPosition,yPosition)){
+			
 			throw new IllegalPositionException(xPosition,yPosition);}
 		
 		this.xPosition = xPosition;
@@ -318,7 +319,7 @@ public class Ship {
 					&& (xPosition != Double.NEGATIVE_INFINITY) && (yPosition != Double.POSITIVE_INFINITY) 
 								&& (yPosition != Double.NEGATIVE_INFINITY));
 	}
-
+	
 
 	/** 
 	 * This method sets the Velocity to the given value.  
@@ -329,7 +330,7 @@ public class Ship {
 	 * 		  The new velocity in the y-direction for this ship.
 	 * 
 	 * @post if one of the given velocities is not a number, the velocities are left untouched.
-	 * 	     if ((xVelocity == Double.NaN) || (yVelocity == Double.NaN)){
+	 * 	     if (Double.isNaN(xVelocity) || Double.isNaN(yVelocity)){
 	 * 				then new.getxVelocity() = getxVelocity()
 	 * 					 new.getyVelocity() = getyVelocity()
 	 * 
@@ -352,7 +353,7 @@ public class Ship {
 	 */
 	public void setVelocity(double xVelocity, double yVelocity){
 		
-		if ((xVelocity != Double.NaN) && (yVelocity != Double.NaN)){
+		if ((!Double.isNaN(xVelocity)) && (!Double.isNaN(yVelocity))){
 		
 		
 			this.xVelocity = xVelocity;
@@ -437,11 +438,12 @@ public class Ship {
 	 * 		   The radius of the ship.
 	 * 
 	 * @return True if the radius exceeds the minimal radius
-	 * 		   false if the radius is less than the minimal_radius.
+	 * 		   false if the radius is less than the minimal_radius. 
+	 * 		   Or if the radius is Infinity or not a number.
 	 * 		   | radius >= Min_Radius;
 	 */
 	public static boolean isValidRadius(double radius){
-		return radius >= Min_Radius;
+		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 
 
@@ -474,12 +476,12 @@ public class Ship {
 	 * @param orientations
 	 * 		  The orientation of which we need to check whether it is legal.
 	 * 
-	 * @return True if and only if the given orientation is within the boundaries opposed upon orientation.
-	 * 		   |result == (Min_Orientation <= orientation) && (orientation < Max_Orientation)
+	 * @return True if and only if the given orientation is within the boundaries opposed upon orientation. (And has to be a number)
+	 * 		   |result == (Min_Orientation <= orientation) && (orientation < Max_Orientation) && !Double.isNaN(orientation)
 	 * 
 	 */
 	public static boolean isValidOrientation(double orientation){
-		return (Min_Orientation <= (orientation)) && (orientation <= Max_Orientation);	
+		return ((Min_Orientation <= (orientation)) && (orientation <= Max_Orientation) && (!Double.isNaN(orientation)));	
 	}
 
 
@@ -554,11 +556,11 @@ public class Ship {
 	 * 
 	 * @param duration
 	 * 		  The duration of the specific movement of the ship
-	 * @return true if the duration is non-negative
-	 * 		   | return duration >= 0
+	 * @return true if the duration is a non-negative number and finite.
+	 * 		   | return (duration >= 0 && !Double.isNaN(duration) && (duration != Double.POSITIVE_INFINITY))
 	 */			
 	public boolean isValidDuration(double duration){
-		return duration >= 0;	
+		return ((duration >= 0) && (!Double.isNaN(duration)) && (duration != Double.POSITIVE_INFINITY));
 	}
 
 	/**
