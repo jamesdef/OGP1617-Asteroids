@@ -275,7 +275,8 @@ public class Ship {
 
 	// ------------------------------------ SETTERS --------------------------
 
-	/** DEFENSIVE PROGRAMMING
+	/** 
+	 * Sets the position to the given coordinates, if these make for a valid position.
 	 * 
 	 * @param xPostion
 	 * 		  The new x-coordinate for this ship.	
@@ -292,7 +293,7 @@ public class Ship {
 	 */
 	public void setPosition(double xPosition, double yPosition) 
 			throws IllegalPositionException{
-		if (!isValidPosition(xPosition,yPosition)){
+		if (!isValidPosition(xPosition,yPosition)){	
 			throw new IllegalPositionException(xPosition,yPosition);}
 		
 		this.xPosition = xPosition;
@@ -300,29 +301,40 @@ public class Ship {
 	}
 
 	/**
+	 * Returns whether the given Position is valid.
+	 * 
 	 * @param xPostion
 	 * 		  The x-coordinate for this ship.	
 	 * @param yPosition
 	 * 		  The y-coordinate for this ship.	 
 	 * @return True if and only if neither of the coordinates is either infinity or NaN
-	 *		  | result == (xPosition != Double.NaN && yPosition != Double.NaN && xPosition != Double.POSITIVE_INFINITY && xPosition != Double.NEGATIVE_INFINITY && yPosition != Double.POSITIVE_INFINITY && yPosition != Double.NEGATIVE_INFINITY)
+	 *		  | result == (xPosition != Double.NaN && yPosition != Double.NaN && xPosition != Double.POSITIVE_INFINITY 
+	 *						&& xPosition != Double.NEGATIVE_INFINITY && yPosition != Double.POSITIVE_INFINITY
+	 * 																				&& yPosition != Double.NEGATIVE_INFINITY)
 	 *
 	 */
 	public static boolean isValidPosition(double xPosition, double yPosition){
-		return (xPosition != Double.NaN && yPosition != Double.NaN && xPosition != Double.POSITIVE_INFINITY 
-					&& xPosition != Double.NEGATIVE_INFINITY && yPosition != Double.POSITIVE_INFINITY 
-								&& yPosition != Double.NEGATIVE_INFINITY);
+		return ((!Double.isNaN(xPosition)) && (!Double.isNaN(yPosition)) && (xPosition != Double.POSITIVE_INFINITY) 
+					&& (xPosition != Double.NEGATIVE_INFINITY) && (yPosition != Double.POSITIVE_INFINITY) 
+								&& (yPosition != Double.NEGATIVE_INFINITY));
 	}
 
-	/** TOTAL PROGRAMMING 
+
+	/** 
+	 * This method sets the Velocity to the given value.  
 	 * 
 	 * @param xVelocity
 	 * 		  The new velocity in the x-direction for this ship.
 	 * @param yVelocity
 	 * 		  The new velocity in the y-direction for this ship.
 	 * 
-	 *@post If the new total velocity does not exceed the maximum velocity
-	 *		and both components are postive then the given values are set as the new velocity.
+	 * @post if one of the given velocities is not a number, the velocities are left untouched.
+	 * 	     if ((xVelocity == Double.NaN) || (yVelocity == Double.NaN)){
+	 * 				then new.getxVelocity() = getxVelocity()
+	 * 					 new.getyVelocity() = getyVelocity()
+	 * 
+	 * @post If the new total velocity does not exceed the maximum velocity
+	 *		 and both components are postive then the given values are set as the new velocity.
 	 *		|if (!new.exceedsMaxVelocity() & hasPositiveComponents())
 	 *		|		then new.xVelocity = xVelocity;
 	 *   				 new.yVelocity = yVelocity;
@@ -332,17 +344,23 @@ public class Ship {
 	 * 		|if (new.exceedsMaxVelocity()) 
 	 * 		|   then new.scaleVelocity()
 	 * 
-	 * @note The last postcondition is not really necessary.
-	 * 		 Everything that is not changed within the method is left  untouched.
+	 * @post If one of the given velocities is not a number, the velocities are left untouched.
+	 * 	     |if ((xVelocity == Double.NaN) || (yVelocity == Double.NaN)){
+	 * 		 |		then new.getxVelocity() = getxVelocity();
+	 * 		 |			 new.getyVelocity() = getyVelocity();
+	 * 
 	 */
 	public void setVelocity(double xVelocity, double yVelocity){
 		
-		this.xVelocity = xVelocity;
-		this.yVelocity = yVelocity;
+		if ((xVelocity != Double.NaN) && (yVelocity != Double.NaN)){
+		
+		
+			this.xVelocity = xVelocity;
+			this.yVelocity = yVelocity;
 
-		if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
-			this.scaleVelocity(xVelocity, yVelocity);
-		}
+				if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
+					this.scaleVelocity(xVelocity, yVelocity);
+		}		}
 	}
 
 
@@ -367,7 +385,8 @@ public class Ship {
 
 	}
 
-	/** Changes the velocity to it's scaled value (so that the class invariants hold)
+	/** 
+	 * Changes the velocity to it's scaled value (so that the class invariants hold)
 	 *  .
 	 * 
 	 * @param xVelocity
@@ -392,7 +411,8 @@ public class Ship {
 	}
 
 
-	/** Defensive Programming
+	/** 
+	 * Sets the radius to the given Value, if it is valid.
 	 * 
 	 * @param radius
 	 * 		  The new, given radius of the ship.
@@ -410,7 +430,8 @@ public class Ship {
 		this.radius = radius;
 	}
 
-	/** Checks whether the given radius has a valid value.
+	/** 
+	 * Checks whether the given radius has a valid value.
 	 * 
 	 * @param  radius
 	 * 		   The radius of the ship.
@@ -425,12 +446,16 @@ public class Ship {
 
 
 
-	/** Sets the orientation to the given angle, if this is a valid angle.
+	/**
+	 *  Sets the orientation to the given angle, if this is a valid angle.
 	 * 
 	 * @param orientation
 	 * 		  The new, given orientation of the ship.
 	 * @pre The given orientation must be a valid one.
 	 * 		|isValidOrientation(orientation)
+	 * @post if the given Value is negative, it is first changed to its positive counterpart.
+	 * 		 |	if (orientation < 0){
+						then orientation = 2.0*Math.PI + orientation}
 	 * @post The orientation of the ship is now changed to the given value
 	 *		|new.getOrientation()== orientation
 	 */
@@ -443,7 +468,8 @@ public class Ship {
 	}
 
 
-	/** Check whether the given orientaton is a valid value.
+	/**
+	 *  Check whether the given orientaton is a valid value.
 	 * 
 	 * @param orientations
 	 * 		  The orientation of which we need to check whether it is legal.
@@ -460,7 +486,8 @@ public class Ship {
 
 	//-------- Moving, turning and accelerating-----
 
-	/** Raises the velocity of the ship based on a certain, given acceleration and the ship's orientation.
+	/**
+	 *  Raises the velocity of the ship based on a certain, given acceleration and the ship's orientation.
 	 * 
 	 * @param acceleration
 	 * 
@@ -490,7 +517,8 @@ public class Ship {
 		this.setVelocity(NewxVelocity, NewyVelocity);	
 	}
 
-	/** Move the ship, given a certain duration.
+	/**
+	 *  Move the ship, given a certain duration.
 	 * 
 	 * @param duration
 	 * 		  The duration of the movement, given in seconds
@@ -521,7 +549,8 @@ public class Ship {
 
 	}
 
-	/** Check whether the given duration is legal.
+	/**
+	 *  Check whether the given duration is legal.
 	 * 
 	 * @param duration
 	 * 		  The duration of the specific movement of the ship
@@ -532,7 +561,8 @@ public class Ship {
 		return duration >= 0;	
 	}
 
-	/** Adjust the orientation of the ship by a given angle
+	/**
+	 *  Adjust the orientation of the ship by a given angle
 	 * 
 	 * @param angle
 	 * 		  The angle to add to the orientation of the ship
@@ -553,7 +583,8 @@ public class Ship {
 		this.setOrientation(ScaledAngle);
 	}
 
-	/** Scales the given angle so that it is within 0<= angle < 2*PI
+	/**
+	 *  Scales the given angle so that it is within 0<= angle < 2*PI
 	 * 
 	 * @param angle
 	 * 		  The angle to scale 
@@ -568,7 +599,8 @@ public class Ship {
 
 	//  COLLISION PREDICTION  : DEFENSIVE
 
-	/** Return the distance betwheen two ships.
+	/**
+	 *  Return the distance betwheen two ships.
 	 * 
 	 * @param other
 	 *        The other ship of which we want to know the distance to this ship.
@@ -585,7 +617,8 @@ public class Ship {
 	}
 
 
-	/**Check whether two ships overlap.
+	/**
+	 * Check whether two ships overlap.
 	 * 
 	 * @param other
 	 * 		  The other ship of which we want to check if it overlaps with this ship.
@@ -597,7 +630,8 @@ public class Ship {
 	}
 
 
-	/** Calculates the time to the point where the two given ships collide.
+	/**
+	 *  Calculates the time to the point where the two given ships collide.
 	 * 	If they never collide, it returns positive infinity.
 	 * 
 	 * @param other
@@ -647,7 +681,8 @@ public class Ship {
 			return - (DvDr + Math.sqrt(d))/(DvDv);}
 	}
 
-	/** Returns the position on which two ships collide, if they ever collide. Otherwise it returns null.
+	/** 
+	 * Returns the position on which two ships collide, if they ever collide. Otherwise it returns null.
 	 * 
 	 * @param other
 	 * 		  The other ship with which this ship might collide.
