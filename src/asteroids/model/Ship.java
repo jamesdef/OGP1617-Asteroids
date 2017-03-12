@@ -7,7 +7,7 @@ import be.kuleuven.cs.som.annotate.Basic;
  * 
  * @invar   The highest possible absolute, total velocity is 300000 (km/s) the ship can never exceed this speed.
  * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
- *  *
+ *  
  * @invar	The orientation of the ship must be a valid value.
  * 			|isValidOrientation(getOrientation())
  * 
@@ -175,7 +175,7 @@ public class Ship {
 	/**
 	 * Variable registering the minimum allowed Radius.
 	 */
-	private static final double Min_Radius = 10;
+	private static final double Min_Radius = 10.0;
 
 
 
@@ -309,10 +309,9 @@ public class Ship {
 	 * @param yPosition
 	 * 		  The y-coordinate for this ship.	 
 	 * @return True if and only if neither of the coordinates is either infinity or NaN
-	 *		  | result == (xPosition != Double.NaN && yPosition != Double.NaN && xPosition != Double.POSITIVE_INFINITY 
-	 *						&& xPosition != Double.NEGATIVE_INFINITY && yPosition != Double.POSITIVE_INFINITY
-	 * 																				&& yPosition != Double.NEGATIVE_INFINITY)
-	 *
+	 *		  | result == ((!Double.isNaN(xPosition)) && (!Double.isNaN(yPosition)) && (xPosition != Double.POSITIVE_INFINITY) 
+	 *				&& (xPosition != Double.NEGATIVE_INFINITY) && (yPosition != Double.POSITIVE_INFINITY) 
+	 *							&& (yPosition != Double.NEGATIVE_INFINITY));
 	 */
 	public static boolean isValidPosition(double xPosition, double yPosition){
 		return ((!Double.isNaN(xPosition)) && (!Double.isNaN(yPosition)) && (xPosition != Double.POSITIVE_INFINITY) 
@@ -334,9 +333,9 @@ public class Ship {
 	 * 				then new.getxVelocity() = getxVelocity()
 	 * 					 new.getyVelocity() = getyVelocity()
 	 * 
-	 * @post If the new total velocity does not exceed the maximum velocity
+	 * @post If the new total velocity is valid and does not exceed the maximum velocity
 	 *		 and both components are postive then the given values are set as the new velocity.
-	 *		|if (!new.exceedsMaxVelocity() & hasPositiveComponents())
+	 *		|if (!new.exceedsMaxVelocity())
 	 *		|		then new.xVelocity = xVelocity;
 	 *   				 new.yVelocity = yVelocity;
 	 * 
@@ -344,11 +343,6 @@ public class Ship {
 	 * 		 both velocities scaled so that the class invariants hold.
 	 * 		|if (new.exceedsMaxVelocity()) 
 	 * 		|   then new.scaleVelocity()
-	 * 
-	 * @post If one of the given velocities is not a number, the velocities are left untouched.
-	 * 	     |if ((xVelocity == Double.NaN) || (yVelocity == Double.NaN)){
-	 * 		 |		then new.getxVelocity() = getxVelocity();
-	 * 		 |			 new.getyVelocity() = getyVelocity();
 	 * 
 	 */
 	public void setVelocity(double xVelocity, double yVelocity){
@@ -394,14 +388,14 @@ public class Ship {
 	 * 		  The velocity in the x-direction
 	 * @param yVelocity
 	 *        The velocity in the y-direction
-	 * 
-	 * @note This method is only called upon if the total velocity 
-	 * 		 of the given parameters exceed the maximum velocity.
 	 * 		 
 	 * @post The velocities are changed to their scaled values. 
 	 * 		 The velocity no longer exceeds the limit.
 	 * 		| new.xVelocity = (xVelocity*Max_Velocity)/this.getTotalVelocity();
-	 *      | new.yVelocity = (yVelocity*Max_Velocity)/this.getTotalVelocity();	     
+	 *      | new.yVelocity = (yVelocity*Max_Velocity)/this.getTotalVelocity();	    
+	 *      
+	 * @note This method is only called upon if the total velocity 
+	 * 		 of the given parameters exceed the maximum velocity.
 	 */
 	public void scaleVelocity(double xVelocity, double yVelocity ){
 		double scaledxVelocity = (xVelocity*Max_Velocity)/this.getTotalVelocity();
@@ -418,7 +412,7 @@ public class Ship {
 	 * @param radius
 	 * 		  The new, given radius of the ship.
 	 * 
-	 * @post The radius of the ship is now equal to the given radius.
+	 * @post The radius of the ship is now equal to the given, valid radius.
 	 * 		|new.getRadius() == radius	
 	 * 
 	 * @throws  IllegalRadiusException
@@ -654,8 +648,7 @@ public class Ship {
 	 *		   By substituting these expressions for the coordinates into the sigma equation, we get a quadratic equation.
 	 *		   By solving this we get a certain expression for T. 
 	 *		   Finally calculating this expression(which is done in the body below) asks for a lot of scalar products.
-	 *		   To simplify this, the scalar products are calculated seperatly.
-	 *		   
+	 *		   To simplify this, the scalar products are calculated seperatly.		   
 	 *	   	
 	 * @throws IllegalCollisionException
 	 * 		   If two ships overlap, this method does not apply.
@@ -664,7 +657,9 @@ public class Ship {
 		if (overlap(other)){
 			throw new IllegalCollisionException(this,other);
 		}
-		double sigma = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+ Math.pow((this.getyPosition()-other.yPosition), 2.0));
+		
+		//Sigma is centerdistance at the moment of collision : sum of two radii.
+		double sigma = other.getRadius() + this.getRadius();
 		double[] Dv= {other.getxVelocity() - this.getxVelocity(), other.getyVelocity() - this.getyVelocity()};
 		double[] Dr= {other.getxPosition() - this.getxPosition(), other.getyPosition() - this.getyPosition()};
 
@@ -673,16 +668,19 @@ public class Ship {
 		double DvDr = Dv[0]*Dr[0] + Dv[1]*Dr[1];
 		double DvDv = Math.pow(Dv[0], 2.0)+Math.pow(Dv[1], 2.0);
 
-		double d = Math.pow(DvDr, 2.0) - (DvDv)*(DrDr-Math.pow(sigma, 2.0));
+		double d = Math.pow(DvDr, 2.0) - (DvDv)*(DrDr- Math.pow(sigma, 2.0));
 
 		if ((d <= 0) || (DvDr >= 0)){
 			return Double.POSITIVE_INFINITY;
 		}
-
+		
 		else{
-			return - (DvDr + Math.sqrt(d))/(DvDv);}
+			return -(DvDr + Math.sqrt(d))/(DvDv);}
 	}
 
+	
+
+	
 	/** 
 	 * Returns the position on which two ships collide, if they ever collide. Otherwise it returns null.
 	 * 

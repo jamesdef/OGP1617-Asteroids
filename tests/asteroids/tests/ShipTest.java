@@ -38,9 +38,7 @@ public class ShipTest {
 		
 		double orientation = ship.getOrientation();
 		assertEquals(0, orientation, EPSILON);
-
-		
-		
+			
 	}
 	
 	@Test
@@ -69,8 +67,6 @@ public class ShipTest {
 		assertNotNull(orientation);
 		assertEquals(0.5, orientation, EPSILON);
 		
-		
-
 	}
 	
 	@Test
@@ -127,36 +123,24 @@ public class ShipTest {
 		Ship ship = new Ship(0, 0, 10, 10, 10, 0);
 		ship.turn(0.5);
 		double newOrientation = ship.getOrientation();
-		assertNotNull(newOrientation);
-		
+		assertEquals(0.5,newOrientation,EPSILON);		
 	}
 
 	@Test
 	public void testCollision() throws IllegalPositionException, IllegalRadiusException, IllegalCollisionException {
-		Ship ship1 = new Ship(0, 0, 10, 0, 10, 0);
+		Ship ship1 = new Ship(0, 0, 10.0 , 0, 10, 0);
 		Ship ship2 = new Ship(40, 0, 0, 0, 10, 0);
 		
 		double distanceBetween = ship1.getDistanceBetween(ship2);
 		assertEquals(20, distanceBetween, EPSILON);
 		
 		double timeToCollision = ship1.getTimeToCollision(ship2);
-	    System.out.println(timeToCollision);
-		//assertEquals(2.0, timeToCollision, EPSILON);
+		assertEquals(2.0, timeToCollision, EPSILON);
 		
 		double[] collisionPosition = ship1.getCollisionPosition(ship2);
 		double xCord = collisionPosition[0];
 		double yCord = collisionPosition[1];
-		assertEquals(20, xCord, EPSILON);
-		//assertEquals(0, yCord, EPSILON);
-
-		
-		
-		
+		assertEquals(30, xCord, EPSILON);
+		assertEquals(0, yCord, EPSILON);
 	}
-
-
-	
-	
-	
-
 }
