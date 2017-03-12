@@ -115,26 +115,36 @@ public class ShipTest {
 	
 	@Test
 	public void testThrust() throws IllegalPositionException, IllegalRadiusException{
-		Ship ship = new Ship(100, 100, 30, -15, 20, 0);
-
+		Ship ship = new Ship(0, 0, 10, 10, 10, 0);
+		ship.thrust(10);
+		double newxVelocity = ship.getxVelocity();
+		assertEquals(20, newxVelocity, EPSILON);
+		
 		
 	}
 	
 	@Test
 	public void testTurn() throws IllegalPositionException, IllegalRadiusException{
-		Ship ship = new Ship(0, 0, 10, 10, 10, 0);
+		Ship ship = new Ship(0, 0, 10, 10, 10);
 		ship.turn(0.5);
 		double newOrientation = ship.getOrientation();
 		assertNotNull(newOrientation);
 		assertEquals(0.5, newOrientation, EPSILON);
 		
-		//negative angle
-		ship.turn(-0.5);
-		
 	}
 	
 	@Test
 	public void testCollision(){
+		Ship ship1 = new Ship(0, 0, 10, 0, 10);
+		Ship ship2 = new Ship(21, 0, 0, 0, 1);
+		
+		double distanceBetween = ship1.getDistanceBetween(ship2);
+		assertEquals(10, distanceBetween, EPSILON);
+		double timeToCollision = ship1.getTimeToCollision(ship2);
+		assertEquals(1, timeToCollision, EPSILON);
+		
+		double collisionPosition
+		
 		
 	}
 
