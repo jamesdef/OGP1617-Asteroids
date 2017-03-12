@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
 
+import asteroids.model.IllegalCollisionException;
 import asteroids.model.IllegalDurationException;
 import asteroids.model.IllegalPositionException;
 import asteroids.model.IllegalRadiusException;
@@ -125,25 +126,32 @@ public class ShipTest {
 	
 	@Test
 	public void testTurn() throws IllegalPositionException, IllegalRadiusException{
-		Ship ship = new Ship(0, 0, 10, 10, 10);
+		Ship ship = new Ship(0, 0, 10, 10, 10, 0);
 		ship.turn(0.5);
 		double newOrientation = ship.getOrientation();
 		assertNotNull(newOrientation);
-		assertEquals(0.5, newOrientation, EPSILON);
 		
 	}
-	
+
 	@Test
-	public void testCollision(){
-		Ship ship1 = new Ship(0, 0, 10, 0, 10);
-		Ship ship2 = new Ship(21, 0, 0, 0, 1);
+	public void testCollision() throws IllegalPositionException, IllegalRadiusException, IllegalCollisionException {
+		Ship ship1 = new Ship(0, 0, 10, 0, 10, 0);
+		Ship ship2 = new Ship(40, 0, 0, 0, 10, 0);
 		
 		double distanceBetween = ship1.getDistanceBetween(ship2);
-		assertEquals(10, distanceBetween, EPSILON);
-		double timeToCollision = ship1.getTimeToCollision(ship2);
-		assertEquals(1, timeToCollision, EPSILON);
+		assertEquals(20, distanceBetween, EPSILON);
 		
-		double collisionPosition
+		double timeToCollision = ship1.getTimeToCollision(ship2);
+	    System.out.println(timeToCollision);
+		//assertEquals(2.0, timeToCollision, EPSILON);
+		
+		double[] collisionPosition = ship1.getCollisionPosition(ship2);
+		double xCord = collisionPosition[0];
+		double yCord = collisionPosition[1];
+		assertEquals(20, xCord, EPSILON);
+		//assertEquals(0, yCord, EPSILON);
+
+		
 		
 		
 	}
