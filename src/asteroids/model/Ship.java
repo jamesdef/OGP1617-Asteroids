@@ -110,7 +110,7 @@ public class Ship {
 	 * i.e. :   |this(0.0,0.0,Min_Velocity,Max_Velocity,Min_Radius,Min_Orientation);
 	 * 
 	 * @note We know that the exceptions can never be thorwn in this default case, but JAVA makes us throw them anyway.
-	 */
+	 *
 	public Ship() throws IllegalPositionException, IllegalRadiusException{
 		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation);
 	}
