@@ -12,10 +12,13 @@ package asteroids.model;
  * final height (boundary)
  * static MAX_VALUE (not final because this value may change in the future)
  * 
+ * DEFENSIVELY 
  * addBullet
  * addShip
  * rmBullet
  * rmShip
+ * 
+ * All ships must fully lie in this world and not overlap with other ships
  * 
  * getAllBullets (HASHSET ?)
  * getAllShips (HASHSET ?)
@@ -33,6 +36,7 @@ public class World {
  /**
   * 
   */ public World(width,height,ships,bullets){
+	  
 	  setWidth(with);
 	  setHeigth(heigth);
 	  setShips(ships);
