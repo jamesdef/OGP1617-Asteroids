@@ -18,8 +18,11 @@ package asteroids.model;
  * rmBullet
  * rmShip
  * 
+<<<<<<< HEAD
  * All ships must fully lie in this world and not overlap with other ships
  * 
+=======
+>>>>>>> 52621ff964a286e013f289f4a28f3838962087ba
  * getAllBullets (HASHSET ?)
  * getAllShips (HASHSET ?)
  * getAllEntities (Combination of previous sets?)
@@ -36,7 +39,10 @@ public class World {
  /**
   * 
   */ public World(width,height,ships,bullets){
+<<<<<<< HEAD
 	  
+=======
+>>>>>>> 52621ff964a286e013f289f4a28f3838962087ba
 	  setWidth(with);
 	  setHeigth(heigth);
 	  setShips(ships);
