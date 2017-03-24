@@ -1,6 +1,7 @@
 package asteroids.model;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.Basic;
@@ -18,6 +19,10 @@ import be.kuleuven.cs.som.annotate.Basic;
 /**
  * final width (boundary) final height (boundary) static MAX_VALUE (not final
  * because this value may change in the future)
+ * 
+ * De grootte van het coordinaten vlak dient als volgt te worden gedefinieerd:
+ *  x element of [0, width] , y element of [0,height] 
+ *  This means that coordinates can never be negative!
  * 
  * DEFENSIVELY addBullet addShip rmBullet rmShip
  * 
@@ -38,26 +43,52 @@ public class World {
 	/**
 	 * 
 	 */
-	public World(double width, double height, Ship ships, Bullet bullets) {
+	public World(double width, double height, List<Ship> ships, List<Bullet> bullets) {
 
 		setWidth(width);
 		setHeight(height);
 		for (Ship ship : ships){
 			addAsShip(ship);
 		}
-
-		setBullets(bullets);
+		for (Bullet bullet : bullets){
+			addAsBullet(bullet);
+		}
 	}
+	
+	
 
 	private final Set<Ship> ships = 
 			new HashSet<Ship>();
 	
+	/** DEFENSIVE PROGRAMMING
+	 * 
+	 * 
+	 * 
+	 * @param ship
+	 */
 	public void addAsShip(Ship ship){
 		this.ships.add(ship);
 	}
 	
+	private final Set<Bullet> bullets = 
+			new HashSet<Bullet>();
+	
+	public void addAsBullet(Bullet bullet){
+		this.bullets.add(bullet);
+	}
 	
 	
+	public Set<Ship> getAllShips(){
+		return this.ships;
+	}
+	
+	public Set<Bullet> getAllBullets(){
+		return this.bullets;
+	}
+	
+	public  Set<Entity> getAllEntities(){
+		return this.ships.combine(this.bullets);
+	}
 	
 	/*
 	 * Default constructor, ceates an 'empty' world.
@@ -158,7 +189,7 @@ public class World {
 	
 	
 	
-	/**
+	/**  TOTAL PROGRAMMING
 	 * Returns the entity (ship or bullet), if there is one, at the given Positon.
 	 *	 
 	 * @returns The entity (ship or bullet) that has it's centre at the given postion.
@@ -186,11 +217,12 @@ public class World {
 	 * 		  
 	 */
 	public Boolean significantOverlap (Entity object1, Entity object2){
-		Double boundary = object1.getRadius() + object2.getRadius();
+		double boundary = object1.getRadius() + object2.getRadius();
 		return (object1.getDistanceBetween(object2) <= 0.99*boundary);
 	}
 	
-	/**
+	/** FOUT GEEN REKENING GEHOUDEN MET 0 grenzen.
+	 * 
 	 * Returns whether an object is within the boundaries of this world.
 	 * 
 	 * @param object
@@ -199,12 +231,35 @@ public class World {
 	 * 		  True only if the distance between the boundaries of this world and 
 	 * 		  the centre of the object is bigger than 99% of the objectsradius.
 	 * 		  |@ see implementation
+	 * 
+	 *  Math.abs: In onze beschrijving van ship hebben we niet geëist
+	 *  dat de position enkel positieve coordinaten kent. Maar: een schip met negatieve 
+	 *  coordinaten ligt toch sowieso niet in de wereld?
 	 */
 	public Boolean withinWorldBoundaries(Entity object){
 		return ((World.width - Math.abs(object.getxPosition()) >= 0.99*object.getRadius()) ||
 				(World.height - Math.abs(object.getyPosition()) >= 0.99*object.getRadius()));
 	}
 	
-	public void evolve(double seconds)
+	public void evolve(double Dt){
+		double tC = getFastestTimetoCollision();
+		if (tC < Dt){
+			Dt = Dt - tC;
+		}
+		// tC heeft nu de waarde waarmee we stappen id tijd.
+		// We verplaatsen nu alle schepen en bullets over deze time frame.
+	}
 	
+	public double getFastestTimetoCollision(){
+		double TimetoFastestCollision = 100.0;
+		for (Ship ship1 : this.getAllShips());{
+			for (Ship ship2 : this.getAllShips());{
+				double time = ship1.getTimeToCollision(ship2);
+				if (time < TimetoFastestCollision){
+					TimetoFastestCollision = time;
+				}
+			}
+		}
+		return TimetoFastestCollision;
+	}
 }
