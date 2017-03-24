@@ -1,5 +1,8 @@
 package asteroids.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import be.kuleuven.cs.som.annotate.Basic;
 
 // Mijn naam is Michiel en Git is mijn vriend 
@@ -39,12 +42,25 @@ public class World {
 
 		setWidth(width);
 		setHeight(height);
-		setShips(ships);
+		for (Ship ship : ships){
+			addAsShip(ship);
+		}
+
 		setBullets(bullets);
 	}
 
+	private final Set<Ship> ships = 
+			new HashSet<Ship>();
+	
+	public void addAsShip(Ship ship){
+		this.ships.add(ship);
+	}
+	
+	
+	
+	
 	/*
-	 * Default constructor, creates an 'empty' world.
+	 * Default constructor, ceates an 'empty' world.
 	 */
 	public World() {
 		this(width, height, null, null);
@@ -153,5 +169,42 @@ public class World {
 	public Entity getEntityatPosition(double xPosition, double yPosition){
 	  return Entity;
 	}
-  
+	
+	/** 
+	 * Returns whether two objects (entities) overlap. 
+	 * A certain boundary is set to account for rounding issues with the double-representation.
+	 * 
+	 * @param object1
+	 * 		  One of two entities that might overlap.
+	 * @param object2
+	 * 		  The other of two enitities that might overlap.
+	 * @return 
+	 * 			True only if they overlap significantly. 
+	 * 			A significant overlap is reached when the distance between the centres
+	 * 			of the two entities is smaller than 99% of the sum of the objects' radii.
+	 * 		 | @see implementation
+	 * 		  
+	 */
+	public Boolean significantOverlap (Entity object1, Entity object2){
+		Double boundary = object1.getRadius() + object2.getRadius();
+		return (object1.getDistanceBetween(object2) <= 0.99*boundary);
+	}
+	
+	/**
+	 * Returns whether an object is within the boundaries of this world.
+	 * 
+	 * @param object
+	 * 		  The object of which we want to check if it is within this world
+	 * @return
+	 * 		  True only if the distance between the boundaries of this world and 
+	 * 		  the centre of the object is bigger than 99% of the objectsradius.
+	 * 		  |@ see implementation
+	 */
+	public Boolean withinWorldBoundaries(Entity object){
+		return ((World.width - Math.abs(object.getxPosition()) >= 0.99*object.getRadius()) ||
+				(World.height - Math.abs(object.getyPosition()) >= 0.99*object.getRadius()));
+	}
+	
+	public void evolve(double seconds)
+	
 }
