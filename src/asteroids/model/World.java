@@ -1,5 +1,7 @@
 package asteroids.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -237,12 +239,15 @@ public class World {
 	 *  coordinaten ligt toch sowieso niet in de wereld?
 	 */
 	public Boolean withinWorldBoundaries(Entity object){
-		return ((World.width - Math.abs(object.getxPosition()) >= 0.99*object.getRadius()) ||
-				(World.height - Math.abs(object.getyPosition()) >= 0.99*object.getRadius()));
+		return ((World.width - Math.abs(object.getxPosition()) >= 0.99*object.getRadius()) &&
+				(Math.abs(object.getxPosition()) >= 0.99*object.getRadius()) &&
+				(World.height - Math.abs(object.getyPosition()) >= 0.99*object.getRadius()) &&
+				(Math.abs(object.getyPosition()) >= 0.99*object.getRadius()));
+				
 	}
 	
-	public void evolve(double Dt){
-		double tC = getFastestTimetoCollision();
+	public void evolve(double Dt) throws IllegalCollisionException{
+		double tC = getTimetoFirstCollision();
 		if (tC < Dt){
 			Dt = Dt - tC;
 		}
@@ -250,16 +255,52 @@ public class World {
 		// We verplaatsen nu alle schepen en bullets over deze time frame.
 	}
 	
-	public double getFastestTimetoCollision(){
-		double TimetoFastestCollision = 100.0;
-		for (Ship ship1 : this.getAllShips());{
-			for (Ship ship2 : this.getAllShips());{
+	/** VERRE VAN EFFICIENT: zoek een manier om in sets 2 opeenvolgende elementen te gebruiken.
+	 * 
+	 * @return
+	 * @throws IllegalCollisionException
+	 */
+	public double getTimetoFirstCollision() throws IllegalCollisionException{
+		double TimetoFirstCollision = 100.0;
+		for (Ship ship1 : this.getAllShips()){
+			for (Ship ship2 : this.getAllShips()){
 				double time = ship1.getTimeToCollision(ship2);
-				if (time < TimetoFastestCollision){
-					TimetoFastestCollision = time;
+				if (time < TimetoFirstCollision){
+					TimetoFirstCollision = time;	
 				}
-			}
+			}		
 		}
-		return TimetoFastestCollision;
+		return TimetoFirstCollision;
 	}
+	
+//	for (int i = 0; i < a.length; i++) {
+//    for (int k = i + 1; k < a.length; k++) {
+//        if (a[i] != a[k]) {
+//            //do stuff
+//        }
+//    }
+//}
+//
+//public double getTimetoFirstCollision() throws IllegalCollisionException{
+//	double TimetoFirstCollision = 100.0;
+//	Set<Ship> ships = this.getAllShips();
+//	List<Ship> shiplist = new ArrayList<Ship>();
+//	for(int i = 0; i < ships.size(); i++){
+//		for (int j = i+1; j <ships.size(); j++){
+//		}
+//			if(shiplist[i] != a[j]){
+//				
+//			}
+//			if (time < TimetoFirstCollision){
+//				TimetoFirstCollision = time;
+//			}
+				
+	
+	
+	
+	
+	
+	
 }
+
+
