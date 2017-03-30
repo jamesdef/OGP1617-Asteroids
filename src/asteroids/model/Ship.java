@@ -1,5 +1,6 @@
 package asteroids.model;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 
 
 /**
@@ -257,6 +258,7 @@ public class Ship {
 	 * @return the radius of this ship.
 	 */
 	@Basic
+	@Immutable
 	public double getRadius(){
 		return this.radius;
 	}
@@ -302,6 +304,7 @@ public class Ship {
 		this.yPosition = yPosition;
 	}
 
+// Je zou ook isValidCoordinate kunnen invoeren en dat 2 maal toepassen op x en y, dat is mooier.
 	/**
 	 * Returns whether the given Position is valid.
 	 * 
@@ -442,6 +445,9 @@ public class Ship {
 	}
 
 
+	
+// Je programeert hier nominaal, dan moeten mensen maar een valid orientation geven, is ze negatief en mag dat niet?
+// Dat kan jou niets schelen, wij werken met ValidOrientations, dat staat in de pre-conditie, de gebruiker moet daaraan voldoen.
 
 	/**
 	 *  Sets the orientation to the given angle, if this is a valid angle.
@@ -457,14 +463,16 @@ public class Ship {
 	 *		|new.getOrientation()== orientation
 	 */
 	public void setOrientation(double orientation){
-		if (orientation < 0){
-			orientation = 2.0*Math.PI + orientation;
-		}
+//		if (orientation < 0){
+//			orientation = 2.0*Math.PI + orientation;
+//		}
 		assert isValidOrientation(orientation);
 		this.orientation = orientation;	
 	}
 
-
+// OPLETTEN MET HET GEBRUIK VAN "Min_Orientation" in je documentatie. 
+// dit is immers een private variable, wat betekent dat de gebruiker die niet kan zien. Misschien best een methode
+// getMin_Orientation invoeren.
 	/**
 	 *  Check whether the given orientaton is a valid value.
 	 * 
@@ -493,16 +501,12 @@ public class Ship {
 	 * 		 |if acceleration < 0
 	 * 		 | 		then new.getxVelocity() = getxVelocity()
 	 * 	     | 		then new.getyVelocity() = getyVelocity()
-	 * 
-	 * @post if the given acceleration is greater than zero, the new velocities
-	 * 		 are computed according to the given acceleration and the ship's orientaton.
-	 * 		 |NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()));
-		     |NewyVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()));
-
+	 *
 	 * @effect The velocity is changed, dependent on the given acceleration.
 	 * 	      This is only the case if the calculated new velocity is legal.
 	 * 		  The method setVelocity makes sure that this is the case.
-
+	 *		 |NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()));
+	 *	     |NewyVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()));
 	 * 		  |this.setVelocity(NewxVelocity, NewyVelocity);
 	 */
 	public void thrust(double acceleration){
@@ -530,8 +534,8 @@ public class Ship {
 	 * 
 	 * @effect The new position of the ship is calculated by adding the duration multiplied with the velocity, 
 	 *         to the positon of the ship.
-	 *         |newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
-	 *	       |newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
+	 *        |newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
+	 *	      |newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
 	 *	       |this.setPosition(newxPosition, newyPosition);
 	 * 
 	 */
@@ -580,6 +584,7 @@ public class Ship {
 		this.setOrientation(ScaledAngle);
 	}
 
+// Max_orientation is niet beschikbaar voor gebruikers, dit is een private variable, pas dcumentatie aan
 	/**
 	 *  Scales the given angle so that it is within 0<= angle < 2*PI
 	 * 
@@ -596,6 +601,9 @@ public class Ship {
 
 	//  COLLISION PREDICTION  : DEFENSIVE
 
+	
+// Fout gemaakt hier moet je ook nog rekening houden dat de gebruiker het eigen schip kan opgeven.
+// Hier moeten dus 2 return clauses staan.
 	/**
 	 *  Return the distance betwheen two ships.
 	 * 
@@ -606,6 +614,10 @@ public class Ship {
 	 * 		   | centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+ 
 	 * 											Math.pow((this.getyPosition()-other.yPosition), 2.0));
 	 * 		   | result  == centerDistance - this.getRadius() - other.radius;
+	 * 
+	 * @return if ship == other ship
+	 * 		   result == 0
+	 * 
 	 */
 	public double getDistanceBetween(Ship other){
 		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+
@@ -626,7 +638,11 @@ public class Ship {
 		return (this.getDistanceBetween(other) < 0);	
 	}
 
-
+// DECLARATIEVE SPECIFICATIE:
+	// HOUDT in dat je duidt op wat het nut is van de functie, wat je kan doen met het resultaat.
+	//Je bespreekt dus niet exact hoe het resultaat bekomen wordt, maar wel wat je ermee kan doen.
+	// Daar heeft de gebruiker immers het meeste aan.
+	
 	/**
 	 *  Calculates the time to the point where the two given ships collide.
 	 * 	If they never collide, it returns positive infinity.
@@ -634,9 +650,6 @@ public class Ship {
 	 * @param other
 	 * 		  The other ship with which this ship might collide
 	 * 
-	 * @post 
-	 * 		  The returned time will be positive (or zero if the ships already 'touch') at all times.
-	 * 		   | getTimeToCollision >= 0
 	 * 
 	 * @return Returns in how many seconds 2 spacecrafts will collide.
 	 * 		   If they never collide it wil return Double.POSITIVE_INFINITY
