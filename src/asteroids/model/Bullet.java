@@ -1,8 +1,8 @@
 package asteroids.model;
 
-public class Bullet {
+public class Bullet extends Entity {
 	
-	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, Ship ship, World world){
+	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, Ship ship, Worlsd world){
 		
 		setxPosition(xPosition);
 		setyPosition(yPosition);

@@ -1,5 +1,6 @@
 package asteroids.model;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 
 //The goal is to create a class that involves all the thinggs that entities (ie ships and bullets)
 //have in common. Bullet and ship will then be made subclasses of Entity. If needed, the methods within
@@ -31,51 +32,51 @@ public class Entity {
 	/**
 	 * Variable registering the xPosition of this Entity.
 	 */
-	private double xPosition = 0.0;
+	protected double xPosition = 0.0;
 
 	/**
 	 * Variable registering the yPosition of this Entity.
 	 */
-	private double yPosition = 0.0;
+	protected double yPosition = 0.0;
 
 
 	/**
 	 * Variable registering the xVelocity of this Entity.
 	 */
-	private double xVelocity = Min_Velocity;
+	protected double xVelocity = Min_Velocity;
 
 
 	/**
 	 * Variable registering the yVelocity of this Entity.
 	 */
-	private double yVelocity = Min_Velocity;
+	protected double yVelocity = Min_Velocity;
 
 
 	/**
 	 * Variable registering the minimum allowed velocity.
 	 */
-	private static final double Min_Velocity = 0;
+	protected static final double Min_Velocity = 0;
 
 	/**
 	 * Variable registering the maximum allowed velocity.
 	 */
-	private static final double Max_Velocity = 300000;
+	protected static final double Max_Velocity = 300000;
 
 	/**
 	 * Variable registering the orientation of this Entity.
 	 */
-	private double orientation = Min_Orientation;
+	protected double orientation = Min_Orientation;
 
 	/**
 	 * Variable registering the minimum allowed orientation
 	 */
-	private static final double Min_Orientation = 0.0;
+	protected static final double Min_Orientation = 0.0;
 
 
 	/**
 	 * Variable registering the maximum allowed orientation
 	 */
-	private static final double Max_Orientation = 2.0*Math.PI;
+	protected static final double Max_Orientation = 2.0*Math.PI;
 
 
 	/**
@@ -115,6 +116,121 @@ public class Entity {
     private double mass = Min_Mass;
 
 //-----------------------------------------
+    
+	//Inspectors
+    
+    /**
+	 * Return the x-coordinate of this ship.  
+	 * @return the x-coordinate of this ship.
+	 */
+	@Basic
+	public double getxPosition(){
+		return this.xPosition;	
+	}	
+
+
+	/**
+	 * Return the y-coordinate of this ship.
+	 * @return the y-coordinate of this ship.
+	 * 
+	 */
+	@Basic
+	public double getyPosition(){
+		return this.yPosition;	
+	}	
+
+
+	/**
+	 * Return the velocity of this Entity, in the x-direction.
+	 * @return the horizontal velocity of this Entity.
+	 */
+	@Basic
+	public double getxVelocity(){
+		return this.xVelocity;
+
+	}
+
+	/**
+	 * Return the velocity of this Entity, in the y-direction.
+	 * @return the vertical velocity of this Entity.
+	 */
+	@Basic
+	public double getyVelocity(){
+		return this.yVelocity;
+
+	}
+	/**
+	 * Returns the velocity in an array: (Vx,Vy).
+	 * 
+	 * @return A set of doubles; the xVelocity and yVelocity.
+	 * 		   |double[] Velocity = {getxVelocity(),getyVelocity()}
+	 * 		   |return Velocity
+	 */
+	public double[] getVelocity(){
+		double[] Velocity = {getxVelocity(),getyVelocity()};
+		return Velocity;
+	}
+
+	/**
+	 * Return the total velocity of this Entity.
+	 * @return the total velocity of this Entity.
+	 * @note The total velocity of a Entity is computed:
+	 * 		 by taking the square root of the sum of the
+	 * 		 secondpowers of the horizontal and vertical velocity.
+	 * 		-> sqrt(Vx^2+Vy^2)
+	 */
+	@Basic
+	public double getTotalVelocity(){
+		return Math.sqrt(Math.pow(getyVelocity(),2.0)+Math.pow(getxVelocity(),2.0));	
+	}
+
+	/**
+	 *  Return the orientation of this ship.
+	 * @return the orientation of this ship.
+	 */
+	@Basic
+	public double getOrientation(){
+		return this.orientation;	
+	}	
+
+	/**
+	 *  Return the radius of this ship.
+	 * @return the radius of this ship.
+	 */
+	@Basic
+	@Immutable
+	public double getRadius(){
+		return this.radius;
+	}
+
+	/** 
+	 *  Returns the x and y coordinates within an array.
+	 *  
+	 * @return the x and y coordinate as an array.
+	 * 		 
+	 */
+	public double[] getPosition(){
+		double[] position = {this.getxPosition(),this.getyPosition()};	
+		return position;			
+	}
+	
+	/**
+	 * Return the mass of this entity.
+	 * @return the mass of this entity.
+	 */
+	public double getMass(){
+		return this.mass;
+	}
+    
+	/**
+	 * Return the mass of this entity.
+	 * @return the mass of this entity.
+	 */
+	public double getDensity(){
+		return this.density;
+	}
+	
+	
 	
 	//Setters
 	
@@ -164,49 +280,6 @@ public class Entity {
 	//VELOCITY
 	
 
-	/**
-	 * Return the velocity of this Entity, in the x-direction.
-	 * @return the horizontal velocity of this Entity.
-	 */
-	@Basic
-	public double getxVelocity(){
-		return this.xVelocity;
-
-	}
-
-	/**
-	 * Return the velocity of this Entity, in the y-direction.
-	 * @return the vertical velocity of this Entity.
-	 */
-	@Basic
-	public double getyVelocity(){
-		return this.yVelocity;
-
-	}
-	/**
-	 * Returns the velocity in an array: (Vx,Vy).
-	 * 
-	 * @return A set of doubles; the xVelocity and yVelocity.
-	 * 		   |double[] Velocity = {getxVelocity(),getyVelocity()}
-	 * 		   |return Velocity
-	 */
-	public double[] getVelocity(){
-		double[] Velocity = {getxVelocity(),getyVelocity()};
-		return Velocity;
-	}
-
-	/**
-	 * Return the total velocity of this Entity.
-	 * @return the total velocity of this Entity.
-	 * @note The total velocity of a Entity is computed:
-	 * 		 by taking the square root of the sum of the
-	 * 		 secondpowers of the horizontal and vertical velocity.
-	 * 		-> sqrt(Vx^2+Vy^2)
-	 */
-	@Basic
-	public double getTotalVelocity(){
-		return Math.sqrt(Math.pow(getyVelocity(),2.0)+Math.pow(getxVelocity(),2.0));	
-	}
 	
 	/** 
 	 * This method sets the Velocity to the given value.  
@@ -295,20 +368,88 @@ public class Entity {
 	
 	//RADIUS
 	
-	public void setRadius(){
-		
+	/** 
+	 * Sets the radius to the given Value, if it is valid.
+	 * 
+	 * @param radius
+	 * 		  The new, given radius of the ship.
+	 * 
+	 * @post The radius of the ship is now equal to the given, valid radius.
+	 * 		|new.getRadius() == radius	
+	 * 
+	 * @throws  IllegalRadiusException
+	 * 		   The given radius is not a valid radius.
+	 * 		   | ! isValidRadius(radius)
+	 */
+	public void setRadius(double radius) throws IllegalRadiusException{
+		if (!isValidRadius(radius)){
+			throw new IllegalRadiusException(radius);}
+		this.radius = radius;
 	}
 	
+	/** 
+	 * Checks whether the given radius has a valid value.
+	 * 
+	 * @param  radius
+	 * 		   The radius of the ship.
+	 * 
+	 * @return True if the radius exceeds the minimal radius
+	 * 		   false if the radius is less than the minimal_radius. 
+	 * 		   Or if the radius is Infinity or not a number.
+	 * 		   | radius >= getMin_Radius;
+	 */
+	public static boolean isValidRadius(double radius){
+		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+	}
+	
+	/**
+	 *  Sets the orientation to the given angle, if this is a valid angle.
+	 * 
+	 * @param orientation
+	 * 		  The new, given orientation of the ship.
+	 * @pre The given orientation must be a valid one.
+	 * 		|isValidOrientation(orientation)
+	 * @post The orientation of the ship is now changed to the given value
+	 *		|new.getOrientation()== orientation
+	 */
+	public void setOrientation(double orientation){
+		assert isValidOrientation(orientation);
+		this.orientation = orientation;	
+	}
+
+	/**
+	 *  Check whether the given orientaton is a valid value.
+	 * 
+	 * @param orientations
+	 * 		  The orientation of which we need to check whether it is legal.
+	 * 
+	 * @return True if and only if the given orientation is within the boundaries opposed upon orientation. (And has to be a number)
+	 * 		   |result == (getMin_Orientation <= orientation) && (orientation < getMax_Orientation) && !Double.isNaN(orientation)
+	 * 
+	 */
+	public static boolean isValidOrientation(double orientation){
+		return ((Min_Orientation <= (orientation)) && (orientation <= Max_Orientation) && (!Double.isNaN(orientation)));	
+	}
+
+	/**
+	 * Total Programming:
+	 * 
+	 * 
+	 * @param mass
+	 */
 	public void setMass(double mass){
-		if(isValidMass(mass,radius)){
+		if(isBigEnoughMass(mass,radius)){
 			this.mass=mass;
 		}
-		
+		else{
+			this.mass = Min_Mass;
+		}	
 	}
 	
 	// als mass op zich niet gemeenschappelijk heeft, is het dan nuttig om het hier te definieren?
-	public boolean isValidMass(double mass, double radius){
-		double minimalMass = getDensity()*(4/3)*Math.PI*(Math.pow(radius,3);
+	public boolean isBigEnoughMass(double mass, double radius){
+		double minimalMass = getDensity()*(4/3)*Math.PI*(Math.pow(radius,3));
+		return getMass() >= minimalMass;
 	}
 	
 	
@@ -329,14 +470,37 @@ public class Entity {
 		return (density >= Entity.Min_Density);
 	}
 	
-	public double getDensity(){
-		return this.density;
-	}
-	
-
-	//Inspectors
-	
 	//Mutators
+	
+	// COLLISIONN
+	
+	
+	
+	/**
+	 *  Return the distance betwheen two ships.
+	 * 
+	 * @param other
+	 *        The other ship of which we want to know the distance to this ship.
+	 * 
+	 * @return If the 2 ships are in fact different ship; The distance between the two ships. Computed as below:
+	 * 		   | centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+ 
+	 * 											Math.pow((this.getyPosition()-other.yPosition), 2.0));
+	 * 		   | result  == centerDistance - this.getRadius() - other.radius;
+	 * 
+	 * @return If the given ships refer the same ship, 0 will be the returned result.
+	 * 		   |if ship == other ship
+	 * 		   |result == 0
+	 */
+	public double getDistanceBetween(Entity other){
+		double result = 0;
+		if (this != other){
+		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+
+									Math.pow((this.getyPosition()-other.yPosition), 2.0));
+		result = centerDistance - this.getRadius() - other.radius;
+		}
+		return result;
+	}
+
 
 }
 
