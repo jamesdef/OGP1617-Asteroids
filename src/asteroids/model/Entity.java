@@ -1,23 +1,125 @@
 package asteroids.model;
 import be.kuleuven.cs.som.annotate.Basic;
 
+//The goal is to create a class that involves all the thinggs that entities (ie ships and bullets)
+//have in common. Bullet and ship will then be made subclasses of Entity. If needed, the methods within
+//these classes can override the methods of ENtity.
+
+/** Plaats, snelheid, standaard methoden,...
+*  
+* 
+* @author Michiel
+*
+*/
 public class Entity {
-	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double mass, double density){
+	
+	public Entity(){
+		
+	}
+	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double mass, double density)
+		throws IllegalPositionException, IllegalRadiusException{
 		setPosition(xPosition,yPosition);
 		setVelocity(xVelocity,yVelocity);
 		setRadius(radius);
 		setOrientation(orientation);	
-		setMass(mass);
 		setDensity(density);
+		setMass(mass);
 	}
+
+	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
+    
+	/**
+	 * Variable registering the xPosition of this Entity.
+	 */
+	private double xPosition = 0.0;
+
+	/**
+	 * Variable registering the yPosition of this Entity.
+	 */
+	private double yPosition = 0.0;
+
+
+	/**
+	 * Variable registering the xVelocity of this Entity.
+	 */
+	private double xVelocity = Min_Velocity;
+
+
+	/**
+	 * Variable registering the yVelocity of this Entity.
+	 */
+	private double yVelocity = Min_Velocity;
+
+
+	/**
+	 * Variable registering the minimum allowed velocity.
+	 */
+	private static final double Min_Velocity = 0;
+
+	/**
+	 * Variable registering the maximum allowed velocity.
+	 */
+	private static final double Max_Velocity = 300000;
+
+	/**
+	 * Variable registering the orientation of this Entity.
+	 */
+	private double orientation = Min_Orientation;
+
+	/**
+	 * Variable registering the minimum allowed orientation
+	 */
+	private static final double Min_Orientation = 0.0;
+
+
+	/**
+	 * Variable registering the maximum allowed orientation
+	 */
+	private static final double Max_Orientation = 2.0*Math.PI;
+
+
+	/**
+	 * Variable registering the radius of this Entity.
+	 * @Override
+	 */
+	private double radius = Min_Radius;
+
+	/**
+	 * Variable registering the minimum allowed Radius.
+	 * @Override
+	 */
+	private static final double Min_Radius = 10.0;
 	
+
+  
+    /**
+     * Variable registering the minimum allowed density.
+     * @Override
+     */
+    
+    private static final double Min_Density = 1.42*(Math.pow(10, 12));
+    
+    /**
+     * Variable registering the density of this Entity.
+     */
+    private double density = Min_Density;
+    
+    /**
+     * Variable registering the Minimum allowed mass.
+     */
+    private final double Min_Mass = Min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+    
+    /**
+     * Variable registering the mass of this Entity.
+     */
+    private double mass = Min_Mass;
+
+//-----------------------------------------
 	
 	//Setters
 	
 	
 	//POSITION
-	double xPosition;
-	double yPosition;
 	public void setPosition(double xPosition, double yPosition) 
 			throws IllegalPositionException{
 		if (!isValidPosition(xPosition,yPosition)){
@@ -32,9 +134,9 @@ public class Entity {
 	 * Returns whether the given Position is valid.
 	 * 
 	 * @param xPostion
-	 * 		  The x-coordinate for this ship.	
+	 * 		  The x-coordinate for this Entity.	
 	 * @param yPosition
-	 * 		  The y-coordinate for this ship.	 
+	 * 		  The y-coordinate for this Entity.	 
 	 * @return True if and only if neither of the coordinates is either infinity or NaN
 	 *		  | result == (isValidCoordinate(xPosition) && isValidCoordinate(yPosition))
 	 */
@@ -61,31 +163,10 @@ public class Entity {
 	
 	//VELOCITY
 	
-	/**
-	 * Variable registering the xVelocity of this Ship.
-	 */
-	private double xVelocity = Min_Velocity;
-
 
 	/**
-	 * Variable registering the yVelocity of this Ship.
-	 */
-	private double yVelocity = Min_Velocity;
-
-
-	/**
-	 * Variable registering the minimum allowed velocity.
-	 */
-	private static final double Min_Velocity = 0;
-
-	/**
-	 * Variable registering the maximum allowed velocity.
-	 */
-	private static final double Max_Velocity = 300000;
-	
-	/**
-	 * Return the velocity of this ship, in the x-direction.
-	 * @return the horizontal velocity of this ship.
+	 * Return the velocity of this Entity, in the x-direction.
+	 * @return the horizontal velocity of this Entity.
 	 */
 	@Basic
 	public double getxVelocity(){
@@ -94,24 +175,30 @@ public class Entity {
 	}
 
 	/**
-	 * Return the velocity of this ship, in the y-direction.
-	 * @return the vertical velocity of this ship.
+	 * Return the velocity of this Entity, in the y-direction.
+	 * @return the vertical velocity of this Entity.
 	 */
 	@Basic
 	public double getyVelocity(){
 		return this.yVelocity;
 
 	}
-
+	/**
+	 * Returns the velocity in an array: (Vx,Vy).
+	 * 
+	 * @return A set of doubles; the xVelocity and yVelocity.
+	 * 		   |double[] Velocity = {getxVelocity(),getyVelocity()}
+	 * 		   |return Velocity
+	 */
 	public double[] getVelocity(){
 		double[] Velocity = {getxVelocity(),getyVelocity()};
 		return Velocity;
 	}
-	
+
 	/**
-	 * Return the total velocity of this ship.
-	 * @return the total velocity of this ship.
-	 * @note The total velocity of a ship is computed:
+	 * Return the total velocity of this Entity.
+	 * @return the total velocity of this Entity.
+	 * @note The total velocity of a Entity is computed:
 	 * 		 by taking the square root of the sum of the
 	 * 		 secondpowers of the horizontal and vertical velocity.
 	 * 		-> sqrt(Vx^2+Vy^2)
@@ -120,16 +207,14 @@ public class Entity {
 	public double getTotalVelocity(){
 		return Math.sqrt(Math.pow(getyVelocity(),2.0)+Math.pow(getxVelocity(),2.0));	
 	}
-
-
 	
 	/** 
 	 * This method sets the Velocity to the given value.  
 	 * 
 	 * @param xVelocity
-	 * 		  The new velocity in the x-direction for this ship.
+	 * 		  The new velocity in the x-direction for this Entity.
 	 * @param yVelocity
-	 * 		  The new velocity in the y-direction for this ship.
+	 * 		  The new velocity in the y-direction for this Entity.
 	 * 
 	 * @post if one of the given velocities is not a number, the velocities are left untouched.
 	 * 	     if (Double.isNaN(xVelocity) || Double.isNaN(yVelocity)){
@@ -151,16 +236,16 @@ public class Entity {
 	public void setVelocity(double xVelocity, double yVelocity){
 		
 		if ((!Double.isNaN(xVelocity)) && (!Double.isNaN(yVelocity))){
-		
-		
-			this.xVelocity = xVelocity;
-			this.yVelocity = yVelocity;
 
 				if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
 					this.scaleVelocity(xVelocity, yVelocity);
-		}		}
+				}		
+				else{
+					this.xVelocity = xVelocity;
+					this.yVelocity = yVelocity;
+				}
+		}
 	}
-
 
 
 	/**
@@ -208,9 +293,6 @@ public class Entity {
 		this.yVelocity = scaledyVelocity;
 	}
 	
-	
-	
-	
 	//RADIUS
 	
 	public void setRadius(){
@@ -218,57 +300,44 @@ public class Entity {
 	}
 	
 	public void setMass(double mass){
-		if(isValidMass(mass)){
+		if(isValidMass(mass,radius)){
 			this.mass=mass;
 		}
 		
 	}
 	
+	// als mass op zich niet gemeenschappelijk heeft, is het dan nuttig om het hier te definieren?
 	public boolean isValidMass(double mass, double radius){
-		double minimalMass = this.density;
+		double minimalMass = getDensity()*(4/3)*Math.PI*(Math.pow(radius,3);
 	}
 	
 	
 	
-	//DENSITY
-	public double density;
-	public static final double defaultDensity = 	1.42*(Math.pow(10, 12));
+	//DENSITY -- Minimale waarde verschilt voor schip en kogel. 
+	// Namelijk 1.42*(Math.pow(10, 12)) voor schip
+	// en 7.8*(Math.pow(10, 12)) voor kogel.
 
 	public void setDensity(double density){
 		if(this.isValidDensity(density)){
 			this.density = density;
 		} else {
-			this.density = this.defaultDensity;
+			this.density = Entity.Min_Density;
 		}
 	}
 	
 	public boolean isValidDensity(double density){
-		return (density >= this.defaultDensity);
+		return (density >= Entity.Min_Density);
 	}
 	
 	public double getDensity(){
 		return this.density;
 	}
-		
+	
 
 	//Inspectors
 	
 	//Mutators
 
-// The goal is to create a class that involves all the thinggs that entities (ie ships and bullets)
-// have in common. Bullet and ship will then be made subclasses of Entity. If needed, the methods within
-// these classes can override the methods of ENtity.
-
-/** Plaats, snelheid, standaard methoden,...
- *  
- * 
- * @author Michiel
- *
- */
-
-public class Entity {
-	
-	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation){ 
-	
-
 }
+
+

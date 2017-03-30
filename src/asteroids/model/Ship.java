@@ -24,7 +24,7 @@ import be.kuleuven.cs.som.annotate.Immutable;
 
  */
 
-public class Ship {
+public class Ship extends Entity {
 
 	//-------------------------------   Constructors: #2 --------------------------------------------
 	/**
@@ -66,7 +66,7 @@ public class Ship {
 	 */
 
 	// Position X and Y are described seperatly, this proves to be the easiest to work with. Same goes for velocity.
-	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation) 
+	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double mass, double density, World world) 
 							throws IllegalPositionException, IllegalRadiusException{
 		
 		// At this point we can invoke our mutators. They will see to it that the class invariants hold at all times.
@@ -95,11 +95,11 @@ public class Ship {
 	 * @note We know that the exceptions can never be thorwn in this default case, but JAVA makes us throw them anyway.
 	 */
     public Ship() throws IllegalPositionException, IllegalRadiusException{
-		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation);
+		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation,Min_Mass,Min_Density null);
 	}
 
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
-
+    
 	/**
 	 * Variable registering the xPosition of this Ship.
 	 */
@@ -152,18 +152,39 @@ public class Ship {
 
 	/**
 	 * Variable registering the radius of this Ship.
+	 * @Override
 	 */
 	private double radius = Min_Radius;
 
 	/**
 	 * Variable registering the minimum allowed Radius.
+	 * @Override
 	 */
 	private static final double Min_Radius = 10.0;
-
-
-
-
-
+	
+    /**
+     * Variable registering the density of this ship.
+     */
+    private double density = Min_Density;
+  
+    /**
+     * Variable registering the minimum allowed density.
+     * @Override
+     */
+    
+    private static final double Min_Density = 1.42*(Math.pow(10, 12));
+    
+    /**
+     * Variable registering the Minimum allowed mass.
+     */
+    private final double Min_Mass = Min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+    
+    /**
+     * Variable registering the mass of this ship.
+     */
+    private double mass = Min_Mass;
+    
+    
 	// ------------------------   The inspectors -------------------------------------------------------
 
 	/**
@@ -350,14 +371,15 @@ public class Ship {
 	public void setVelocity(double xVelocity, double yVelocity){
 		
 		if ((!Double.isNaN(xVelocity)) && (!Double.isNaN(yVelocity))){
-		
-		
-			this.xVelocity = xVelocity;
-			this.yVelocity = yVelocity;
 
 				if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
 					this.scaleVelocity(xVelocity, yVelocity);
-		}		}
+				}		
+				else{
+					this.xVelocity = xVelocity;
+					this.yVelocity = yVelocity;
+				}
+		}
 	}
 
 
@@ -407,7 +429,7 @@ public class Ship {
 		this.yVelocity = scaledyVelocity;
 	}
 
-
+ 
 	/** 
 	 * Sets the radius to the given Value, if it is valid.
 	 * 
@@ -653,7 +675,6 @@ public class Ship {
 	 *		   This result can, for example, be used to calculate the distance between a ship and
 	 *		   the collision with the other object. This simply by multiplying the time (found by this method)
 	 *		   with the speed of the entity. One could also use the method move to move the ship to to the place of collision.
-	 * 
 	 *
 	 * @see implementation		   
 	 *	   	
@@ -684,9 +705,6 @@ public class Ship {
 		else{
 			return -(DvDr + Math.sqrt(d))/(DvDv);}
 	}
-
-	
-
 	
 	/** 
 	 * Returns the position on which two ships collide, if they ever collide. Otherwise it returns null.

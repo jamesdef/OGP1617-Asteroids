@@ -261,7 +261,7 @@ public class World {
 	 * @throws IllegalCollisionException
 	 */
 	public double getTimetoFirstCollision() throws IllegalCollisionException{
-		double TimetoFirstCollision = 100.0;
+		double TimetoFirstCollision = 1000000.0;
 		for (Ship ship1 : this.getAllShips()){
 			for (Ship ship2 : this.getAllShips()){
 				double time = ship1.getTimeToCollision(ship2);
