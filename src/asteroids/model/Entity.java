@@ -28,6 +28,36 @@ public class Entity {
 		this.yPosition = yPosition;
 	}
 	
+	/**
+	 * Returns whether the given Position is valid.
+	 * 
+	 * @param xPostion
+	 * 		  The x-coordinate for this ship.	
+	 * @param yPosition
+	 * 		  The y-coordinate for this ship.	 
+	 * @return True if and only if neither of the coordinates is either infinity or NaN
+	 *		  | result == (isValidCoordinate(xPosition) && isValidCoordinate(yPosition))
+	 */
+	public static boolean isValidPosition(double xPosition, double yPosition){
+	
+		return (isValidCoordinate(xPosition) && isValidCoordinate(yPosition));
+	}
+	
+	/**
+	 * Returns whether this coordinate is valid
+	 * 
+	 * @param coordinate
+	 * 		   The coordinate that we wish to inspect
+	 * 
+	 * @return True if and only if this coordinate is not infinity or not a number.
+	 * 		   |result == (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
+				&& (coordinate != Double.NEGATIVE_INFINITY));
+	 */
+	public static boolean isValidCoordinate(double coordinate){
+		return (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
+				&& (coordinate != Double.NEGATIVE_INFINITY));
+	}
+	
 	
 	//VELOCITY
 	
@@ -195,7 +225,7 @@ public class Entity {
 	}
 	
 	public boolean isValidMass(double mass, double radius){
-		double minimalMass = this.density
+		double minimalMass = this.density;
 	}
 	
 	
@@ -224,7 +254,7 @@ public class Entity {
 	//Inspectors
 	
 	//Mutators
-=======
+
 // The goal is to create a class that involves all the thinggs that entities (ie ships and bullets)
 // have in common. Bullet and ship will then be made subclasses of Entity. If needed, the methods within
 // these classes can override the methods of ENtity.

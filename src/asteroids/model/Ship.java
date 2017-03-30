@@ -7,7 +7,7 @@ import be.kuleuven.cs.som.annotate.Immutable;
  * A class for dealing with ships that have a certain position, radius, speed and orientation.
  * 
  * 
- * @invar   The highest possible absolute, total velocity is 300000 (km/s) the ship can never exceed this speed.
+ * @invar   The highest possible absolute, total velocity is lower than a certain maximum the ship can never exceed this speed.
  * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
  *  
  * @invar	The orientation of the ship must be a valid value.
@@ -19,7 +19,7 @@ import be.kuleuven.cs.som.annotate.Immutable;
  * @invar   The coordinates of a ship must be finit numbers.
  * 			|isValidPosition(getxPosition,getyPosition);
  *   
- * @version 1.0     
+ * @version 2.0     
  * @author James Defauw & Michiel De Koninck
 
  */
@@ -55,16 +55,6 @@ public class Ship {
 	 * 		   The orientation of this vessel, i.e., it's direction.
 	 * 		   Expressed in radians.    
 	 * 
-	 * @throws IllegalPositionException 
-	 * 		   Handled within setPosition()
-	 * 		   This position is not valid
-	 * 		   |!isValidPosition(xPosition,yPosition)
-	 * 
-	 * @throws IllegalRadiusException
-	 * 		   Handled within setRadius() 
-	 * 		   This radius is not valid.
-	 * 		   |!isValidRadius(radius)
-	 * 
 	 * @effect The given parameters are set as the properties of the new ship.
 	 * 		   |setPosition(xPosition,yPosition);
 	 *	       |setVelocity(xVelocity,yVelocity);
@@ -78,7 +68,7 @@ public class Ship {
 	// Position X and Y are described seperatly, this proves to be the easiest to work with. Same goes for velocity.
 	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation) 
 							throws IllegalPositionException, IllegalRadiusException{
-
+		
 		// At this point we can invoke our mutators. They will see to it that the class invariants hold at all times.
 		setPosition(xPosition,yPosition);
 		setVelocity(xVelocity,yVelocity);
@@ -89,15 +79,6 @@ public class Ship {
 
 	/**
 	 * Initialize this new ship with their parameters (position,speed,radius,orientation) set to their lowest possible values.
-	 * @throws IllegalPositionException 
-	 * 		   Handled within setPosition()
-	 * 		   This position is not valid
-	 * 		   |!isValidPosition(xPosition,yPosition)
-	 * 
-	 * @throws IllegalRadiusException
-	 * 		   Handled within setRadius() 
-	 * 		   This radius is not valid.
-	 * 		   |!isValidRadius(radius)
 	 * 
 	 * @effect 	This new ship is initialized in the center of the grid: (0,0)
 	 * 			It's radius will be set to it's lowest possible value.
@@ -224,7 +205,14 @@ public class Ship {
 		return this.yVelocity;
 
 	}
-
+	
+	/**
+	 * Returns the velocity in an array: (Vx,Vy).
+	 * 
+	 * @return A set of doubles; the xVelocity and yVelocity.
+	 * 		   |double[] Velocity = {getxVelocity(),getyVelocity()}
+	 * 		   |return Velocity
+	 */
 	public double[] getVelocity(){
 		double[] Velocity = {getxVelocity(),getyVelocity()};
 		return Velocity;
@@ -267,10 +255,9 @@ public class Ship {
 	 *  Returns the x and y coordinates within an array.
 	 *  
 	 * @return the x and y coordinate as an array.
-	 * 
+	 * 		 
 	 */
 	public double[] getPosition(){
-
 		double[] position = {this.getxPosition(),this.getyPosition()};	
 		return position;			
 	}
@@ -304,7 +291,6 @@ public class Ship {
 		this.yPosition = yPosition;
 	}
 
-// Je zou ook isValidCoordinate kunnen invoeren en dat 2 maal toepassen op x en y, dat is mooier.
 	/**
 	 * Returns whether the given Position is valid.
 	 * 
@@ -313,15 +299,26 @@ public class Ship {
 	 * @param yPosition
 	 * 		  The y-coordinate for this ship.	 
 	 * @return True if and only if neither of the coordinates is either infinity or NaN
-	 *		  | result == ((!Double.isNaN(xPosition)) && (!Double.isNaN(yPosition)) && (xPosition != Double.POSITIVE_INFINITY) 
-	 *				&& (xPosition != Double.NEGATIVE_INFINITY) && (yPosition != Double.POSITIVE_INFINITY) 
-	 *							&& (yPosition != Double.NEGATIVE_INFINITY));
+	 *		  | result == (isValidCoordinate(xPosition) && isValidCoordinate(yPosition))
 	 */
 	public static boolean isValidPosition(double xPosition, double yPosition){
 	
-		return ((!Double.isNaN(xPosition)) && (!Double.isNaN(yPosition)) && (xPosition != Double.POSITIVE_INFINITY) 
-					&& (xPosition != Double.NEGATIVE_INFINITY) && (yPosition != Double.POSITIVE_INFINITY) 
-								&& (yPosition != Double.NEGATIVE_INFINITY));
+		return (isValidCoordinate(xPosition) && isValidCoordinate(yPosition));
+	}
+	
+	/**
+	 * Returns whether this coordinate is valid
+	 * 
+	 * @param coordinate
+	 * 		   The coordinate that we wish to inspect
+	 * 
+	 * @return True if and only if this coordinate is not infinity or not a number.
+	 * 		   |result == (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
+				&& (coordinate != Double.NEGATIVE_INFINITY));
+	 */
+	public static boolean isValidCoordinate(double coordinate){
+		return (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
+				&& (coordinate != Double.NEGATIVE_INFINITY));
 	}
 	
 
@@ -439,7 +436,7 @@ public class Ship {
 	 * @return True if the radius exceeds the minimal radius
 	 * 		   false if the radius is less than the minimal_radius. 
 	 * 		   Or if the radius is Infinity or not a number.
-	 * 		   | radius >= Min_Radius;
+	 * 		   | radius >= getMin_Radius;
 	 */
 	public static boolean isValidRadius(double radius){
 		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
@@ -457,16 +454,10 @@ public class Ship {
 	 * 		  The new, given orientation of the ship.
 	 * @pre The given orientation must be a valid one.
 	 * 		|isValidOrientation(orientation)
-	 * @post if the given Value is negative, it is first changed to its positive counterpart.
-	 * 		 |	if (orientation < 0){
-						then orientation = 2.0*Math.PI + orientation}
 	 * @post The orientation of the ship is now changed to the given value
 	 *		|new.getOrientation()== orientation
 	 */
 	public void setOrientation(double orientation){
-//		if (orientation < 0){
-//			orientation = 2.0*Math.PI + orientation;
-//		}
 		assert isValidOrientation(orientation);
 		this.orientation = orientation;	
 	}
@@ -481,7 +472,7 @@ public class Ship {
 	 * 		  The orientation of which we need to check whether it is legal.
 	 * 
 	 * @return True if and only if the given orientation is within the boundaries opposed upon orientation. (And has to be a number)
-	 * 		   |result == (Min_Orientation <= orientation) && (orientation < Max_Orientation) && !Double.isNaN(orientation)
+	 * 		   |result == (getMin_Orientation <= orientation) && (orientation < getMax_Orientation) && !Double.isNaN(orientation)
 	 * 
 	 */
 	public static boolean isValidOrientation(double orientation){
@@ -592,7 +583,7 @@ public class Ship {
 	 * @param angle
 	 * 		  The angle to scale 
 	 * @return returns the angle scaled to fit the boundaries of the orientation.
-	 *         | result = angle % Max_Orientation;
+	 *         | result = angle % getMax_Orientation;
 	 */
 	public double scaleangle(double angle){
 		double ScaledAngle = angle % Max_Orientation;
@@ -603,7 +594,7 @@ public class Ship {
 	//  COLLISION PREDICTION  : DEFENSIVE
 
 	
-// Fout gemaakt hier moet je ook nog rekening houden dat de gebruiker het eigen schip kan opgeven.
+// Fout gemaakt hier moet je ook nog rekening houden dat de gebruiker het schip zelf 2 maal kan opgeven.
 // Hier moeten dus 2 return clauses staan.
 	/**
 	 *  Return the distance betwheen two ships.
@@ -611,19 +602,23 @@ public class Ship {
 	 * @param other
 	 *        The other ship of which we want to know the distance to this ship.
 	 * 
-	 * @return The distance between the two ships. Computed as below:
+	 * @return If the 2 ships are in fact different ship; The distance between the two ships. Computed as below:
 	 * 		   | centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+ 
 	 * 											Math.pow((this.getyPosition()-other.yPosition), 2.0));
 	 * 		   | result  == centerDistance - this.getRadius() - other.radius;
 	 * 
-	 * @return if ship == other ship
-	 * 		   result == 0
-	 * 
+	 * @return If the given ships refer the same ship, 0 will be the returned result.
+	 * 		   |if ship == other ship
+	 * 		   |result == 0
 	 */
 	public double getDistanceBetween(Ship other){
+		double result = 0;
+		if (this != other){
 		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+
 									Math.pow((this.getyPosition()-other.yPosition), 2.0));
-		return centerDistance - this.getRadius() - other.radius;
+		result = centerDistance - this.getRadius() - other.radius;
+		}
+		return result;
 	}
 
 
@@ -652,18 +647,15 @@ public class Ship {
 	 * 		  The other ship with which this ship might collide
 	 * 
 	 * 
-	 * @return Returns in how many seconds 2 spacecrafts will collide.
-	 * 		   If they never collide it wil return Double.POSITIVE_INFINITY
-	 * 		   |if ((d <= 0) || (DvDr >= 0))
-	 *		   |     then getTimeToCollision(this,other) = Double.POSITIVE_INFINITY;
-	 *		   
-	 *		   Otherwise it wil first compute sigma: the distance between 
-	 *		   the two centres of the ships at the moment of collision.
-	 *		   For this we compute the position at which they are at after travelling a certain time T.
-	 *		   By substituting these expressions for the coordinates into the sigma equation, we get a quadratic equation.
-	 *		   By solving this we get a certain expression for T. 
-	 *		   Finally calculating this expression(which is done in the body below) asks for a lot of scalar products.
-	 *		   To simplify this, the scalar products are calculated seperatly.		   
+	 * @return Returns in how many seconds 2 entities will collide.
+	 * 		   If they never collide it wil return positive infinity.
+	 *			
+	 *		   This result can, for example, be used to calculate the distance between a ship and
+	 *		   the collision with the other object. This simply by multiplying the time (found by this method)
+	 *		   with the speed of the entity. One could also use the method move to move the ship to to the place of collision.
+	 * 
+	 *
+	 * @see implementation		   
 	 *	   	
 	 * @throws IllegalCollisionException
 	 * 		   If two ships overlap, this method does not apply.
@@ -706,17 +698,8 @@ public class Ship {
 	 * 		   Computation starts from initial positions and calculates the difference in positions at the time of collision.
 	 * 		   This information is used to return the Collision coordinates.
 	 * 		   Null if they never collide.
-	 * 		   |if (getTimeToCollision(other) == Double.POSITIVE_INFINITY){
-	 *					then return null;
-	 *         |else:
-	 *		    |double[] FirstShipPosition = {this.getxPosition() + this.getxVelocity()*T, this.getyPosition() + this.getyVelocity()*T};
-	 *			|double[] SecondShipPosition = {other.getxPosition() + other.getxVelocity()*T, other.getyPosition() + other.getyVelocity()*T};
-	 *		    |double[] CenterDistance = {SecondShipPosition[0] - FirstShipPosition[0], SecondShipPosition[1]- FirstShipPosition[1]};
-	 *			|double Norm = Math.sqrt(Math.pow(CenterDistance[0],2.0)+ Math.pow(CenterDistance[1],2.0));
-	 *			|double[] NormedCenterDistance = {(SecondShipPosition[0] - FirstShipPosition[0])/Norm, (SecondShipPosition[1]- FirstShipPosition[1])/Norm};
-	 *			|double[]RadiusWithDirection = {this.getRadius()*NormedCenterDistance[0],this.getRadius()*NormedCenterDistance[1]};
-	 *			|double[] CollisionCoordinates = {FirstShipPosition[0]+RadiusWithDirection[0], FirstShipPosition[1]+RadiusWithDirection[1]};
-	 *			|getCollisionPosition = CollisionCoordinates
+	 * 
+	 * @see implementation
 	 *		
 	 * 
 	 * @throws IllegalCollisionException
