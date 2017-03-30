@@ -318,6 +318,7 @@ public class Ship {
 	 *							&& (yPosition != Double.NEGATIVE_INFINITY));
 	 */
 	public static boolean isValidPosition(double xPosition, double yPosition){
+	
 		return ((!Double.isNaN(xPosition)) && (!Double.isNaN(yPosition)) && (xPosition != Double.POSITIVE_INFINITY) 
 					&& (xPosition != Double.NEGATIVE_INFINITY) && (yPosition != Double.POSITIVE_INFINITY) 
 								&& (yPosition != Double.NEGATIVE_INFINITY));

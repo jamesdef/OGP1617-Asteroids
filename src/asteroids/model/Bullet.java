@@ -1,6 +1,7 @@
 package asteroids.model;
 
 public class Bullet {
+	
 	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, Ship ship, World world){
 		
 		setxPosition(xPosition);
