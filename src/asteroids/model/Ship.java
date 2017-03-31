@@ -108,12 +108,15 @@ public class Ship extends Entity {
 
 	/**
 	 * Variable registering the minimum allowed Radius.
+	 * The minimum radius may change in the future. 
+	 * But it will always remain the same for all Ships.
 	 * @Override
 	 */
 	private static double Min_Radius = 10.0;
 	
     /**
      * Variable registering the density of this ship.
+     * @Override
      */
     private double density = Min_Density;
   
@@ -127,21 +130,60 @@ public class Ship extends Entity {
     
     /**
      * Variable registering the Minimum allowed mass.
+     * @Override
      */
     private final double Min_Mass = Min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
     
     /**
      * Variable registering the mass of this ship.
+     * @Override
      */
     private double mass = Min_Mass;
     
     
 	// ------------------------   The inspectors -------------------------------------------------------
 
-
+    
+    /**
+     * This method returns the total mass of this ship. 
+     * 
+     * This mass is equal to the mass of the ship itself plus the mass of
+     * objects carried by the ship
+     * 
+     * @return  The mass of the ship itself plus the mass of
+     * 			objects carried by the ship
+     * 			|return this.getMass() + GetMassOfAllBulletsOwnedByThisShip;
+     */
+	public double getTotalMass(){
+		return this.getMass() + GetMassOfAllBulletsOwnedByThisShip;
+	}
 
 	// ------------------------------------ SETTERS --------------------------
  
+	 /**
+     * This method makes it possible for the user to change the lower bound
+     * imposed upon ships, for all ships.
+     * 
+     * @param Lower_Bound
+     * 		  The new minimum radius.
+     * 
+     * @post The new universal lower bound for the radius is equal to the given value.
+     * 		 |new.Min_Radius == Lower_Bound
+     * 
+     * @throws IllegalArgumentException
+     * 		   The given argument is not valid.
+     * 		   | !(Lower_bound > 0)
+     */
+    public void setMin_Radius(double Lower_Bound){
+    	if (Lower_Bound > 0){
+    		Ship.Min_Radius = Lower_Bound;
+    	}
+    	else{
+    		throw new IllegalArgumentException(Double.toString(Lower_Bound));
+    	}
+    }
+    
+    
 	/** 
 	 * Sets the radius to the given Value, if it is valid.
 	 * 

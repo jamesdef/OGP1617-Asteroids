@@ -12,19 +12,22 @@ import be.kuleuven.cs.som.annotate.Immutable;
 * @author Michiel
 *
 */
-public class Entity {
+
+// Ik denk dat dit een abstracte klasse mag zijn omdat zijn constructor in principe overbodig is.
+public abstract class Entity {
 	
 	public Entity(){
 		
 	}
+	// Constructoren worden niet gebruikt in abstracte klasses
 	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double mass, double density)
 		throws IllegalPositionException, IllegalRadiusException{
-		setPosition(xPosition,yPosition);
-		setVelocity(xVelocity,yVelocity);
-		setRadius(radius);
-		setOrientation(orientation);	
-		setDensity(density);
-		setMass(mass);
+//		setPosition(xPosition,yPosition);
+//		setVelocity(xVelocity,yVelocity);
+//		setRadius(radius);
+//		setOrientation(orientation);	
+//		setDensity(density);
+//		setMass(mass);
 	}
 
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
@@ -87,12 +90,10 @@ public class Entity {
 
 	/**
 	 * Variable registering the minimum allowed Radius.
-	 * @Override
 	 */
-	private static final double Min_Radius = 10.0;
+	protected static double Min_Radius = 10.0;
 	
 
-  
     /**
      * Variable registering the minimum allowed density.
      * @Override
@@ -108,7 +109,7 @@ public class Entity {
     /**
      * Variable registering the Minimum allowed mass.
      */
-    private final double Min_Mass = Min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+    protected final double Min_Mass = Min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
     
     /**
      * Variable registering the mass of this Entity.
@@ -194,8 +195,8 @@ public class Entity {
 	}	
 
 	/**
-	 *  Return the radius of this ship.
-	 * @return the radius of this ship.
+	 *  Return the radius of this Entity.
+	 * @return the radius of this Entity.
 	 */
 	@Basic
 	@Immutable
@@ -209,6 +210,7 @@ public class Entity {
 	 * @return the x and y coordinate as an array.
 	 * 		 
 	 */
+	@Basic
 	public double[] getPosition(){
 		double[] position = {this.getxPosition(),this.getyPosition()};	
 		return position;			
@@ -218,6 +220,7 @@ public class Entity {
 	 * Return the mass of this entity.
 	 * @return the mass of this entity.
 	 */
+	@Basic
 	public double getMass(){
 		return this.mass;
 	}
@@ -226,16 +229,31 @@ public class Entity {
 	 * Return the mass of this entity.
 	 * @return the mass of this entity.
 	 */
+	@Basic
 	public double getDensity(){
 		return this.density;
 	}
 	
-	
-	
 	//Setters
 	
-	
 	//POSITION
+	
+	/** 
+	 * Sets the position to the given coordinates, if these make for a valid position.
+	 * 
+	 * @param xPostion
+	 * 		  The new x-coordinate for this ship.	
+	 * @param yPosition
+	 * 		  The new y-coordinate for this ship.
+	 * @post The x-coordinate of the  ship equals the given xPosition.
+	 * 		 |new.getxPosition == xPosition
+	 * @post The y-coordinate of the  ship equals the given yPosition.
+	 * 		 |new.getyPosition == yPosition
+	 * 
+	 * @throws IllegalPositonException
+	 * 		 The given xPosition or yPosition is not valid.
+	 * 	     | !isValidPosition(xPosition,yPosition)
+	 */
 	public void setPosition(double xPosition, double yPosition) 
 			throws IllegalPositionException{
 		if (!isValidPosition(xPosition,yPosition)){
@@ -367,7 +385,8 @@ public class Entity {
 	}
 	
 	//RADIUS
-	
+    
+    
 	/** 
 	 * Sets the radius to the given Value, if it is valid.
 	 * 
@@ -381,12 +400,12 @@ public class Entity {
 	 * 		   The given radius is not a valid radius.
 	 * 		   | ! isValidRadius(radius)
 	 */
-	public void setRadius(double radius) throws IllegalRadiusException{
+	protected void setRadius(double radius) throws IllegalRadiusException{
 		if (!isValidRadius(radius)){
 			throw new IllegalRadiusException(radius);}
 		this.radius = radius;
 	}
-	
+
 	/** 
 	 * Checks whether the given radius has a valid value.
 	 * 
@@ -401,7 +420,12 @@ public class Entity {
 	public static boolean isValidRadius(double radius){
 		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
+
+
 	
+// Je programeert hier nominaal, dan moeten mensen maar een valid orientation geven, is ze negatief en mag dat niet?
+// Dat kan jou niets schelen, wij werken met ValidOrientations, dat staat in de pre-conditie, de gebruiker moet daaraan voldoen.
+
 	/**
 	 *  Sets the orientation to the given angle, if this is a valid angle.
 	 * 
@@ -417,6 +441,9 @@ public class Entity {
 		this.orientation = orientation;	
 	}
 
+// OPLETTEN MET HET GEBRUIK VAN "Min_Orientation" in je documentatie. 
+// dit is immers een private variable, wat betekent dat de gebruiker die niet kan zien. Misschien best een methode
+// getMin_Orientation invoeren.
 	/**
 	 *  Check whether the given orientaton is a valid value.
 	 * 

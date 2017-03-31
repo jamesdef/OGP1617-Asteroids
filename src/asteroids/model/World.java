@@ -200,7 +200,7 @@ public class World {
    	 * 		  |
    	 */
 	public Entity getEntityatPosition(double xPosition, double yPosition){
-	  return Entity;
+	  return for Entity;
 	}
 	
 	/** 
@@ -298,8 +298,10 @@ public class World {
 	
 	
 	
-	
-	
+	// Probeersel voor klasse structuur
+	public double shmet(Bullet bullet){
+		return bullet.getRadius();
+	}
 	
 }
 
