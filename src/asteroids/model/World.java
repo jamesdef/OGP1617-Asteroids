@@ -303,6 +303,11 @@ public class World {
 		return bullet.getRadius();
 	}
 	
+	// Probeersel voor klasse structuur
+	public double shmet(Bullet bullet, Ship ship){
+		return bullet.getDistanceBetween(ship);
+	}
+	
 }
 
 

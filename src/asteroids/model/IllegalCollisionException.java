@@ -4,7 +4,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 
 /**
- * A class for signaling illegal collision for ships.
+ * A class for signaling illegal collision for entities.
  * 
  * @version 1.0
  * @author Michiel
@@ -23,29 +23,29 @@ public class IllegalCollisionException extends Exception {
 	 * 		 to the given ship.
 	 * 		 | new.getship() == ship
 	 */
-	public IllegalCollisionException(Ship ship1, Ship ship2){
-		this.ship1 = ship1;	
-		this.ship2 = ship2;
+	public IllegalCollisionException(Entity entity, Entity other){
+		this.entity1 = entity;	
+		this.entity2 = other;
 	}
 
-	public Ship ship1;
-	public Ship ship2;
+	public Entity entity1;
+	public Entity entity2;
 	
 	
 	/**
 	 * Return ship1 registered for this illegal collision exception.
 	 */
 	@Basic @Immutable
-	public Ship getship1() {
-		return this.ship1;
+	public Entity getentity1() {
+		return this.entity1;
 	}
 	
 	/**
 	 * Return ship2 registered for this illegal collision exception.
 	 */
 	@Basic @Immutable
-	public Ship getship2() {
-		return this.ship2;
+	public Entity getentity2() {
+		return this.entity2;
 	}
 	
 	/**

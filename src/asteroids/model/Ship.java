@@ -155,7 +155,7 @@ public class Ship extends Entity {
      * 			|return this.getMass() + GetMassOfAllBulletsOwnedByThisShip;
      */
 	public double getTotalMass(){
-		return this.getMass() + GetMassOfAllBulletsOwnedByThisShip;
+		return (this.getMass() + GetMassOfAllBulletsOwnedByThisShip);
 	}
 
 	// ------------------------------------ SETTERS --------------------------
@@ -219,41 +219,7 @@ public class Ship extends Entity {
 	}
 
 
-	
-// Je programeert hier nominaal, dan moeten mensen maar een valid orientation geven, is ze negatief en mag dat niet?
-// Dat kan jou niets schelen, wij werken met ValidOrientations, dat staat in de pre-conditie, de gebruiker moet daaraan voldoen.
 
-	/**
-	 *  Sets the orientation to the given angle, if this is a valid angle.
-	 * 
-	 * @param orientation
-	 * 		  The new, given orientation of the ship.
-	 * @pre The given orientation must be a valid one.
-	 * 		|isValidOrientation(orientation)
-	 * @post The orientation of the ship is now changed to the given value
-	 *		|new.getOrientation()== orientation
-	 */
-	public void setOrientation(double orientation){
-		assert isValidOrientation(orientation);
-		this.orientation = orientation;	
-	}
-
-// OPLETTEN MET HET GEBRUIK VAN "Min_Orientation" in je documentatie. 
-// dit is immers een private variable, wat betekent dat de gebruiker die niet kan zien. Misschien best een methode
-// getMin_Orientation invoeren.
-	/**
-	 *  Check whether the given orientaton is a valid value.
-	 * 
-	 * @param orientations
-	 * 		  The orientation of which we need to check whether it is legal.
-	 * 
-	 * @return True if and only if the given orientation is within the boundaries opposed upon orientation. (And has to be a number)
-	 * 		   |result == (getMin_Orientation <= orientation) && (orientation < getMax_Orientation) && !Double.isNaN(orientation)
-	 * 
-	 */
-	public static boolean isValidOrientation(double orientation){
-		return ((Min_Orientation <= (orientation)) && (orientation <= Max_Orientation) && (!Double.isNaN(orientation)));	
-	}
 
 
 
@@ -352,7 +318,6 @@ public class Ship extends Entity {
 		this.setOrientation(ScaledAngle);
 	}
 
-// Max_orientation is niet beschikbaar voor gebruikers, dit is een private variable, pas dcumentatie aan
 	/**
 	 *  Scales the given angle so that it is within 0<= angle < 2*PI
 	 * 
@@ -365,145 +330,5 @@ public class Ship extends Entity {
 		double ScaledAngle = angle % Max_Orientation;
 		return ScaledAngle;
 	}
-
-
-	//  COLLISION PREDICTION  : DEFENSIVE
-
 	
-// Fout gemaakt hier moet je ook nog rekening houden dat de gebruiker het schip zelf 2 maal kan opgeven.
-// Hier moeten dus 2 return clauses staan.
-	/**
-	 *  Return the distance betwheen two ships.
-	 * 
-	 * @param other
-	 *        The other ship of which we want to know the distance to this ship.
-	 * 
-	 * @return If the 2 ships are in fact different ship; The distance between the two ships. Computed as below:
-	 * 		   | centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+ 
-	 * 											Math.pow((this.getyPosition()-other.yPosition), 2.0));
-	 * 		   | result  == centerDistance - this.getRadius() - other.radius;
-	 * 
-	 * @return If the given ships refer the same ship, 0 will be the returned result.
-	 * 		   |if ship == other ship
-	 * 		   |result == 0
-	 */
-	public double getDistanceBetween(Ship other){
-		double result = 0;
-		if (this != other){
-		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+
-									Math.pow((this.getyPosition()-other.yPosition), 2.0));
-		result = centerDistance - this.getRadius() - other.radius;
-		}
-		return result;
-	}
-
-
-	/**
-	 * Check whether two ships overlap.
-	 * 
-	 * @param other
-	 * 		  The other ship of which we want to check if it overlaps with this ship.
-	 * @return True if and only if the distance between the two ships is less than zero.
-	 * 		   | getDistanceBetween(other) < 0
-	 */
-	public boolean overlap(Ship other){
-		return (this.getDistanceBetween(other) < 0);	
-	}
-
-// DECLARATIEVE SPECIFICATIE:
-	// HOUDT in dat je duidt op wat het nut is van de functie, wat je kan doen met het resultaat.
-	//Je bespreekt dus niet exact hoe het resultaat bekomen wordt, maar wel wat je ermee kan doen.
-	// Daar heeft de gebruiker immers het meeste aan.
-	
-	/**
-	 *  Calculates the time to the point where the two given ships collide.
-	 * 	If they never collide, it returns positive infinity.
-	 * 
-	 * @param other
-	 * 		  The other ship with which this ship might collide
-	 * 
-	 * 
-	 * @return Returns in how many seconds 2 entities will collide.
-	 * 		   If they never collide it wil return positive infinity.
-	 *			
-	 *		   This result can, for example, be used to calculate the distance between a ship and
-	 *		   the collision with the other object. This simply by multiplying the time (found by this method)
-	 *		   with the speed of the entity. One could also use the method move to move the ship to to the place of collision.
-	 *
-	 * @see implementation		   
-	 *	   	
-	 * @throws IllegalCollisionException
-	 * 		   If two ships overlap, this method does not apply.
-	 */
-	public double getTimeToCollision(Ship other) throws IllegalCollisionException {
-		if (overlap(other)){
-			throw new IllegalCollisionException(this,other);
-		}
-		
-		//Sigma is centerdistance at the moment of collision : sum of two radii.
-		double sigma = other.getRadius() + this.getRadius();
-		double[] Dv= {other.getxVelocity() - this.getxVelocity(), other.getyVelocity() - this.getyVelocity()};
-		double[] Dr= {other.getxPosition() - this.getxPosition(), other.getyPosition() - this.getyPosition()};
-
-		// Avoided scalair product by implementing this 'fake multiplication' to guarantee easy computing.
-		double DrDr = Math.pow(Dr[0], 2.0)+Math.pow(Dr[1], 2.0);
-		double DvDr = Dv[0]*Dr[0] + Dv[1]*Dr[1];
-		double DvDv = Math.pow(Dv[0], 2.0)+Math.pow(Dv[1], 2.0);
-
-		double d = Math.pow(DvDr, 2.0) - (DvDv)*(DrDr- Math.pow(sigma, 2.0));
-
-		if ((d <= 0) || (DvDr >= 0)){
-			return Double.POSITIVE_INFINITY;
-		}
-		
-		else{
-			return -(DvDr + Math.sqrt(d))/(DvDv);}
-	}
-	
-	/** 
-	 * Returns the position on which two ships collide, if they ever collide. Otherwise it returns null.
-	 * 
-	 * @param other
-	 * 		  The other ship with which this ship might collide.
-	 * 
-	 * @return The Position (an array) on which two ships collide (if they ever collide).
-	 * 		   Computation starts from initial positions and calculates the difference in positions at the time of collision.
-	 * 		   This information is used to return the Collision coordinates.
-	 * 		   Null if they never collide.
-	 * 
-	 * @see implementation
-	 *		
-	 * 
-	 * @throws IllegalCollisionException
-	 * 		   Created within getTimeToCollision(other)
-	 * 		   We cannot calculate the collision position of two overlapping ships.
-	 */
-	public double[] getCollisionPosition(Ship other) throws IllegalCollisionException{
-
-		//Using the time to collision, we now compute the position of the collision.
-		//For this we first calculate where the two others are at, at the time of collision.
-		//Then we calculate where exactly they collide. 
-
-		double T = getTimeToCollision(other);
-
-		if (T == Double.POSITIVE_INFINITY){
-			return null;
-		}
-
-		//Where are the ships after time T?
-
-		double[] FirstShipPosition = {this.getxPosition() + this.getxVelocity()*T, this.getyPosition() + this.getyVelocity()*T};
-		double[] SecondShipPosition = {other.getxPosition() + other.getxVelocity()*T, other.getyPosition() + other.getyVelocity()*T};
-
-		//The position of the first ship, incremented with it's radius 
-		// (in the right direction = direction to the center of the other ship) results in the answer.
-
-		double[] CenterDistance = {SecondShipPosition[0] - FirstShipPosition[0], SecondShipPosition[1]- FirstShipPosition[1]};
-		double Norm = Math.sqrt(Math.pow(CenterDistance[0],2.0)+ Math.pow(CenterDistance[1],2.0));
-		double[] NormedCenterDistance = {(SecondShipPosition[0] - FirstShipPosition[0])/Norm, (SecondShipPosition[1]- FirstShipPosition[1])/Norm};
-		double[]RadiusWithDirection = {this.getRadius()*NormedCenterDistance[0],this.getRadius()*NormedCenterDistance[1]};
-		double[] CollisionCoordinates = {FirstShipPosition[0]+RadiusWithDirection[0], FirstShipPosition[1]+RadiusWithDirection[1]};
-
-		return CollisionCoordinates;
-	}	
 }

@@ -1,17 +1,18 @@
 package asteroids.model;
 
+import be.kuleuven.cs.som.annotate.Basic;
+
 public class Bullet extends Entity {
 	
-	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, Ship ship, World world){
+	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double density, double mass, Ship ship, World world) throws IllegalPositionException, IllegalRadiusException{
 		
 		setPosition(xPosition,yPosition);
 		setVelocity(xVelocity,yVelocity);
 		setRadius(radius);
 		setOrientation(orientation);
-		
+		setMass(mass);
 		setShip(ship);
-		setWorld(world);
-		
+		setWorld(world);	
 	}
 	
 	// Initialising Variables & Defaults
@@ -47,11 +48,40 @@ public class Bullet extends Entity {
 	 * @Override
 	 */
 	private double mass = density*(4/3)*Math.PI*(Math.pow(radius, 3));
+	
+	/**
+	 * Field initialising the existence of ship.
+	 * Initialised to a value of null.
+	 */
+	private Ship ship = null;
+
+	/**
+	 * Field initialising the existence of World.
+	 * Initialised to a value of null.
+	 */
+	private World world = null;
     
 	
 
 	// Getters
 	
+	/**
+	 * Returns the world to which this bullet belongs.
+	 * @return the world to which this bullet belongs.
+	 */
+	@Basic
+	public World getWorld(){
+		return this.world;
+	}
+	
+	/**
+	 * Returns the ship to which this bullet belongs.
+	 * @return the ship to which this bullet belongs.
+	 */
+	@Basic
+	public Ship getShip(){
+		return this.ship;
+	}
 	
 	
 	// Setters
@@ -78,6 +108,81 @@ public class Bullet extends Entity {
     		throw new IllegalArgumentException(Double.toString(Lower_Bound));
     	}
     }
+    
+
+	/** 
+	 * Sets the radius to the given Value, if it is valid.
+	 * 
+	 * @param radius
+	 * 		  The new, given radius of the ship.
+	 * 
+	 * @post The radius of the ship is now equal to the given, valid radius.
+	 * 		|new.getRadius() == radius	
+	 * 
+	 * @throws  IllegalRadiusException
+	 * 		   The given radius is not a valid radius.
+	 * 		   | ! isValidRadius(radius)
+	 */
+	public void setRadius(double radius) throws IllegalRadiusException{
+		if (!isValidRadius(radius)){
+			throw new IllegalRadiusException(radius);}
+		this.radius = radius;
+	}
+
+	/** 
+	 * Checks whether the given radius has a valid value.
+	 * 
+	 * @param  radius
+	 * 		   The radius of the ship.
+	 * 
+	 * @return True if the radius exceeds the minimal radius
+	 * 		   false if the radius is less than the minimal_radius. 
+	 * 		   Or if the radius is Infinity or not a number.
+	 * 		   | radius >= getMin_Radius;
+	 */
+	public static boolean isValidRadius(double radius){
+		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+	}
+	
+	// BELANGRIJK CONSISTENTIE VAN BINDIGEN!
+	
+	/**
+	 * Method that sets a ship as the owner of this bullet.
+	 * @param ship
+	 * 		  The ship that we try to set as owner
+	 * 
+	 * @post  if the bullet already has an owner, nothing happens.
+	 * 		  |if this.hasOwner()
+	 * 			|then new.ship = this.ship
+	 * 
+	 * @post if the bullet does not have an owner yet, 
+	 * 		 the bullet gets the given ship as its owner.
+	 * 		 |if !this.hasOwner()
+	 * 			|then new.ship = ship
+	 */
+	public void setShip(Ship ship){
+		if (!this.hasOwner()){
+			this.ship = ship;
+		}
+	}
+	
+	/**
+	 * Returns true is this bullet has an owner. 
+	 * That is, if this  bullet has a source from which it came.
+	 * @return True if it has an owner
+	 * 		   False if it does not
+	 */
+	public boolean hasOwner(){
+		return (this.ship != null);
+	}
+	
+	// Als een kogel een schip als bron heeft, dan 
+	// zal het in dezelfde wereld zitten als dit schip.
+	// Die consistentie moet dus gecontroleerd worden.
+	public void setWorld(World world){
+		this.world = world;
+		
+	}
 	
 	
 /*
