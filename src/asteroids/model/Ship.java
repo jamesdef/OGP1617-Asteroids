@@ -144,6 +144,16 @@ public class Ship extends Entity {
 	// ------------------------   The inspectors -------------------------------------------------------
 
     
+    //MASS
+    
+    
+    /**
+     * This returns the sum of all bullets' this ship has masses
+     */
+    
+    public double getMassOfBullets(){
+    	return 0;
+    }
     /**
      * This method returns the total mass of this ship. 
      * 
@@ -155,9 +165,16 @@ public class Ship extends Entity {
      * 			|return this.getMass() + GetMassOfAllBulletsOwnedByThisShip;
      */
 	public double getTotalMass(){
-		return (this.getMass() + GetMassOfAllBulletsOwnedByThisShip);
+		return (this.getMass() + getMassOfBullets());
 	}
 
+	
+	
+	
+	
+	
+	
+	
 	// ------------------------------------ SETTERS --------------------------
  
 	 /**
@@ -223,7 +240,10 @@ public class Ship extends Entity {
 
 
 
-	//-------- Moving, turning and accelerating-----
+	
+	
+	
+	//-------- MOVING, TURNING AND ACCELARATING-----
 
 	/**
 	 *  Raises the velocity of the ship based on a certain, given acceleration and the ship's orientation.
@@ -329,6 +349,43 @@ public class Ship extends Entity {
 	public double scaleangle(double angle){
 		double ScaledAngle = angle % Max_Orientation;
 		return ScaledAngle;
+	}
+	
+	
+	
+	
+	//BULLETS --------------------------
+	
+	
+	public int getNbOfBullets(){
+		return 0;
+	}
+	
+	public void addBullet(){
+		
+	}
+	
+	public void addMultipleBullets(int numberOfBullets){
+		
+	}
+	
+	public void removeBullet(){
+		
+	}
+	
+	public void fireBullet(){
+		//if not in world, can't fire
+		
+	}
+	
+	public boolean canPlaceBullet(){
+		//if collides with other entity upon placement
+		
+		
+		//if not entirely in world, destroy
+		
+		
+		//returns true if bullet can be placed and fired next
 	}
 	
 }
