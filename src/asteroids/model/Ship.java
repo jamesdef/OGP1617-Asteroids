@@ -148,12 +148,13 @@ public class Ship extends Entity {
     
     
     /**
-     * This returns the sum of all bullets' this ship has masses
+     * This returns the sum of all the masses of the bullets' on this ship
      */
     
     public double getMassOfBullets(){
     	return 0;
     }
+    
     /**
      * This method returns the total mass of this ship. 
      * 
@@ -235,12 +236,6 @@ public class Ship extends Entity {
 		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 
-
-
-
-
-
-	
 	
 	
 	//-------- MOVING, TURNING AND ACCELARATING-----
