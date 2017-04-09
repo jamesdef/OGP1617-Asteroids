@@ -373,58 +373,108 @@ public class Ship extends Entity {
 	
 	private Set<Bullet> bullets = new HashSet<Bullet>();
 
-	
+	/**
+	 * Returns all the bullets this ship contains
+	 * 
+	 */
 	public Set<Bullet> getAllBullets(){
-		return this.bullets();
+		return bullets;
 	}
 
-
+	/*
+	 * Returns the number of bullets this ship contains
+	 */
 	public int getNbOfBullets(){
 		return getAllBullets.size();
 	}
 	
+	/**
+	 * Adds a bullet to the bullets loaded on the ship
+	 */
 	public void addBullet(){
 		Bullet bullet = new Bullet(1, 1, radius, Min_Mass, Min_Mass, Min_Mass, Min_Mass, Min_Mass, ship, null);
 		this.getBullets().add(bullet);
 		
 	}
 	
+	/**
+	 * Adds a specified amount of bullets to the ship
+	 * 
+	 * @param numberOfBullets
+	 */
 	public void addMultipleBullets(int numberOfBullets){
+		for(int i=0; i<numberOfBullets; i++){
+            addBullet();
+       }
+		
 		
 		
 	}
 	
-	public void removeBullet(){
+	/**
+	 * Removes a specified bullet from the ships' bullets
+	 * @param bullet
+	 */
+	public void removeBullet(Bullet bullet){
+		bullets.remove(bullet);
 		
 	}
 	
 	
-	public void fireBullet(){
+	/**
+	 * Fires a bullet
+	 */
+	public void fireBullet(Bullet bullet){
 		//if not in world, can't fire
 		if(belongsToWorld()){
 			//bullet is fired
-			removeBullet();
-			if(canPlaceBullet()){
+			if(canPlaceBullet(bullet)){
 				//fire bullet
+				
+				double Bulletspeed = 10;
+				double xSpeed = Bulletspeed*Math.cos(this.getOrientation());
+				double ySpeed = Bulletspeed*Math.sin(this.getOrientation());
+				
+				//remove bullet from ship qs it's fired
+				removeBullet(bullet);
+				bullet.setVelocity(xSpeed, ySpeed);
+				
+			} else {
+				
 			}
 		}
 		
+	}
+
+	
+	/**
+	 * Checks whether a bullet can initially be placed before actually being fired
+	 * 
+	 */
+	public boolean canPlaceBullet(Bullet bullet){
+		if(belongsToWorld()){
+		//if collides with other entity upon placement
+		double bulletXPos = this.getxPosition() + (this.getRadius() + bullet.getRadius())*Math.cos(this.getOrientation());
+		double bulletYPos=  this.getyPosition() + (this.getRadius() + bullet.getRadius())*Math.sin(this.getOrientation());
+	
+		try {
+			bullet.setPosition(bulletXPos, bulletYPos);
+		} catch (IllegalPositionException e) {
+			return false;
+		}
+		
+			if(getWorld().overlaps(bullet)){
+				return false;
+			}
+			
+		}
+		return true;
 	}
 	
 	public boolean belongsToWorld(){
 		 if (getWorld() != null) return true;
 		 return false;
 		
-		
-	}
-	public boolean canPlaceBullet(){
-		//if collides with other entity upon placement
-		
-		
-		//if not entirely in world, destroy
-		
-		
-		//returns true if bullet can be placed and fired next
 	}
 	
 }

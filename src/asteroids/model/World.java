@@ -234,7 +234,7 @@ public class World {
 	 * 		  the centre of the object is bigger than 99% of the objectsradius.
 	 * 		  |@ see implementation
 	 * 
-	 *  Math.abs: In onze beschrijving van ship hebben we niet geëist
+	 *  Math.abs: In onze beschrijving van ship hebben we niet geï¿½ist
 	 *  dat de position enkel positieve coordinaten kent. Maar: een schip met negatieve 
 	 *  coordinaten ligt toch sowieso niet in de wereld?
 	 */
@@ -306,6 +306,11 @@ public class World {
 	// Probeersel voor klasse structuur
 	public double shmet(Bullet bullet, Ship ship){
 		return bullet.getDistanceBetween(ship);
+	}
+	
+	public boolean overlaps(Entity entity){
+		return false;
+		
 	}
 	
 }
