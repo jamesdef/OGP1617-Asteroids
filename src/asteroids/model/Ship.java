@@ -3,6 +3,10 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
+
 /**
  * A class for dealing with ships that have a certain position, radius, speed and orientation.
  * 
@@ -148,12 +152,17 @@ public class Ship extends Entity {
     
     
     /**
-     * This returns the sum of all bullets' this ship has masses
+     * This returns the sum of all the masses of the bullets' on this ship
      */
     
     public double getMassOfBullets(){
-    	return 0;
+    	double bulletMass=0;
+    	
+		for (Bullet bullet: this.getAllBullets())
+			bulletMass =+ bullet.getMass();
+		return bulletMass;
     }
+    
     /**
      * This method returns the total mass of this ship. 
      * 
@@ -245,12 +254,6 @@ public class Ship extends Entity {
 		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 
-
-
-
-
-
-	
 	
 	
 	//-------- MOVING, TURNING AND ACCELARATING-----
@@ -364,21 +367,30 @@ public class Ship extends Entity {
 	
 	
 	
+	
+	
 	//BULLETS --------------------------
 	
-	public Bullet[] bullets;
+	private Set<Bullet> bullets = new HashSet<Bullet>();
+
 	
+	public Set<Bullet> getAllBullets(){
+		return this.bullets();
+	}
+
+
 	public int getNbOfBullets(){
-		return bullets.length;
+		return getAllBullets.size();
 	}
 	
 	public void addBullet(){
 		Bullet bullet = new Bullet(1, 1, radius, Min_Mass, Min_Mass, Min_Mass, Min_Mass, Min_Mass, ship, null);
-		
+		this.getBullets().add(bullet);
 		
 	}
 	
 	public void addMultipleBullets(int numberOfBullets){
+		
 		
 	}
 	
