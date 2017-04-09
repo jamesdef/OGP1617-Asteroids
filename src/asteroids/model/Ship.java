@@ -167,6 +167,10 @@ public class Ship extends Entity {
 	public double getTotalMass(){
 		return (this.getMass() + getMassOfBullets());
 	}
+	
+	public World getWorld(){
+		return null;
+	}
 
 	
 	
@@ -176,6 +180,12 @@ public class Ship extends Entity {
 	
 	
 	// ------------------------------------ SETTERS --------------------------
+	
+	
+	
+	public void setWorld(World world){
+		
+	}
  
 	 /**
      * This method makes it possible for the user to change the lower bound
@@ -356,12 +366,15 @@ public class Ship extends Entity {
 	
 	//BULLETS --------------------------
 	
+	public Bullet[] bullets;
 	
 	public int getNbOfBullets(){
-		return 0;
+		return bullets.length;
 	}
 	
 	public void addBullet(){
+		Bullet bullet = new Bullet(1, 1, radius, Min_Mass, Min_Mass, Min_Mass, Min_Mass, Min_Mass, ship, null);
+		
 		
 	}
 	
@@ -373,11 +386,25 @@ public class Ship extends Entity {
 		
 	}
 	
+	
 	public void fireBullet(){
 		//if not in world, can't fire
+		if(belongsToWorld()){
+			//bullet is fired
+			removeBullet();
+			if(canPlaceBullet()){
+				//fire bullet
+			}
+		}
 		
 	}
 	
+	public boolean belongsToWorld(){
+		 if (getWorld() != null) return true;
+		 return false;
+		
+		
+	}
 	public boolean canPlaceBullet(){
 		//if collides with other entity upon placement
 		
