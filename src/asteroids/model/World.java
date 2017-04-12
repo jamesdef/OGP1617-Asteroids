@@ -45,7 +45,7 @@ public class World {
 	/**
 	 * 
 	 */
-	public World(double width, double height, List<Ship> ships, List<Bullet> bullets) {
+	public World(double width, double height) {
 
 		setWidth(width);
 		setHeight(height);

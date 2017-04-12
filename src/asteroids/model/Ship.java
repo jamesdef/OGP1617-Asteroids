@@ -8,7 +8,8 @@ import java.util.Set;
 
 
 /**
- * A class for dealing with ships that have a certain position, radius, speed and orientation.
+ * A class for dealing with ships, which are a kind of entity in space. These have a certain position, velocity, radius, speed and orientation.
+ * The thruster-force defines the ship's thruster. The ship also has a mass and a certain density.
  * 
  * 
  * @invar   The highest possible absolute, total velocity is lower than a certain maximum the ship can never exceed this speed.
@@ -70,19 +71,19 @@ public class Ship extends Entity {
 	 */
 
 	// Position X and Y are described seperatly, this proves to be the easiest to work with. Same goes for velocity.
-	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double mass, double density, World world) 
+	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double mass, double density) 
 							throws IllegalPositionException, IllegalRadiusException{
+		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation, mass, density);
 		
-		// At this point we can invoke our mutators. They will see to it that the class invariants hold at all times.
-		setPosition(xPosition,yPosition);
-		setVelocity(xVelocity,yVelocity);
 		setRadius(radius);
-		setOrientation(orientation);	
+		
+		enableThruster(thrusterState);
+		setForceofThruster(thrusterForce);
 	}
 
 
 	/**
-	 * Initialize this new ship with their parameters (position,speed,radius,orientation) set to their lowest possible values.
+	 * Initialize this new ship with the parameters set to their default values.
 	 * 
 	 * @effect 	This new ship is initialized in the center of the grid: (0,0)
 	 * 			It's radius will be set to it's lowest possible value.
@@ -99,23 +100,25 @@ public class Ship extends Entity {
 	 * @note We know that the exceptions can never be thorwn in this default case, but JAVA makes us throw them anyway.
 	 */
     public Ship() throws IllegalPositionException, IllegalRadiusException{
-		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation,0.0,Min_Density, null);
+		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation,0.0,Min_Density);
 	}
 
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
 
 	/**
 	 * Variable registering the radius of this Ship.
-	 * @Override
 	 */
+    
 	private double radius = Min_Radius;
 
 	/**
 	 * Variable registering the minimum allowed Radius.
 	 * The minimum radius may change in the future. 
 	 * But it will always remain the same for all Ships.
-	 * @Override
+	 *
 	 */
+	// Dit is een waarde die je moet overschrijven maar weet nog niet hoe voorlopig.
+	//@ Override 
 	private static double Min_Radius = 10.0;
 	
     /**

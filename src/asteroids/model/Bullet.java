@@ -2,17 +2,34 @@ package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
 
+
+/**
+ * A class for dealing with bullets, which are a kind of entity in space. These have a certain position, velocity, radius, speed and orientation.
+ * The bullet also has a mass and a certain density.
+ * 
+ * 
+ * @invar   The highest possible absolute, total velocity is lower than a certain maximum the ship can never exceed this speed.
+ * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
+ *  
+ * @invar	The orientation of the ship must be a valid value.
+ * 			|isValidOrientation(getOrientation())
+ * 
+ * @invar 	The radius of each ship must be a valid value.
+ * 			|isValidRadius(getRadius())
+ * 
+ * @invar   The coordinates of a ship must be finit numbers.
+ * 			|isValidPosition(getxPosition,getyPosition);
+ *   
+ * @version 2.0     
+ * @author James Defauw & Michiel De Koninck
+
+ */
 public class Bullet extends Entity {
 	
 	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double density, double mass, Ship ship, World world) throws IllegalPositionException, IllegalRadiusException{
-		
-		setPosition(xPosition,yPosition);
-		setVelocity(xVelocity,yVelocity);
+		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation, mass, density);
+
 		setRadius(radius);
-		setOrientation(orientation);
-		setMass(mass);
-		setShip(ship);
-		setWorld(world);	
 	}
 	
 	// Initialising Variables & Defaults

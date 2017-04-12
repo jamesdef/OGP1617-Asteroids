@@ -7,33 +7,53 @@ import be.kuleuven.cs.som.annotate.Immutable;
 // Je hebt immers de Min_Radius nodig van Ship en Bullet. Aparte gevallen definieren?
 // Via isInstanceOf ??
 // Zelfde geldt eigenlijk voor Min_Mass, doen we dit wel juist?
+// Je kan overriden
 
 //The goal is to create a class that involves all the thinggs that entities (ie ships and bullets)
 //have in common. Bullet and ship will then be made subclasses of Entity. If needed, the methods within
 //these classes can override the methods of ENtity.
 
-/** Plaats, snelheid, standaard methoden,...
+/** 
+*  A class for dealing with entities. We could define these as 'objects that can move through space'.
+*  An example of such an entity can be a ship or a bullet.
 *  
+* @invar   The highest possible absolute, total velocity is lower than a certain maximum, the entity can never exceed this speed.
+* 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
+*  
+* @invar	The orientation of the entity must be a valid value.
+* 			|isValidOrientation(getOrientation())
+* 
+* @invar 	The radius of each entity must be a valid value.
+* 			|isValidRadius(getRadius())
+* 
+* @invar   The coordinates of an entity must be valid.
+* 			|isValidPosition(getxPosition,getyPosition);
+* 
+* @invar   The mass of an entity must be valid.
+* 		    |isValidMass(this.getEntityMass)
+* 
+* @invar   The density of an entity must be valid.
+* 		    |isValidDensity(this.getEntityDensity)
+* 
+* 
 * 
 * @author Michiel
 *
 */
-
-// Ik denk dat dit een abstracte klasse mag zijn omdat zijn constructor in principe overbodig is.
 public abstract class Entity {
 	
-	public Entity(){
-		
-	}
-	// Constructoren worden niet gebruikt in abstracte klasses
+	//-------------------------------- CONSTRUCTOR -------------------------------- 
+	
 	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double mass, double density)
 		throws IllegalPositionException, IllegalRadiusException{
-//		setPosition(xPosition,yPosition);
-//		setVelocity(xVelocity,yVelocity);
-//		setRadius(radius);
-//		setOrientation(orientation);	
-//		setDensity(density);
-//		setMass(mass);
+		
+		// At this point we can invoke our mutators. They will see to it that the class invariants hold at all times.
+		setPosition(xPosition,yPosition);
+		setVelocity(xVelocity,yVelocity);
+		setRadius(radius);
+		setOrientation(orientation);	
+		setDensity(density);
+		setMass(mass);
 	}
 
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
