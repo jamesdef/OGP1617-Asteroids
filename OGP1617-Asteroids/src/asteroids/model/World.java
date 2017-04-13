@@ -66,6 +66,16 @@ public class World {
 	}
 	
 	
+	/*
+	 * Default constructor, ceates a world of maximum size.
+	 * 
+	 * @effect An empty world is created, with maximum size.
+	 */
+	public World() {
+		this(Upper_Bound, Upper_Bound);
+	}
+	
+	
 
 	private final Set<Ship> ships = 
 			new HashSet<Ship>();
@@ -99,13 +109,6 @@ public class World {
 	public  Set<Entity> getAllEntities(){
 		return this.ships.combine(this.bullets);
 	}
-	
-	/*
-	 * Default constructor, ceates an 'empty' world.
-	 */
-	public World() {
-		this(width, height, null, null);
-	}
 
 	/**
 	 * Variable registering the maxium possible width and heigth for all worlds.
@@ -117,13 +120,13 @@ public class World {
 	 * Variable registering the width of this world. The default value is set to
 	 * be half of the maximum possible Value.
 	 */
-	private static double width = (1 / 2) * (Upper_Bound);
+	private static double width = (1/2)*Upper_Bound;
 
 	/**
-	 * Variable registering the width of this world. 
-	 * The default value is set to be half of the maximum possible Value.
+	 * Variable registering the height of this world. The default value is set to
+	 * be half of the maximum possible Value.
 	 */
-	private static double height = (1/2)*(Upper_Bound);
+	private static double height = (1/2)*Upper_Bound;
 	
 	
 	/**
