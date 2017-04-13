@@ -75,10 +75,6 @@ public class Ship extends Entity {
 							throws IllegalPositionException, IllegalRadiusException{
 		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation, mass, density);
 		
-		setRadius(radius);
-		
-		enableThruster(thrusterState);
-		setForceofThruster(thrusterForce);
 	}
 
 
@@ -222,25 +218,6 @@ public class Ship extends Entity {
     	}
     }
     
-    
-	/** 
-	 * Sets the radius to the given Value, if it is valid.
-	 * 
-	 * @param radius
-	 * 		  The new, given radius of the ship.
-	 * 
-	 * @post The radius of the ship is now equal to the given, valid radius.
-	 * 		|new.getRadius() == radius	
-	 * 
-	 * @throws  IllegalRadiusException
-	 * 		   The given radius is not a valid radius.
-	 * 		   | ! isValidRadius(radius)
-	 */
-	public void setRadius(double radius) throws IllegalRadiusException{
-		if (!isValidRadius(radius)){
-			throw new IllegalRadiusException(radius);}
-		this.radius = radius;
-	}
 
 	/** 
 	 * Checks whether the given radius has a valid value.
@@ -260,76 +237,104 @@ public class Ship extends Entity {
 	
 	
 	//-------- MOVING, TURNING AND ACCELARATING-----
-
+	
 	/**
-	 *  Raises the velocity of the ship based on a certain, given acceleration and the ship's orientation.
+	 * The variable thrust defines whether the thrust of this ship is enabled or not.
+	 * It is initialised as being disabled.
+	 */
+	private boolean thrust = false;
+	
+	/**
+	 * This method can enable the thrust for this ship.
+	 */
+	public void thrustOn(){
+		this.thrust = true;
+	}
+	
+	/**
+	 * This method can disable the thrust for this ship.
+	 */
+	public void thrustOff(){
+		this.thrust = false;
+	}
+	
+	/**
+	 * This method returns whether the thruster of this ship is enabled or not.
+	 * @return Whether the thruster is enabled or not.
+	 * 		   True when it is enabled, false otherwise.
+	 */
+	@Basic
+	public Boolean getthrustState(){
+		return thrust;
+	}
+	
+	
+	/**
+	 * This method returns the acceleration that this ship would get when the thruster is enabled.
+	 * It is calculated using Newton's second law of motion.
 	 * 
-	 * @param acceleration
+	 * @return The acceleration of this ship.
+	 * 		   |return (force/getTotalMass())
+	 */
+	public double getPossibleAcceleration(){
+		return force/getTotalMass();
+	}
+	
+	
+	/**
+	 * A variable defining the force that an active thruster can exert on a ship.
+	 */
+	private final double force = 1.1E21;
+	
+
+	
+	/**
+	 *  Raises the velocity of the ship if the thruster is enabled.
+	 *  This raising is based on a given duration, the possible acceleration and the ship's orientation.
 	 * 
-	 * @post if the given acceleration is negative
+	 * @param The duration during which the acceleration happens.
+	 * 
+	 * @post If the possible acceleration is negative or the thruster is disable;
 	 * 		 The velocity is left untouched
-	 * 		 |if acceleration < 0
+	 * 		 |if (acceleration < 0 || getThrustState() == false)
 	 * 		 | 		then new.getxVelocity() = getxVelocity()
 	 * 	     | 		then new.getyVelocity() = getyVelocity()
 	 *
-	 * @effect The velocity is changed, dependent on the given acceleration.
-	 * 	      This is only the case if the calculated new velocity is legal.
-	 * 		  The method setVelocity makes sure that this is the case.
-	 *		 |NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()));
-	 *	     |NewyVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()));
+	 * @effect The velocity is changed, depending on the duration, the possible acceleration of this ship and the orientation.
+	 * 	       This is only the case if the calculated new velocity is legal.
+	 * 		   The method setVelocity makes sure that this is the case.
+	 *		 |NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()))*duration;
+	 *	     |NewyVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()))*duration;
 	 * 		  |this.setVelocity(NewxVelocity, NewyVelocity);
 	 */
-	public void thrust(double acceleration){
-		//If the acceleration is negative, then we leave the velocity untouched.
-		double a = Math.max(0, acceleration);
-		double NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()));
-		double NewyVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()));
-
-		this.setVelocity(NewxVelocity, NewyVelocity);	
+	public void accelerate(double duration){
+		if(getthrustState() == true){
+			//If the acceleration is negative, then we leave the velocity untouched.
+			double a = Math.max(0, getPossibleAcceleration());
+			double NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()))*duration;
+			double NewyVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()))*duration;
+			this.setVelocity(NewxVelocity, NewyVelocity);	
+			}	
 	}
 
+	
 	/**
-	 *  Move the ship, given a certain duration.
+	 * Move this ship and all it's on-board belongings with it.
 	 * 
-	 * @param duration
-	 * 		  The duration of the movement, given in seconds
-	 * 
-	 * @throws IllegalDurationException
-	 * 		   If the duration is not valid, the method throws an exception
-	 * 		 | !isValidDuration(duration)
-	 * 		   
+	 * @throws IllegalDurationException 
 	 * @throws IllegalPositionException 
-	 * 		   If the position is not valid, the method throws an exception.
-	 * 		   | !isValidPosition(newxPosition, newyPosition)
 	 * 
-	 * @effect The new position of the ship is calculated by adding the duration multiplied with the velocity, 
-	 *         to the positon of the ship.
-	 *        |newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
-	 *	      |newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
-	 *	       |this.setPosition(newxPosition, newyPosition);
-	 * 
+	 * @effect The ship itself is moved, as well as all the entities that are in it.
 	 */
+	@Override
 	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
-		if (!isValidDuration(duration)){
-			throw new IllegalDurationException(duration);
-		}
-		double newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
-		double newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
-
-		this.setPosition(newxPosition, newyPosition);
-
-	}
-
-	/**
-	 *  Check whether the given duration is legal.
-	 * 
-	 * @param duration
-	 * 		  The duration of the specific movement of the ship
-	 * @return true if the duration is a non-negative number and finite.
-	 * 		   | return (duration >= 0 && !Double.isNaN(duration) && (duration != Double.POSITIVE_INFINITY))
-	 */			
-	public boolean isValidDuration(double duration){
-		return ((duration >= 0) && (!Double.isNaN(duration)) && (duration != Double.POSITIVE_INFINITY));
+		super.move(duration);
+		
+		// Je zou misschien gewoon de bullets kunnen plaatsen op de plaats waar het schip staat wanneer het klaar is met bewegen.
+		// Immers moeten de bullets toch niks doen tijdens de beweging? (maar is dat dan niet verkeerd omdat de bullets blijven staan op de oude coordinaten
+		// tijdens het bewegen van het schip?
+//	     for (Bullet bullet: this.bullets) {
+//	            bullet.setPosition(this.getPosition());
 	}
 
 	/**
@@ -388,15 +393,17 @@ public class Ship extends Entity {
 	 * Returns the number of bullets this ship contains
 	 */
 	public int getNbOfBullets(){
-		return getAllBullets.size();
+		return getAllBullets().size();
 	}
 	
 	/**
 	 * Adds a bullet to the bullets loaded on the ship
+	 * @throws IllegalRadiusException 
+	 * @throws IllegalPositionException 
 	 */
-	public void addBullet(){
-		Bullet bullet = new Bullet(1, 1, radius, Min_Mass, Min_Mass, Min_Mass, Min_Mass, Min_Mass, ship, null);
-		this.getBullets().add(bullet);
+	public void addBullet() throws IllegalPositionException, IllegalRadiusException{
+		Bullet bullet = new Bullet(this.getxPosition(), this.getyPosition(), this.getxVelocity(), this.getyVelocity(), Bullet.Min_Radius, this.getOrientation(), Bullet.Default_Mass, Bullet.Default_Density);
+		this.getAllBullets().add(bullet);
 		
 	}
 	
@@ -404,8 +411,10 @@ public class Ship extends Entity {
 	 * Adds a specified amount of bullets to the ship
 	 * 
 	 * @param numberOfBullets
+	 * @throws IllegalRadiusException 
+	 * @throws IllegalPositionException 
 	 */
-	public void addMultipleBullets(int numberOfBullets){
+	public void addMultipleBullets(int numberOfBullets) throws IllegalPositionException, IllegalRadiusException{
 		for(int i=0; i<numberOfBullets; i++){
             addBullet();
        }

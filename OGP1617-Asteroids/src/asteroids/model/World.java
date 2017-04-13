@@ -43,18 +43,26 @@ import be.kuleuven.cs.som.annotate.Basic;
 public class World {
 
 	/**
+	 * Create this new world as an empty world (no entities within it) that is not terminated.
 	 * 
+	 * @param width
+	 * 		  The width of this new world.
+	 * @param height 
+	 * 		  The height of this new world.
+	 * 
+	 * @post The world is empty upon creation
+	 * 			| new.getNbEntities() == 0
 	 */
 	public World(double width, double height) {
-
+		
 		setWidth(width);
 		setHeight(height);
-		for (Ship ship : ships){
-			addAsShip(ship);
-		}
-		for (Bullet bullet : bullets){
-			addAsBullet(bullet);
-		}
+//		for (Ship ship : ships){
+//			addAsShip(ship);
+//		}
+//		for (Bullet bullet : bullets){
+//			addAsBullet(bullet);
+//		}
 	}
 	
 	

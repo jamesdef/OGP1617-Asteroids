@@ -107,18 +107,17 @@ public abstract class Entity {
 	 */
 	protected static final double Max_Orientation = 2.0*Math.PI;
 
+	
+	/**
+	 * Variable registering the minimum allowed Radius.
+	 */
+	protected static double Min_Radius = 10.0;
 
 	/**
 	 * Variable registering the radius of this Entity.
 	 * @Override
 	 */
 	private double radius = Min_Radius;
-
-	/**
-	 * Variable registering the minimum allowed Radius.
-	 */
-	protected static double Min_Radius = 10.0;
-	
 
     /**
      * Variable registering the minimum allowed density.
@@ -441,6 +440,41 @@ public abstract class Entity {
 	public static boolean isValidOrientation(double orientation){
 		return ((Min_Orientation <= (orientation)) && (orientation <= Max_Orientation) && (!Double.isNaN(orientation)));	
 	}
+	
+    
+	/** 
+	 * Sets the radius to the given Value, if it is valid.
+	 * 
+	 * @param radius
+	 * 		  The new, given radius of the ship.
+	 * 
+	 * @post The radius of the ship is now equal to the given, valid radius.
+	 * 		|new.getRadius() == radius	
+	 * 
+	 * @throws  IllegalRadiusException
+	 * 		   The given radius is not a valid radius.
+	 * 		   | ! isValidRadius(radius)
+	 */
+	public void setRadius(double radius) throws IllegalRadiusException{
+		if (!isValidRadius(radius)){
+			throw new IllegalRadiusException(radius);}
+		this.radius = radius;
+	}
+
+	/** 
+	 * Checks whether the given radius has a valid value.
+	 * 
+	 * @param  radius
+	 * 		   The radius of the ship.
+	 * 
+	 * @return True if the radius exceeds the minimal radius
+	 * 		   false if the radius is less than the minimal_radius. 
+	 * 		   Or if the radius is Infinity or not a number.
+	 * 		   | radius >= getMin_Radius;
+	 */
+	public static boolean isValidRadius(double radius){
+		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+	}
 
 	/**
 	 * Total Programming:
@@ -489,9 +523,62 @@ public abstract class Entity {
 		return (density >= Entity.Min_Density);
 	}
 	
-	//Mutators
+	// ---------------- Moving -------------------
+	
+	
+	/**
+	 *  Move the entity, given a certain duration.
+	 * 
+	 * @param duration
+	 * 		  The duration of the movement, given in seconds
+	 * 
+	 * @throws IllegalDurationException
+	 * 		   If the duration is not valid, the method throws an exception
+	 * 		 | !isValidDuration(duration)
+	 * 		   
+	 * @throws IllegalPositionException 
+	 * 		   If the position is not valid, the method throws an exception.
+	 * 		   | !isValidPosition(newxPosition, newyPosition)
+	 * 
+	 * @effect The new position of the entity is calculated by adding the duration multiplied with the velocity, 
+	 *         to the positon of the ship.
+	 *        |newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
+	 *	      |newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
+	 *	       |this.setPosition(newxPosition, newyPosition);
+	 * 
+	 */
+	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
+		if (!isValidDuration(duration)){
+			throw new IllegalDurationException(duration);
+		}
+		double newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
+		double newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
+
+		this.setPosition(newxPosition, newyPosition);
+
+	}
+	
+	/**
+	 *  Check whether the given duration is legal.
+	 * 
+	 * @param duration
+	 * 		  The duration of the specific movement of the ship
+	 * @return true if the duration is a non-negative number and finite.
+	 * 		   | return (duration >= 0 && !Double.isNaN(duration) && (duration != Double.POSITIVE_INFINITY))
+	 */			
+	public boolean isValidDuration(double duration){
+		return ((duration >= 0) && (!Double.isNaN(duration)) && (duration != Double.POSITIVE_INFINITY));
+	}
 	
 	// ---------------------  COLLISION and Relative Postioning ----------------------
+	
+	
+	
+	
+	
+	
+	
+	
 	
     //  COLLISION PREDICTION  : DEFENSIVE
 	

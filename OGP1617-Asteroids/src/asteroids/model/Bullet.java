@@ -26,32 +26,43 @@ import be.kuleuven.cs.som.annotate.Basic;
  */
 public class Bullet extends Entity {
 	
-	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double density, double mass, Ship ship, World world) throws IllegalPositionException, IllegalRadiusException{
+	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double density, double mass) throws IllegalPositionException, IllegalRadiusException{
 		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation, mass, density);
-
 		setRadius(radius);
 	}
 	
 	// Initialising Variables & Defaults
 	
 	/**
-	 * Variable registering the radius of this Ship.
-	 * @Override
-	 */
-	private double radius = Min_Radius;
-	
-	/**
 	 * Variable registering the minimum allowed Radius.
 	 * The minimum radius may change in the future. 
 	 * But it will always remain the same for all Bullets.
+	 */
+	protected static double Min_Radius = 1.0;
+	
+	/**
+	 * Check whether the Minimum radius is a valid limit.
+	 * 
+	 * @param Min_Radius
+	 * 		  The minimum radius to check.
+	 * @return Whether the minimum radius is positive or not.
+	 * 			| result == (Min_Radius > 0)
+	 */
+	public static boolean isValidMinimumRadius(double Min_Radius){
+		return (Min_Radius > 0);
+	}
+	
+	/**
+	 * Variable registering the radius of this Ship.
 	 * @Override
 	 */
-	private static double Min_Radius = 1.0;
+	protected double radius = Min_Radius;
+
 	
 	/**
 	 * Variable registering the default density of a bullet.
 	 */
-	private final static double Default_Density = 7.8*(Math.pow(10, 12));
+	protected final static double Default_Density = 7.8*(Math.pow(10, 12));
 	
 	
 	/**
@@ -64,7 +75,12 @@ public class Bullet extends Entity {
 	 * Variable registering the mass of this bullet.
 	 * @Override
 	 */
-	private double mass = density*(4/3)*Math.PI*(Math.pow(radius, 3));
+	private double mass = Default_Mass;
+	
+	/**
+	 * Variable registering the Default_Mass of a bullet
+	 */
+	protected final static double Default_Mass = Default_Density*(4/3)*Math.PI*(Math.pow(Min_Radius, 3));
 	
 	/**
 	 * Field initialising the existence of ship.
@@ -117,7 +133,7 @@ public class Bullet extends Entity {
      * 		   The given argument is not valid.
      * 		   | !(Lower_bound > 0)
      */
-    public void setMin_Radius(double Lower_Bound){
+    public final void setMin_Radius(double Lower_Bound){
     	if (Lower_Bound > 0){
     		Bullet.Min_Radius = Lower_Bound;
     	}
