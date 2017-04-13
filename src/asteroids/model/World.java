@@ -1,7 +1,9 @@
 package asteroids.model;
 
+
+
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,19 +53,46 @@ public class World {
 	 * 		  The height of this new world.
 	 * 
 	 * @post The world is empty upon creation
-	 * 			| new.getNbEntities() == 0
+	 * 			| new.getNumberOfEntities() == 0
 	 */
 	public World(double width, double height) {
 		
 		setWidth(width);
 		setHeight(height);
-//		for (Ship ship : ships){
-//			addAsShip(ship);
-//		}
-//		for (Bullet bullet : bullets){
-//			addAsBullet(bullet);
-//		}
 	}
+	
+	/**
+	 * A map containing the different entities in this world, allong with the position of their center.
+	 */
+	private final HashMap <double[], Entity> entities = new HashMap<double[],Entity>();
+	
+	/**
+	 * Return the entities located in this world at a certain positionas a map (using location as the key of each entity).
+	 * @return a map holding the entities and their positions.
+	 */ 
+	public HashMap<double[],Entity> getEntities() {
+		return this.entities;	
+	}
+	
+	/**
+	 * Returns the entities within this world.
+	 * @return All the entities within this world.
+	 */
+	public Set<Entity> getAllEntities(){
+		return new HashSet<>(this.entities.values());
+	}
+	
+	/**
+	 * A method returning the amount of entities within this world.
+	 * 
+	 * @return The number of entities within this world.
+	 * 			|result == entities.size();
+	 */
+	public int getNumberofEntities(){
+		return entities.size();
+	}
+	
+	
 	
 	
 	/*
@@ -106,9 +135,6 @@ public class World {
 		return this.bullets;
 	}
 	
-	public  Set<Entity> getAllEntities(){
-		return this.ships.combine(this.bullets);
-	}
 
 	/**
 	 * Variable registering the maxium possible width and heigth for all worlds.
@@ -203,15 +229,21 @@ public class World {
 	
 	
 	/**  TOTAL PROGRAMMING
-	 * Returns the entity (ship or bullet), if there is one, at the given Positon.
+	 * Returns the entity (ship or bullet), if there is one, at the given Position.
 	 *	 
 	 * @returns The entity (ship or bullet) that has it's centre at the given postion.
 	 * 		  |
    	 * @returns Null if no entity has it's centre at the given position.
    	 * 		  |
    	 */
-	public Entity getEntityatPosition(double xPosition, double yPosition){
-	  return for Entity;
+	public Entity getEntityAt(double xPosition, double yPosition){
+	  double[] position = {xPosition, yPosition};
+	  if (this.getEntities().containsKey(position)){
+		  	return this.getEntities().get(position);
+	  }
+	  else{
+		  return null;
+	  }
 	}
 	
 	/** 
@@ -250,11 +282,19 @@ public class World {
 	 *  coordinaten ligt toch sowieso niet in de wereld?
 	 */
 	public Boolean withinWorldBoundaries(Entity object){
-		return ((World.width - Math.abs(object.getxPosition()) >= 0.99*object.getRadius()) &&
-				(Math.abs(object.getxPosition()) >= 0.99*object.getRadius()) &&
-				(World.height - Math.abs(object.getyPosition()) >= 0.99*object.getRadius()) &&
-				(Math.abs(object.getyPosition()) >= 0.99*object.getRadius()));
-				
+		
+		double x = object.getxPosition();
+		double y = object.getyPosition();
+		double width = this.getWidth();
+		double height = this.getHeight();
+		double radius = object.getRadius();
+		
+		return (
+				((width - x) >= 0.99*radius) &&
+				(x >= 0.99*radius) &&
+				((height - y) >= 0.99*radius) &&
+				(y >= 0.99*radius)
+				);
 	}
 	
 	public void evolve(double Dt) throws IllegalCollisionException{
@@ -266,58 +306,36 @@ public class World {
 		// We verplaatsen nu alle schepen en bullets over deze time frame.
 	}
 	
-	/** VERRE VAN EFFICIENT: zoek een manier om in sets 2 opeenvolgende elementen te gebruiken.
+	/**
 	 * 
 	 * @return
 	 * @throws IllegalCollisionException
 	 */
 	public double getTimetoFirstCollision() throws IllegalCollisionException{
-		double TimetoFirstCollision = 1000000.0;
-		for (Ship ship1 : this.getAllShips()){
-			for (Ship ship2 : this.getAllShips()){
-				double time = ship1.getTimeToCollision(ship2);
+		// We need a list so we can use the concept of order in efficiently comparing entities.
+		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
+		// Initialise the time to something way bigger than what you expect to find.
+		double TimetoFirstCollision = Double.POSITIVE_INFINITY;
+		for (int i = 0; i < getAllEntities().size(); i++){
+			for (int j = i +1; j < getAllEntities().size(); j++){
+				double time = (ArrayofEntities.get(i)).getTimeToCollision((ArrayofEntities.get(j)));
 				if (time < TimetoFirstCollision){
-					TimetoFirstCollision = time;	
+					TimetoFirstCollision = time;
 				}
-			}		
+			}
+			//If the entity that is being handled in the primary for-loop, collides with the boundary of it's world, sooner than with another entity;
+			//then this shorter time will be our result (for now).
+			double time = (ArrayofEntities.get(i)).getTimeToBoundaryCollision();
+			if (time < TimetoFirstCollision){
+				TimetoFirstCollision = time;
+			}
 		}
 		return TimetoFirstCollision;
 	}
 	
-//	for (int i = 0; i < a.length; i++) {
-//    for (int k = i + 1; k < a.length; k++) {
-//        if (a[i] != a[k]) {
-//            //do stuff
-//        }
-//    }
-//}
-//
-//public double getTimetoFirstCollision() throws IllegalCollisionException{
-//	double TimetoFirstCollision = 100.0;
-//	Set<Ship> ships = this.getAllShips();
-//	List<Ship> shiplist = new ArrayList<Ship>();
-//	for(int i = 0; i < ships.size(); i++){
-//		for (int j = i+1; j <ships.size(); j++){
-//		}
-//			if(shiplist[i] != a[j]){
-//				
-//			}
-//			if (time < TimetoFirstCollision){
-//				TimetoFirstCollision = time;
-//			}
-				
 	
-	
-	
-	// Probeersel voor klasse structuur
-	public double shmet(Bullet bullet){
-		return bullet.getRadius();
-	}
-	
-	// Probeersel voor klasse structuur
-	public double shmet(Bullet bullet, Ship ship){
-		return bullet.getDistanceBetween(ship);
-	}
+
+
 	
 	public boolean overlaps(Entity entity){
 		return false;

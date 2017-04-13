@@ -619,6 +619,18 @@ public abstract class Entity {
 	public boolean overlap(Entity other){
 		return (this.getDistanceBetween(other) < 0);	
 	}
+	
+	
+	/**
+	 * This method returns the time until an entity will reach a certain boundary of the world it is in.
+	 * 
+	 * @return the time until this entity collides with a boundary of this world.
+	 */
+	public double getTimeToBoundaryCollision(){
+		return 0;
+		
+		
+	}
 
 // DECLARATIEVE SPECIFICATIE:
 	// HOUDT in dat je duidt op wat het nut is van de functie, wat je kan doen met het resultaat.
