@@ -333,7 +333,7 @@ public class World {
 	 * 
 	 */
 	public Boolean canHaveAsEntity(Entity entity){
-		if (entity.isTerminated() || this.isTerminated || entity == null  || entity.getWorld() != null 
+		if (entity.isTerminated() || this.isTerminated() || entity == null  || entity.getWorld() != null 
 				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
 			return false;
 		}

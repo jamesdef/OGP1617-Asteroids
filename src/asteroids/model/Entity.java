@@ -47,7 +47,7 @@ public abstract class Entity {
 	
 	//-------------------------------- CONSTRUCTOR -------------------------------- 
 	
-	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double mass, double density)
+	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation)
 		throws IllegalPositionException, IllegalRadiusException{
 		
 		// At this point we can invoke our mutators. They will see to it that the class invariants hold at all times.
@@ -55,10 +55,38 @@ public abstract class Entity {
 		setVelocity(xVelocity,yVelocity);
 		setRadius(radius);
 		setOrientation(orientation);	
-		setDensity(density);
-		setMass(mass);
 	}
 
+	
+	// ----------------Termination-------------------
+	
+	/**
+	 * This method terminates this entity.
+	 * 
+	 * @post This entity is now terminated
+	 * 		| new.isTerminated() == true
+	 */
+	public void terminate(){
+		if(this.getWorld()!= null)
+			this.getWorld().removeEntity(this);
+		this.isTerminated = true;
+	}
+	
+	/**
+	 * Checks whether this entity is terminated.
+	 * @return The state of this entity; whether it is terminated or not.
+	 */
+	public boolean isTerminated(){
+		return this.isTerminated;
+	}
+	
+	/**
+	 * A variable registering whether or not this enity is terminated.
+	 * Initialised as false.
+	 */
+	private boolean isTerminated = false;
+	
+	
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
     
 	/**
@@ -121,34 +149,15 @@ public abstract class Entity {
 	 * @Override
 	 */
 	private double radius = Min_Radius;
-
-    /**
-     * Variable registering the minimum allowed density.
-     * @Override
-     */
-    
-    private static final double Min_Density = 1.42*(Math.pow(10, 12));
-    
-    /**
-     * Variable registering the density of this Entity.
-     */
-    private double density = Min_Density;
-    
-    /**
-     * Variable registering the Minimum allowed mass.
-     */
-    protected final double Min_Mass = Min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
-    
-    /**
-     * Variable registering the mass of this Entity.
-     */
-    protected double mass = Min_Mass;
     
     /**
      * Variable registering the world to which this entity belongs.
      * Initialised as null; the entity has no world per default.
      */
     private World world = null;
+
+
+	private double density;
 
 //-----------------------------------------
     
@@ -259,6 +268,14 @@ public abstract class Entity {
 	}
 	
 	/**
+	 * Returns the density of this ship.
+	 * @return the density of this ship.
+	 */
+	public double getDensity(){
+		return this.density;
+	}
+	
+	/**
 	 * Return the mass of this entity.
 	 * @return the mass of this entity.
 	 */
@@ -266,15 +283,11 @@ public abstract class Entity {
 	public double getMass(){
 		return this.mass;
 	}
-    
-	/**
-	 * Return the mass of this entity.
-	 * @return the mass of this entity.
-	 */
-	@Basic
-	public double getDensity(){
-		return this.density;
-	}
+	
+    /**
+     * Variable registering the mass of this entity.
+     */
+    protected double mass;
 	
 	//Setters
 	
@@ -547,52 +560,18 @@ public abstract class Entity {
 		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 
-	/**
-	 * Total Programming:
-	 * 
-	 * 
-	 * @param mass
-	 */
-	public void setMass(double mass){
-		if(isBigEnoughMass(mass,radius)){
-			this.mass = mass;
-		}
-		else{
-			this.mass = Min_Mass;
-		}	
-	}
+
 	
 	// als mass op zich niet gemeenschappelijk heeft, is het dan nuttig om het hier te definieren?
-	/**
-	 * 
-	 * @param mass
-	 * @param radius
-	 * @return
-	 */
-	public boolean isBigEnoughMass(double mass, double radius){
-		double minimalMass = getDensity()*(4/3)*Math.PI*(Math.pow(radius,3));
-		return (getMass() >= minimalMass);
-	}
+
 	
 	
 	
 	//DENSITY -- Minimale waarde verschilt voor schip en kogel. 
 	// Namelijk 1.42*(Math.pow(10, 12)) voor schip
 	// en 7.8*(Math.pow(10, 12)) voor kogel.
-
-	public void setDensity(double density){
-		if(this.isValidDensity(density)){
-			this.density = density;
-		} 
-		
-		else {
-			this.density = Entity.Min_Density;
-		}
-	}
 	
-	public boolean isValidDensity(double density){
-		return (density >= Entity.Min_Density);
-	}
+
 	
 	// ---------------- Moving -------------------
 	
@@ -719,7 +698,7 @@ public abstract class Entity {
 		List<Double> times = new ArrayList<>();
 		
 		
-		
+		return 0;
 		
 	}
 

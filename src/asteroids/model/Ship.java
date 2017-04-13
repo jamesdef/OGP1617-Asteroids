@@ -1,7 +1,5 @@
 package asteroids.model;
 import be.kuleuven.cs.som.annotate.Basic;
-import be.kuleuven.cs.som.annotate.Immutable;
-
 
 import java.util.HashSet;
 import java.util.Set;
@@ -71,13 +69,11 @@ public class Ship extends Entity {
 	 */
 
 	// Position X and Y are described seperatly, this proves to be the easiest to work with. Same goes for velocity.
-	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double mass, double density) 
+	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation,double mass) 
 							throws IllegalPositionException, IllegalRadiusException{
-		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation, mass, density);
-		
+		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation);
+		setMass(mass);
 	}
-
-
 	/**
 	 * Initialize this new ship with the parameters set to their default values.
 	 * 
@@ -96,7 +92,7 @@ public class Ship extends Entity {
 	 * @note We know that the exceptions can never be thorwn in this default case, but JAVA makes us throw them anyway.
 	 */
     public Ship() throws IllegalPositionException, IllegalRadiusException{
-		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation,0.0,Min_Density);
+		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation,0.0);
 	}
 
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
@@ -104,7 +100,6 @@ public class Ship extends Entity {
 	/**
 	 * Variable registering the radius of this Ship.
 	 */
-    
 	private double radius = Min_Radius;
 
 	/**
@@ -130,7 +125,6 @@ public class Ship extends Entity {
     
     private static final double Min_Density = 1.42*(Math.pow(10, 12));
     
-    
     /**
      * Variable registering the Minimum allowed mass.
      * @Override
@@ -139,25 +133,86 @@ public class Ship extends Entity {
     
     /**
      * Variable registering the mass of this ship.
-     * @Override
+     *
      */
     private double mass = Min_Mass;
+   
+   // ------------------------------
     
+    
+    
+	/**
+	 * Total Programming:
+	 * Sets the mass of this entity to the given value.
+	 * 
+	 * @param mass
+	 * 		 The given mass to which we want to set the mass of this entity.
+	 * @post if the given mass is valid, this mass is set as the new mass.
+	 * 		|if (isValidMass(double mass))
+	 * 		|	then new.mass == mass
+	 * @post if the given mass does not 
+	 */
+	public void setMass(double mass){
+		if(!isValidMass(mass)){
+	        mass = 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getDensity();
+		}
+	    this.mass = mass;
+	}
+	
+	/**
+	 * Checks whether the given mass is valid.
+	 * 
+	 * @param mass
+	 * 		  The mass to check
+	 * @return Whether the mass is valid for a ship to have.
+	 * 		   |result == (mass >= 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getMassDensity())
+	 */
+	public boolean isValidMass(double mass){
+        return (mass >= 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getDensity());
+	}
+	
+	/**
+	 * Returns the mass of this ship.
+	 * @return the mass of this ship.
+	 */
+	public double getMass(){
+		return this.mass;
+	}
+	
+	/**
+	 * Returns the density of this ship.
+	 * @return the density of this ship.
+	 */
+	public double getDensity(){
+		return this.density;
+	}
+	
+	public void setDensity(double density){
+		if (!isValidDensity(density)){
+			density = Min_Density;
+		}
+		this.density = density;
+	}
+	
+	public boolean isValidDensity(double density){
+		return (density >= Min_Density);
+	}
     
 	// ------------------------   The inspectors -------------------------------------------------------
 
+
     
-    //MASS
+    //MASS - Total programming
     
     
-    /**
+    /** 
      * This returns the sum of all the masses of the bullets' on this ship
      */
     
     public double getMassOfBullets(){
     	double bulletMass=0;
     	
-		for (Bullet bullet: this.getAllBullets())
+		for (Bullet bullet: this.getBullets())
 			bulletMass =+ bullet.getMass();
 		return bulletMass;
     }
@@ -379,21 +434,25 @@ public class Ship extends Entity {
 	
 	//BULLETS --------------------------
 	
-	private Set<Bullet> bullets = new HashSet<Bullet>();
-
 	/**
-	 * Returns all the bullets this ship contains
-	 * 
+	 * A variable registering the bullets owned by this ship.
 	 */
-	public Set<Bullet> getAllBullets(){
-		return bullets;
+    private Set<Bullet> bullets = new HashSet<Bullet>();
+    
+    
+    /**
+	 * Return the bullets owned by this ship.
+	 * @return the bullets owned by this ship
+	 */ 
+	public Set<Bullet> getBullets() {
+		return this.bullets;	
 	}
 
-	/*
-	 * Returns the number of bullets this ship contains
+	/**
+	 * Returns the number of bullets this ship contains.
 	 */
 	public int getNbOfBullets(){
-		return getAllBullets().size();
+		return this.getBullets().size();
 	}
 	
 	/**
@@ -401,10 +460,10 @@ public class Ship extends Entity {
 	 * @throws IllegalRadiusException 
 	 * @throws IllegalPositionException 
 	 */
-	public void addBullet() throws IllegalPositionException, IllegalRadiusException{
-		Bullet bullet = new Bullet(this.getxPosition(), this.getyPosition(), this.getxVelocity(), this.getyVelocity(), Bullet.Min_Radius, this.getOrientation(), Bullet.Default_Mass, Bullet.Default_Density);
-		this.getAllBullets().add(bullet);
-		
+	public void loadBullet() throws IllegalPositionException, IllegalRadiusException{
+		Bullet bullet = new Bullet(this.getxPosition(), this.getyPosition(), this.getxVelocity(), this.getyVelocity(),
+												Bullet.Min_Radius, this.getOrientation());
+		this.getBullets().add(bullet);
 	}
 	
 	/**
@@ -416,7 +475,7 @@ public class Ship extends Entity {
 	 */
 	public void addMultipleBullets(int numberOfBullets) throws IllegalPositionException, IllegalRadiusException{
 		for(int i=0; i<numberOfBullets; i++){
-            addBullet();
+            loadBullet();
        }
 		
 		

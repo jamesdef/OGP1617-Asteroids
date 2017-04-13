@@ -26,8 +26,8 @@ import be.kuleuven.cs.som.annotate.Basic;
  */
 public class Bullet extends Entity {
 	
-	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation, double density, double mass) throws IllegalPositionException, IllegalRadiusException{
-		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation, mass, density);
+	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation) throws IllegalPositionException, IllegalRadiusException{
+		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation);
 		setRadius(radius);
 	}
 	
@@ -116,6 +116,21 @@ public class Bullet extends Entity {
 		return this.ship;
 	}
 	
+	/**
+	 * Returns the mass of this bullet.
+	 * @return the mass of this bullet.
+	 */
+	public double getMass(){
+		return this.mass;
+	}
+	
+	/**
+	 * Returns the density of this ship.
+	 * @return the density of this ship.
+	 */
+	public double getDensity(){
+		return this.density;
+	}
 	
 	// Setters
 	
