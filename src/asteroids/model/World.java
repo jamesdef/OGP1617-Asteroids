@@ -61,6 +61,16 @@ public class World {
 		setHeight(height);
 	}
 	
+	/*
+	 * Default constructor, ceates a world of maximum size.
+	 * 
+	 * @effect An empty world is created, with maximum size.
+	 */
+	public World() {
+		this(Upper_Bound, Upper_Bound);
+	}
+	
+	
 	/**
 	 * A map containing the different entities in this world, allong with the position of their center.
 	 */
@@ -89,25 +99,91 @@ public class World {
 	 * 			|result == entities.size();
 	 */
 	public int getNumberofEntities(){
-		return entities.size();
+		return getAllEntities().size();
 	}
 	
 	
+	/// ----------------- TERMINATION --------------------------------
 	
-	
-	/*
-	 * Default constructor, ceates a world of maximum size.
+	/**
+     * Terminate this world
+     * 
+     * @post The world is terminated
+     * 		 |new.isTerminated()
+     */
+    public void terminate(){
+    	for (Entity entity : this.getAllEntities())
+    		this.removeEntity(entity);
+    	this.terminated = true;
+    }
+    
+    /**
+     * Check whether this world is terminated.
+     * @return The state of this world; whether it is terminated or not.
+     */
+    @Basic
+    public boolean isTerminated(){
+    	return this.terminated;
+    }
+    
+    /**
+     * Variable registering whether or not this world is terminated.
+     */
+    private boolean terminated = false;
+    
+    
+    /**
+	 * The given entity is removed from the set of entities that this world holds.
 	 * 
-	 * @effect An empty world is created, with maximum size.
+	 * @param  entity
+	 *         The entity which will be removed.
+	 * @post   The world no longer has the entity as one of its entities
+	 *         | !new.hasAsEntity(entity)
+	 *       
+	 * @post	If this world has the given entity as one of its entities,
+	 * 			the given entity is no longer attached to any world.
+	 * 			|if (hasAsEntity(entity){
+	 * 			|	((new entity).getWorld == null)}
+	 * @throws IllegalArgumentException 
+	 * 		   If the given entity is not active or the given entity does not belong to this
+	 * 		   world, this exception is thrown.
+	 * 		
 	 */
-	public World() {
-		this(Upper_Bound, Upper_Bound);
+	public void removeEntity(Entity entity) throws IllegalArgumentException{
+		if (entity == null || !hasEntity(entity)){
+		    throw new IllegalArgumentException();
+		}
+		
+        this.entities.remove(entity.getPosition());
+        entity.setWorld(null);
+	}
+    
+	
+	/**
+	 * A variable containing the ships that are within this world.
+	 */
+	private final HashSet<Ship> ships = new HashSet<Ship>();
+	
+	/**
+	 * A variable containing the bullets that are within this world.
+	 */
+	private final HashSet<Bullet> bullets = new HashSet<Bullet>();
+	
+	/**
+	 * A method that returns the ships located in this world.
+	 * @return The ships located in this world.
+	 */
+	public HashSet<Ship> getships(){
+			return this.ships;
 	}
 	
-	
-
-	private final Set<Ship> ships = 
-			new HashSet<Ship>();
+	/**
+	 * A method that returns the bullets located in this world.
+	 * @return The bullets located in this worl.
+	 */
+	public HashSet<Bullet> getBullets(){
+		return this.bullets;
+	}
 	
 	/** DEFENSIVE PROGRAMMING
 	 * 
@@ -119,8 +195,7 @@ public class World {
 		this.ships.add(ship);
 	}
 	
-	private final Set<Bullet> bullets = 
-			new HashSet<Bullet>();
+
 	
 	public void addAsBullet(Bullet bullet){
 		this.bullets.add(bullet);
@@ -227,14 +302,64 @@ public class World {
 	}
 	
 	
+	/**
+	 * Returns whether or not the given entity is within this world.
+	 * 
+	 * @param entity
+	 * 		  The entity of which we want to know whether it is within this world.
+	 * @return True if the given entity is within this world.
+	 * 		   False if the given entity is not within this world.
+	 */
+	@Basic
+	public Boolean hasEntity(Entity entity) {
+		return getEntities().containsValue(entity);
+	}
+	
+	
+	/**
+	 * Check whether this world can have the given entity as one of its entities.
+	 * 
+	 * @param entity
+	 * 		  The entity to investigate
+	 * 
+	 * @return True if and only if:
+	 * 			- The world and the entity are not terminated
+	 * 			- The entity is effective
+	 * 			- The entity has a world ascribed to it
+	 * 			- The entity is within the worlds boundaries 
+	 * 			- In the case that the entity is a bullet, it must not have a ship ascribed to it. 
+	 * 					(otherwise the bullet should belong to the ship, not the world)
+	 * 			-If the given entity overlaps with another entity, it can not belong to this world.
+	 * 
+	 */
+	public Boolean canHaveAsEntity(Entity entity){
+		if (entity.isTerminated() || this.isTerminated || entity == null  || entity.getWorld() != null 
+				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
+			return false;
+		}
+		for (Entity other : this.getAllEntities()) {
+			if (entity.overlap(other)){
+				return false;
+			}
+	    }
+	    return true;
+	}
 	
 	/**  TOTAL PROGRAMMING
 	 * Returns the entity (ship or bullet), if there is one, at the given Position.
 	 *	 
+	 *@param The xPosition at which we want to find an entity.
+	 *
+	 *@param The yPosition at which we want to find an entity.
+	 *
 	 * @returns The entity (ship or bullet) that has it's centre at the given postion.
-	 * 		  |
+	 * 		  | if ((this.getEntities().containsKey(position))
+	 * 		  |		result.getxPosition == xPosition;
+	 * 		  |		result.getyPosition == yPosition;
+	 * 
    	 * @returns Null if no entity has it's centre at the given position.
-   	 * 		  |
+   	 * 		  | if (!(this.getEntities().containsKey(position))
+   	 * 		  |   	result == null
    	 */
 	public Entity getEntityAt(double xPosition, double yPosition){
 	  double[] position = {xPosition, yPosition};
@@ -307,9 +432,13 @@ public class World {
 	}
 	
 	/**
+	 * This method returns the time to the next collision. 
+	 * This collision can be one between two entities, or between an entity and a boundary.
 	 * 
-	 * @return
-	 * @throws IllegalCollisionException
+	 * @return The time to the first collision which will happen.
+	 * 
+	 * @throws IllegalCollisionException 
+	 * 			--> Handled within getTimeToCollision
 	 */
 	public double getTimetoFirstCollision() throws IllegalCollisionException{
 		// We need a list so we can use the concept of order in efficiently comparing entities.
@@ -318,13 +447,14 @@ public class World {
 		double TimetoFirstCollision = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < getAllEntities().size(); i++){
 			for (int j = i +1; j < getAllEntities().size(); j++){
-				double time = (ArrayofEntities.get(i)).getTimeToCollision((ArrayofEntities.get(j)));
+				double time = (ArrayofEntities.get(i)).getTimeToEntityCollision((ArrayofEntities.get(j)));
 				if (time < TimetoFirstCollision){
 					TimetoFirstCollision = time;
 				}
 			}
 			//If the entity that is being handled in the primary for-loop, collides with the boundary of it's world, sooner than with another entity;
-			//then this shorter time will be our result (for now).
+			//then this shorter time will be our result (for now). This is because if an entity bounces with a wall, 
+			// we also need to change things to it's properties befor going further.
 			double time = (ArrayofEntities.get(i)).getTimeToBoundaryCollision();
 			if (time < TimetoFirstCollision){
 				TimetoFirstCollision = time;

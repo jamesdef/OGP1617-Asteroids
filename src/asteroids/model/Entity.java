@@ -1,4 +1,7 @@
 package asteroids.model;
+import java.util.ArrayList;
+import java.util.List;
+
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 
@@ -140,14 +143,29 @@ public abstract class Entity {
      * Variable registering the mass of this Entity.
      */
     protected double mass = Min_Mass;
+    
+    /**
+     * Variable registering the world to which this entity belongs.
+     * Initialised as null; the entity has no world per default.
+     */
+    private World world = null;
 
 //-----------------------------------------
     
 	//Inspectors
     
     /**
-	 * Return the x-coordinate of this ship.  
-	 * @return the x-coordinate of this ship.
+     * Return the world to which this entity belongs.
+     * @return The world to which this entity belongs.
+     * 		   null is returned if this entity does not belong to any world.
+     */
+    public World getWorld() {
+    	return this.world;
+    }
+    
+    /**
+	 * Return the x-coordinate of this entity.  
+	 * @return the x-coordinate of this entity.
 	 */
 	@Basic
 	public double getxPosition(){
@@ -156,8 +174,8 @@ public abstract class Entity {
 
 
 	/**
-	 * Return the y-coordinate of this ship.
-	 * @return the y-coordinate of this ship.
+	 * Return the y-coordinate of this entity.
+	 * @return the y-coordinate of this entity.
 	 * 
 	 */
 	@Basic
@@ -259,6 +277,59 @@ public abstract class Entity {
 	}
 	
 	//Setters
+	
+	
+	/**
+	 * Sets the given world as the world of this entity.
+	 * 
+	 * @param world
+	 * 		  The world that we want to link this entity to.
+	 * 
+	 * @pre if the given world is effective, it already has to reference this entity as one of its entities.
+	 * 		|if (world != null)
+	 * 		|   then world.hasEntity(this)
+	 * @pre if the given world is not effective and this entity belongs to an active world, 
+	 *      than that world can not reference this world as one of its entities.
+	 *      |if ((world == null) && this.getWorld() != null)
+	 *      |	then !this.getWorld().hasEntity(this)
+	 * 
+	 * @post This entity now references the given world as the world to which it belongs.
+	 * 		|new.getWorld() == world
+	 */
+	public void setWorld(World world){
+		// If the world is effective, it already has to have this entity as one if its entities. 
+		assert((world == null) || (world.hasEntity(this)));
+		// If the world is not effective, and this entity belongs to an effective world, 
+		// then that world can not reference this entity as one of its entities.
+		assert((world != null) || (this.getWorld() == null) || (!this.getWorld().hasEntity(this)));
+		
+		this.world = world;
+	}
+	
+	
+	/**
+	 * Check whether this entity can belong to the given world.
+	 * 
+	 * @param world
+	 * 		 The world that we will investigate
+	 * @return True if the given world is effective and the given world can has this entity as one of its entities.
+	 * 		   | result == (world != null && world.canHaveAsEntity(this));
+	 */
+	public boolean canHaveAsWorld(World world){
+		return (world != null && world.canHaveAsEntity(this));
+	}
+	
+	/**
+	 * Check whether this entity belongs to a proper world.
+	 * 
+	 * @return true if and only if this entity can be rightly associated with it's world and if this world is
+	 * 		   either not effective or if it has this entity as one of its entities.
+	 * 		   |result == (   (canHaveAsWorld(getWorld()) &&
+	 * 						  ((getWorld() == null) || getWorld().hasEntity(this)))   )
+	 */
+	public boolean hasProperWorld(){
+		return (canHaveAsWorld(getWorld()) && ((getWorld() == null) || getWorld().hasEntity(this)));
+	}
 	
 	//POSITION
 	
@@ -624,10 +695,30 @@ public abstract class Entity {
 	/**
 	 * This method returns the time until an entity will reach a certain boundary of the world it is in.
 	 * 
-	 * @return the time until this entity collides with a boundary of this world.
+	 * @return If this entity will never collide with a boundary, the method will return infinity.
+	 * 		   Otherwise it will return the time until the entity reaches a boundary.
+	 * 		   A use for the following method: 
+	 * 		   One can use the result to move the given entity by the resulted duration to place the
+	 * 		   entity directly against the boundary. If one were to move the ship for a slightly longer duration; 
+	 * 		   the ship would be out of the world's boundary.
+	 * 		   |if (extra > 0){
+	 * 		   | 	this.move(resulting_time + extra)
+	 * 		   |	!this.getWorld().withinBoundaries(this)
+	 * 	       If we had not increased resulting_time with extra, the entity would have still been within this world.
+	 * 
+	 * @throw IllegalStateException
+	 * 		  The entity is not within a certain world.
+	 * 		  |this.getWorld() == null
+	 * 		  
 	 */
 	public double getTimeToBoundaryCollision(){
-		return 0;
+		if (this.getWorld() == null){
+			throw new IllegalStateException();
+			}
+		
+		List<Double> times = new ArrayList<>();
+		
+		
 		
 		
 	}
@@ -657,7 +748,7 @@ public abstract class Entity {
 	 * @throws IllegalCollisionException
 	 * 		   If two entities overlap, this method does not apply.
 	 */
-	public double getTimeToCollision(Entity other) throws IllegalCollisionException {
+	public double getTimeToEntityCollision(Entity other) throws IllegalCollisionException {
 		if (overlap(other)){
 			throw new IllegalCollisionException(this,other);
 		}
@@ -700,13 +791,13 @@ public abstract class Entity {
 	 * 		   Created within getTimeToCollision(other)
 	 * 		   We cannot calculate the collision position of two overlapping entities.
 	 */
-	public double[] getCollisionPosition(Entity other) throws IllegalCollisionException{
+	public double[] getEntityCollisionPosition(Entity other) throws IllegalCollisionException{
 
 		//Using the time to collision, we now compute the position of the collision.
 		//For this we first calculate where the two others are at, at the time of collision.
 		//Then we calculate where exactly they collide. 
 
-		double T = getTimeToCollision(other);
+		double T = getTimeToEntityCollision(other);
 
 		if (T == Double.POSITIVE_INFINITY){
 			return null;
