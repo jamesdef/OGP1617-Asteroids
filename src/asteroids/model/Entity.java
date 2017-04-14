@@ -5,20 +5,14 @@ import java.util.List;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 
-
-// RADIUS HIER (NOG) NIET IN VERWERKT, NIET ZEKER HOE DIT MOET 
-// Je hebt immers de Min_Radius nodig van Ship en Bullet. Aparte gevallen definieren?
-// Via isInstanceOf ??
-// Zelfde geldt eigenlijk voor Min_Mass, doen we dit wel juist?
-// Je kan overriden
-
 //The goal is to create a class that involves all the thinggs that entities (ie ships and bullets)
 //have in common. Bullet and ship will then be made subclasses of Entity. If needed, the methods within
 //these classes can override the methods of ENtity.
 
 /** 
 *  A class for dealing with entities. We could define these as 'objects that can move through space'.
-*  An example of such an entity can be a ship or a bullet.
+*  An example of such an entity can be a ship or a bullet. 
+*  Properties described are: position, velocity,radius and orientation.
 *  
 * @invar   The highest possible absolute, total velocity is lower than a certain maximum, the entity can never exceed this speed.
 * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
@@ -32,6 +26,9 @@ import be.kuleuven.cs.som.annotate.Immutable;
 * @invar   The coordinates of an entity must be valid.
 * 			|isValidPosition(getxPosition,getyPosition);
 * 
+* @invar  	The entity has to belong to a proper world at all times.
+* 			| hasProperWorld()
+* 
 * @invar   The mass of an entity must be valid.
 * 		    |isValidMass(this.getEntityMass)
 * 
@@ -39,14 +36,51 @@ import be.kuleuven.cs.som.annotate.Immutable;
 * 		    |isValidDensity(this.getEntityDensity)
 * 
 * 
-* 
-* @author Michiel
+* @version 1.0
+* @author Michiel De Koninck & James Defauw
 *
 */
 public abstract class Entity {
 	
 	//-------------------------------- CONSTRUCTOR -------------------------------- 
 	
+	/**
+	 * Initialize this new entity with given position,radius, speed, orientation and mass.
+	 * 
+	 * 
+	 * @param  xPosition
+	 *         The position of this entity, according to the x-axis. 
+	 *         Expressed in km.
+	 *         
+	 * @param  yPosition
+	 *         The position of this entity,according to the y-axis.
+	 *         Expressed in km.
+	 *         
+	 * @param  radius
+	 * 		   The radius of this new entity.
+	 * 		   Expressed in km.	
+	 * 
+	 * @param  xVelocity 
+	 *         The velocity of this vessel, in the x-direction.
+	 *         Expressed in km/s.
+	 *         
+	 * @param  yVelocity 
+	 * 		   The velocity of the vessel, in the y-direction. 
+	 * 		   Expressed in km/s.
+	 *         
+	 * @param  orientation
+	 * 		   The orientation of this vessel, i.e., it's direction.
+	 * 		   Expressed in radians.    
+	 * 
+	 * @effect The given parameters are set as the properties of the new entity.
+	 * 		   |setPosition(xPosition,yPosition);
+	 *	       |setVelocity(xVelocity,yVelocity);
+	 *	       |setRadius(radius);
+	 *	       |setOrientation(orientation);
+	 *
+	 *@note    Any new entity initialized with this constructor
+	 * 		   will satisfy all its class invariants. The setters will see to this in their implementation.
+	 */
 	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation)
 		throws IllegalPositionException, IllegalRadiusException{
 		
@@ -559,19 +593,6 @@ public abstract class Entity {
 	public static boolean isValidRadius(double radius){
 		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
-
-
-	
-	// als mass op zich niet gemeenschappelijk heeft, is het dan nuttig om het hier te definieren?
-
-	
-	
-	
-	//DENSITY -- Minimale waarde verschilt voor schip en kogel. 
-	// Namelijk 1.42*(Math.pow(10, 12)) voor schip
-	// en 7.8*(Math.pow(10, 12)) voor kogel.
-	
-
 	
 	// ---------------- Moving -------------------
 	
@@ -605,8 +626,8 @@ public abstract class Entity {
 		double newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
 
 		this.setPosition(newxPosition, newyPosition);
-
 	}
+	
 	
 	/**
 	 *  Check whether the given duration is legal.
@@ -620,15 +641,8 @@ public abstract class Entity {
 		return ((duration >= 0) && (!Double.isNaN(duration)) && (duration != Double.POSITIVE_INFINITY));
 	}
 	
+	
 	// ---------------------  COLLISION and Relative Postioning ----------------------
-	
-	
-	
-	
-	
-	
-	
-	
 	
     //  COLLISION PREDICTION  : DEFENSIVE
 	

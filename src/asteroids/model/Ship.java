@@ -7,20 +7,12 @@ import java.util.Set;
 
 /**
  * A class for dealing with ships, which are a kind of entity in space. These have a certain position, velocity, radius, speed and orientation.
- * The thruster-force defines the ship's thruster. The ship also has a mass and a certain density.
+ * The ship has a thrusther with which it can accelerate. The ship also has a mass and a certain density.
  * 
- * 
- * @invar   The highest possible absolute, total velocity is lower than a certain maximum the ship can never exceed this speed.
- * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
- *  
- * @invar	The orientation of the ship must be a valid value.
- * 			|isValidOrientation(getOrientation())
- * 
- * @invar 	The radius of each ship must be a valid value.
- * 			|isValidRadius(getRadius())
- * 
- * @invar   The coordinates of a ship must be finit numbers.
- * 			|isValidPosition(getxPosition,getyPosition);
+ *@invar The invariants of the superclass 'Entity' are described there.
+ *
+ *@invar Each ship has proper bullets as its belongings.
+ *		 |hasProperBullets()
  *   
  * @version 2.0     
  * @author James Defauw & Michiel De Koninck
@@ -31,7 +23,7 @@ public class Ship extends Entity {
 
 	//-------------------------------   Constructors: #2 --------------------------------------------
 	/**
-	 * Initialize this new ship with given position,radius, speed and orientation.
+	 * Initialize this new ship with given position,radius, speed and mass.
 	 * 
 	 * 
 	 * @param  xPosition
@@ -58,13 +50,21 @@ public class Ship extends Entity {
 	 * 		   The orientation of this vessel, i.e., it's direction.
 	 * 		   Expressed in radians.    
 	 * 
+	 * @param mass
+	 * 		  The mass of this vessel.
+	 * 
+	 * @effect The given mass is set as the mass of this new ship.
+	 * 		   |setMass(mass);
+	 * 
 	 * @effect The given parameters are set as the properties of the new ship.
 	 * 		   |setPosition(xPosition,yPosition);
 	 *	       |setVelocity(xVelocity,yVelocity);
 	 *	       |setRadius(radius);
 	 *	       |setOrientation(orientation);
+	 *
+	 *
 	 * 
-	 *@note    Any new ship initialized with this constructor
+	 *@note    Any new ship initialized with this constructor (via superclass Entity)
 	 * 		   will satisfy all its class invariants. The setters will see to this in their implementation.
 	 */
 
@@ -95,6 +95,27 @@ public class Ship extends Entity {
 		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation,0.0);
 	}
 
+    
+    //---------------------------- Termination -----------------
+    
+    
+    /**
+     * Terminates this ship and all of it's property.
+     * It does this by first deleting it's on board bullets and than terminating the ship itself.
+     * 
+     * @effect All bullets are first removed and then the ship itself is terminated.
+     * 		| new.getNbOfBullets  == 0 
+	 * 		| new.isTerminated() == true
+	 * 
+     */
+    public void terminate(){
+    	for (Bullet bullet : bullets){
+    		removeBullet(bullet);
+    	}
+    	//We can now safely terminate the empty ship as an entity.
+    	super.terminate();
+    }
+    
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
 
 	/**
@@ -231,24 +252,9 @@ public class Ship extends Entity {
 		return (this.getMass() + getMassOfBullets());
 	}
 	
-	public World getWorld(){
-		return null;
-	}
-
-	
-	
-	
-	
-	
-	
 	
 	// ------------------------------------ SETTERS --------------------------
 	
-	
-	
-	public void setWorld(World world){
-		
-	}
  
 	 /**
      * This method makes it possible for the user to change the lower bound
@@ -450,10 +456,71 @@ public class Ship extends Entity {
 
 	/**
 	 * Returns the number of bullets this ship contains.
+	 * @return this.getBullets().size()
 	 */
 	public int getNbOfBullets(){
 		return this.getBullets().size();
 	}
+	
+	/**
+	 * Check whether this ship has the bullet as one of its bullets.
+	 * @param bullet
+	 * 		  The bullet to investigate
+	 * @return True if and only if the bullet belongs to this ship.
+	 * 		   |result == bullets.contains(bullet);
+	 */
+	public boolean hasBullet(Bullet bullet){
+		return getBullets().contains(bullet);
+	}
+	
+    /**
+     * Check whether this ship can have the given bullet
+     * as one of its bullets.
+     *
+     * @param  bullet
+     *         The bullet to check.
+     * @return True if and only if all folowing statements hold
+     * 		   -The given bullet is effective
+     *         -This ship is not terminated or the bullet is terminated.
+     *         -This ship does not already have the bullet as one of it's bullets
+     *         -This ships' radius is bigger than that of the bullet.
+     *         | result == ( (bullet != null) 
+     *         |       && ((!this.isTerminated()) || (bullet.isTerminated()))
+     *         |			 && (!this.hasBullet(bullet)) 
+     *         |					&& (bullet.getRadius()<this.getRadius())  )
+    }
+     */
+    public boolean canHaveAsBullet(Bullet bullet) {
+    	  return ( (bullet != null) 
+    			       && ((!this.isTerminated()) || (bullet.isTerminated()))
+    			     		 && (!this.hasBullet(bullet)) 
+    			     				&& (bullet.getRadius()<this.getRadius())  );		  
+    }
+	
+    /**
+     * Check whether all the bullets attached to this ship are 'legal'.
+     * 
+     * @return True if and only if this ship can have each of its bullets
+     * 		   as one of its bullets. Each of the bullets also has to reference the ship
+     * 		   to which it belongs.
+     * 		   |for bullet in getBullets():
+     * 		   |    result == ( canHaveAsBullet(bullet) && bullet.getShip() == this )	   
+     */
+    public boolean hasProperBullets(){
+    	for (Bullet bullet : getBullets()) {
+    		if (!canHaveAsBullet(bullet)){
+    			return false;
+    		}
+    		if (bullet.getShip() != this){
+    			return false;
+    		}
+    	}
+    	//Otherwise all requirements hold and we return true
+    	return true;
+    }
+    
+	
+	/**
 	
 	/**
 	 * Adds a bullet to the bullets loaded on the ship
@@ -483,14 +550,25 @@ public class Ship extends Entity {
 	}
 	
 	/**
-	 * Removes a specified bullet from the ships' bullets
+	 * Removes a specified bullet from the ships' bullets.
+	 * 
 	 * @param bullet
+	 * 		  The bullet to remove
+	 * @post  If this ship does not have the given bullet as one of its bullets;
+	 * 		  nothing is changed.
+	 * @post  This ship no longer has the given bullet as one of its bullets.
+	 * 		  | !new.hasBullet(bullet)
+	 * @post  If this ship has the given bullet as one of its bullets, 
+	 * 			the given bullet no longer references any ship.
+	 * 		  | if (hasBullet(bullet){
+	 * 		  |       (bullet.getShip() == null)
 	 */
 	public void removeBullet(Bullet bullet){
-		bullets.remove(bullet);
-		
+		if (hasBullet(bullet)){
+			bullets.remove(bullet);
+			bullet.setShip(null);
+		}
 	}
-	
 	
 	/**
 	 * Fires a bullet
