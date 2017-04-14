@@ -441,6 +441,8 @@ public class World {
 		--> TODO: getTimeToBoundaryCollision() en getPositionBoundaryCollision()
 	}
 	
+
+	
 	/**
 	 * This method returns the time to the next collision. 
 	 * This collision can be one between two entities, or between an entity and a boundary.

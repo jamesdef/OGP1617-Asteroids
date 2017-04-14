@@ -645,8 +645,34 @@ public abstract class Entity {
 			throw new IllegalStateException();
 			}
 		
-	//.......... James brengt redding 
+		double xVelocity = this.getxVelocity();
+		
+		
+		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(), this.getWorld().getWidth());
+		double yTime = getTimeToBoundaryAxisCollsion(this.getyVelocity(), this.getyPosition(), this.getWorld().getHeight());
+		
+		return Math.min(xTime, yTime);
+		
+		
+	//.......... En alweer is de stad gered dankzij
+	//			<*<*< JAMES DEFAUW >*>*>
+	//			Follow me on
+	//				- Instagram: 	james.defauw
+	//				- Twitter:		@jamesdef
 			
+	}
+	
+	public double getTimeToBoundaryAxisCollsion(double axisVelocity, double axisPosition, double worldAxisLength){
+		
+		double time = Double.POSITIVE_INFINITY;
+		if(axisVelocity != 0){
+			double timeToLongBorder = (worldAxisLength-axisPosition-this.getRadius())/axisVelocity;
+			double timeToZeroBorder = -(axisPosition -this.getRadius())/axisVelocity;
+			
+			time = Math.max(timeToZeroBorder,timeToLongBorder);
+		}
+		
+		return time;
 	}
 	
 	/**
