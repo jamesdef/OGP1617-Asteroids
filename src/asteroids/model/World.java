@@ -44,6 +44,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 
 public class World {
 
+// --------------------CONSTRUCTORS 2 --------------------------
 	/**
 	 * Create this new world as an empty world (no entities within it) that is not terminated.
 	 * 
@@ -56,7 +57,6 @@ public class World {
 	 * 			| new.getNumberOfEntities() == 0
 	 */
 	public World(double width, double height) {
-		
 		setWidth(width);
 		setHeight(height);
 	}
@@ -70,7 +70,63 @@ public class World {
 		this(Upper_Bound, Upper_Bound);
 	}
 	
+
+/// ----------------- TERMINATION --------------------------------
 	
+	/**
+	 * Terminate this world
+	 * 
+	 * @post The world is terminated
+	 * 		 |new.isTerminated()
+	 */
+	public void terminate(){
+		for (Entity entity : this.getAllEntities())
+			this.removeEntity(entity);
+		this.terminated = true;
+	}
+
+	/**
+	 * Check whether this world is terminated.
+	 * @return The state of this world; whether it is terminated or not.
+	 */
+	@Basic
+	public boolean isTerminated(){
+		return this.terminated;
+	}
+
+	/**
+	 * Variable registering whether or not this world is terminated.
+	 */
+	private boolean terminated = false;
+
+
+	/**
+	 * The given entity is removed from the set of entities that this world holds.
+	 * 
+	 * @param  entity
+	 *         The entity which will be removed.
+	 * @post   The world no longer has the entity as one of its entities
+	 *         | !new.hasAsEntity(entity)
+	 *       
+	 * @post	If this world has the given entity as one of its entities,
+	 * 			the given entity is no longer attached to any world.
+	 * 			|if (hasAsEntity(entity){
+	 * 			|	((new entity).getWorld == null)}
+	 * @throws IllegalArgumentException 
+	 * 		   If the given entity is not active or the given entity does not belong to this
+	 * 		   world, this exception is thrown.
+	 * 		
+	 */
+	public void removeEntity(Entity entity) throws IllegalArgumentException{
+		if (entity == null || !hasEntity(entity)){
+			throw new IllegalArgumentException();
+		}
+		this.entities.remove(entity.getPosition());
+		entity.setWorld(null);
+	}
+
+	
+// -------------------- Registers; variables; maps; sets ---------------------------------
 	/**
 	 * A map containing the different entities in this world, allong with the position of their center.
 	 */
@@ -102,63 +158,6 @@ public class World {
 		return getAllEntities().size();
 	}
 	
-	
-	/// ----------------- TERMINATION --------------------------------
-	
-	/**
-     * Terminate this world
-     * 
-     * @post The world is terminated
-     * 		 |new.isTerminated()
-     */
-    public void terminate(){
-    	for (Entity entity : this.getAllEntities())
-    		this.removeEntity(entity);
-    	this.terminated = true;
-    }
-    
-    /**
-     * Check whether this world is terminated.
-     * @return The state of this world; whether it is terminated or not.
-     */
-    @Basic
-    public boolean isTerminated(){
-    	return this.terminated;
-    }
-    
-    /**
-     * Variable registering whether or not this world is terminated.
-     */
-    private boolean terminated = false;
-    
-    
-    /**
-	 * The given entity is removed from the set of entities that this world holds.
-	 * 
-	 * @param  entity
-	 *         The entity which will be removed.
-	 * @post   The world no longer has the entity as one of its entities
-	 *         | !new.hasAsEntity(entity)
-	 *       
-	 * @post	If this world has the given entity as one of its entities,
-	 * 			the given entity is no longer attached to any world.
-	 * 			|if (hasAsEntity(entity){
-	 * 			|	((new entity).getWorld == null)}
-	 * @throws IllegalArgumentException 
-	 * 		   If the given entity is not active or the given entity does not belong to this
-	 * 		   world, this exception is thrown.
-	 * 		
-	 */
-	public void removeEntity(Entity entity) throws IllegalArgumentException{
-		if (entity == null || !hasEntity(entity)){
-		    throw new IllegalArgumentException();
-		}
-		
-        this.entities.remove(entity.getPosition());
-        entity.setWorld(null);
-	}
-    
-	
 	/**
 	 * A variable containing the ships that are within this world.
 	 */
@@ -185,32 +184,8 @@ public class World {
 		return this.bullets;
 	}
 	
-	/** DEFENSIVE PROGRAMMING
-	 * 
-	 * 
-	 * 
-	 * @param ship
-	 */
-	public void addAsShip(Ship ship){
-		this.ships.add(ship);
-	}
+// ----------------- HEIGHT AND WIDTH------------------
 	
-
-	
-	public void addAsBullet(Bullet bullet){
-		this.bullets.add(bullet);
-	}
-	
-	
-	public Set<Ship> getAllShips(){
-		return this.ships;
-	}
-	
-	public Set<Bullet> getAllBullets(){
-		return this.bullets;
-	}
-	
-
 	/**
 	 * Variable registering the maxium possible width and heigth for all worlds.
 	 * The default value for this is set to be the largest number achievable.
@@ -302,6 +277,33 @@ public class World {
 	}
 	
 	
+//--------------- ASSOCIATIONS WITH ENTITIES -------------------------
+	
+	/** DEFENSIVE PROGRAMMING
+	 * 
+	 * 
+	 * 
+	 * @param ship
+	 */
+	public void addAsShip(Ship ship){
+		this.ships.add(ship);
+	}
+	
+
+	
+	public void addAsBullet(Bullet bullet){
+		this.bullets.add(bullet);
+	}
+	
+	
+	public Set<Ship> getAllShips(){
+		return this.ships;
+	}
+	
+	public Set<Bullet> getAllBullets(){
+		return this.bullets;
+	}
+	
 	/**
 	 * Returns whether or not the given entity is within this world.
 	 * 
@@ -314,7 +316,6 @@ public class World {
 	public Boolean hasEntity(Entity entity) {
 		return getEntities().containsValue(entity);
 	}
-	
 	
 	/**
 	 * Check whether this world can have the given entity as one of its entities.
@@ -345,8 +346,8 @@ public class World {
 	    return true;
 	}
 	
-	/**  TOTAL PROGRAMMING
-	 * Returns the entity (ship or bullet), if there is one, at the given Position.
+	/** Returns within constant time because we use a map that has positions of entities as keys.
+	 * Returns the entity (ship or bullet) or entities, if there is one, at the given Position.
 	 *	 
 	 *@param The xPosition at which we want to find an entity.
 	 *
@@ -391,8 +392,7 @@ public class World {
 		return (object1.getDistanceBetween(object2) <= 0.99*boundary);
 	}
 	
-	/** FOUT GEEN REKENING GEHOUDEN MET 0 grenzen.
-	 * 
+	/** 
 	 * Returns whether an object is within the boundaries of this world.
 	 * 
 	 * @param object
@@ -422,6 +422,12 @@ public class World {
 				);
 	}
 	
+	
+	/**
+	 * 
+	 * @param Dt
+	 * @throws IllegalCollisionException
+	 */
 	public void evolve(double Dt) throws IllegalCollisionException{
 		double tC = getTimetoFirstCollision();
 		if (tC < Dt){
@@ -429,6 +435,10 @@ public class World {
 		}
 		// tC heeft nu de waarde waarmee we stappen id tijd.
 		// We verplaatsen nu alle schepen en bullets over deze time frame.
+		
+		We hebben zowel de tijd nodig tot de eerste entiteit-botsing; zowel als de eerste botsing met een muur.
+		Immers, in die gevallen moeten we (als dat eerst gebeurt) exact dan iets aanpassen in de wereld.
+		--> TODO: getTimeToBoundaryCollision() en getPositionBoundaryCollision()
 	}
 	
 	/**
@@ -463,12 +473,8 @@ public class World {
 		return TimetoFirstCollision;
 	}
 	
-	
-
-
-	
 	public boolean overlaps(Entity entity){
-		return false;
+		
 		
 	}
 	

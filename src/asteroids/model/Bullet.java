@@ -33,6 +33,9 @@ public class Bullet extends Entity {
 	}
 	
 	
+	
+	
+// -------------- Termination -------------------------
 	/**
 	 * Terminate this bullet.
 	 * 
@@ -56,44 +59,62 @@ public class Bullet extends Entity {
         super.terminate();
     }
 	
-	/**
-     * Returns the source that fired this bullet. 
-     * If it exists; this will always be a ship.
-     */
-    @Basic
-    public Ship getSource() {
-        return this.source;
-    }
+// ---------------- Getters----------------------------------------
+		/**
+		 * Returns the world to which this bullet belongs.
+		 * @return the world to which this bullet belongs.
+		 */
+		@Basic
+		public World getWorld(){
+			return this.world;
+		}
+		
+		/**
+		 * Returns the ship to which this bullet belongs.
+		 * @return the ship to which this bullet belongs.
+		 */
+		@Basic
+		public Ship getShip(){
+			return this.ship;
+		}
+		
+		/**
+		 * Returns the mass of this bullet.
+		 * @return the mass of this bullet.
+		 */
+		public double getMass(){
+			return this.mass;
+		}
+		
+		/**
+		 * Returns the density of this ship.
+		 * @return the density of this ship.
+		 */
+		public double getDensity(){
+			return this.density;
+		}
 
-    /**
-	 * Set the source of this bullet to a given ship.
-	 * 
-	 * @param	source
-	 * 			The ship that fired this bullet.
-	 * @post	The source of this bullet is the given ship.
-	 * 			| new.getSource() == source
-	 * @throws 	IllegalArgumentException
-	 * 			If this bullet 
-	 * 				-already belongs to a world
-	 * 				-already is loaded/fired by a ship
-	 * 		    |(this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
+
+//-------------------- Ownership; Associations ------------------------
+	
+	/**
+	 * Field initialising the existence of ship.
+	 * Initialised to a value of null.
 	 */
-	public void setSource(Ship source) throws IllegalArgumentException {
-		if (this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
-			throw new IllegalArgumentException();
-		if (source==null)
-			this.source=null;
-		else
-			this.source = source;
-	}
+	private Ship ship = null;
+
+	/**		 
+	 * Field initialising the existence of World.
+	 * Initialised to a value of null.
+	*/
+	private World world = null;
 
     /**
      * Variable referencing the source ship (that fired the bullet) of the bullet.
      * In default; set to null.
      */
     private Ship source = null;
-
-	
+    
 	/**
 	 * Check whether this bullet has a proper owner. 
 	 * Meaning that it can not belong to both a world and a ship.
@@ -133,8 +154,77 @@ public class Bullet extends Entity {
     public boolean canHaveAsShip(Ship ship){
         return ((ship == null) || ship.canHaveAsBullet(this));
     }
+
+	/**
+	 * Method that sets a ship as the owner of this bullet.
+	 * 
+	 * @param ship
+	 * 		  The ship that we try to set as owner
+	 * 
+	 * @throws IllegalPositionException 
+	 * 
+     * @pre If the given ship is not effective and this bullet references an effective ship,
+     * 		that ship may not reference this bullet as one of its bullets.
+     * 		| if ((ship == null) && (getShip()!=null))
+     * 		|		then !getShip().hasAsBullet(this)
+     * 
+	 * @pre   If the given ship is effective, it must  have this bullet as one of its bullets.
+	 *        |if (ship != null)
+     * 		  |		then ship.hasBullet(this)
+	 * 
+	 * @post This bullet gets the given ship as its owner
+	 * 		 |new.getShip() = ship;
+	 * 			
+	 */
+	public void setShip(Ship ship) {
+        assert((ship != null) || (getShip() == null) || (!getShip().hasBullet(this)));
+		assert((ship == null) || (ship.hasBullet(this)));
+        this.ship = ship;
+        //If the ship is effective, the location of this bullet is changed to the center of the ship.
+//        if (ship!=null)
+////        	this.setPosition(ship.getxPosition(),ship.getyPosition());
+	}
 	
-	// Initialising Variables & Defaults
+	
+	
+	//setWorld is handled within entity class.
+	
+	
+	//--------------- Source----------------------
+	/**
+     * Returns the source that fired this bullet. 
+     * If it exists; this will always be a ship.
+     */
+    @Basic
+    public Ship getSource() {
+        return this.source;
+    }
+
+    /**
+	 * Set the source of this bullet to a given ship.
+	 * 
+	 * @param	source
+	 * 			The ship that fired this bullet.
+	 * @post	The source of this bullet is the given ship.
+	 * 			| new.getSource() == source
+	 * @throws 	IllegalArgumentException
+	 * 			If this bullet 
+	 * 				-already belongs to a world
+	 * 				-already is loaded/fired by a ship
+	 * 		    |(this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
+	 */
+	public void setSource(Ship source) throws IllegalArgumentException {
+		if (this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
+			throw new IllegalArgumentException();
+		if (source==null)
+			this.source=null;
+		else
+			this.source = source;
+	}
+    
+	
+// ----------------- RADIUS ---------------------------------------------
+	
 	
 	/**
 	 * Variable registering the minimum allowed Radius.
@@ -144,98 +234,11 @@ public class Bullet extends Entity {
 	protected static double Min_Radius = 1.0;
 	
 	/**
-	 * Check whether the Minimum radius is a valid limit.
-	 * 
-	 * @param Min_Radius
-	 * 		  The minimum radius to check.
-	 * @return Whether the minimum radius is positive or not.
-	 * 			| result == (Min_Radius > 0)
-	 */
-	public static boolean isValidMinimumRadius(double Min_Radius){
-		return (Min_Radius > 0);
-	}
-	
-	/**
 	 * Variable registering the radius of this Ship.
 	 * @Override
 	 */
 	protected double radius = Min_Radius;
 
-	
-	/**
-	 * Variable registering the default density of a bullet.
-	 */
-	protected final static double Default_Density = 7.8*(Math.pow(10, 12));
-	
-	
-	/**
-	 * Variable registering the density of this bullet.
-	 * @Override
-	 */
-	private double density = Default_Density;
-	
-	/**
-	 * Variable registering the mass of this bullet.
-	 * @Override
-	 */
-	private double mass = Default_Mass;
-	
-	/**
-	 * Variable registering the Default_Mass of a bullet
-	 */
-	protected final static double Default_Mass = Default_Density*(4/3)*Math.PI*(Math.pow(Min_Radius, 3));
-	
-	/**
-	 * Field initialising the existence of ship.
-	 * Initialised to a value of null.
-	 */
-	private Ship ship = null;
-
-	/**
-	 * Field initialising the existence of World.
-	 * Initialised to a value of null.
-	 */
-	private World world = null;
-    
-	
-
-	// Getters
-	
-	/**
-	 * Returns the world to which this bullet belongs.
-	 * @return the world to which this bullet belongs.
-	 */
-	@Basic
-	public World getWorld(){
-		return this.world;
-	}
-	
-	/**
-	 * Returns the ship to which this bullet belongs.
-	 * @return the ship to which this bullet belongs.
-	 */
-	@Basic
-	public Ship getShip(){
-		return this.ship;
-	}
-	
-	/**
-	 * Returns the mass of this bullet.
-	 * @return the mass of this bullet.
-	 */
-	public double getMass(){
-		return this.mass;
-	}
-	
-	/**
-	 * Returns the density of this ship.
-	 * @return the density of this ship.
-	 */
-	public double getDensity(){
-		return this.density;
-	}
-	
-	// Setters
 	
 	 /**
      * This method makes it possible for the user to change the lower bound
@@ -252,13 +255,25 @@ public class Bullet extends Entity {
      * 		   | !(Lower_bound > 0)
      */
     public final void setMin_Radius(double Lower_Bound){
-    	if (Lower_Bound > 0){
+    	if (isValidMinimumRadius(Lower_Bound)){
     		Bullet.Min_Radius = Lower_Bound;
     	}
     	else{
     		throw new IllegalArgumentException(Double.toString(Lower_Bound));
     	}
     }
+    
+	/**
+	 * Check whether the Minimum radius is a valid limit.
+	 * 
+	 * @param Min_Radius
+	 * 		  The minimum radius to check.
+	 * @return Whether the minimum radius is positive or not.
+	 * 			| result == (Min_Radius > 0)
+	 */
+	public static boolean isValidMinimumRadius(double Min_Radius){
+		return (Min_Radius > 0);
+	}
     
 
 	/** 
@@ -295,41 +310,8 @@ public class Bullet extends Entity {
 		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 	
-	// BELANGRIJK CONSISTENTIE VAN BINDIGEN!
 	
-	/**
-	 * Method that sets a ship as the owner of this bullet.
-	 * 
-	 * @param ship
-	 * 		  The ship that we try to set as owner
-	 * 
-	 * @throws IllegalPositionException 
-	 * 
-     * @pre If the given ship is not effective and this bullet references an effective ship,
-     * 		that ship may not reference this bullet as one of its bullets.
-     * 		| if ((ship == null) && (getShip()!=null))
-     * 		|		then !getShip().hasAsBullet(this)
-     * 
-	 * @pre   If the given ship is effective, it must  have this bullet as one of its bullets.
-	 *        |if (ship != null)
-     * 		  |		then ship.hasBullet(this)
-	 * 
-	 * @post This bullet gets the given ship as its owner
-	 * 		 |new.getShip() = ship;
-	 * 			
-	 */
-	public void setShip(Ship ship) {
-        assert((ship != null) || (getShip() == null) || (!getShip().hasBullet(this)));
-		assert((ship == null) || (ship.hasBullet(this)));
-        this.ship = ship;
-        //If the ship is effective, the location of this bullet is changed to the center of the ship.
-//        if (ship!=null)
-////        	this.setPosition(ship.getxPosition(),ship.getyPosition());
-	}
-	
-	//setWorld is handled within entity class.
-	
-	// ---------------------- Bounces 
+// ---------------------- Bounces -----------------------------------------------------
 	
 	
 	/**
@@ -377,8 +359,6 @@ public class Bullet extends Entity {
 			this.Max_Bounces=bounces;
 	}
 	
-
-	
 	/**
 	 * A variable registering the maximum number of times this bullet can bounce of the boundaries of a world.
 	 */
@@ -391,32 +371,31 @@ public class Bullet extends Entity {
 	 */
 	private int bounces_left = Max_Bounces;
 	
+
+// ---------------------  Initialising Variables & Defaults -------------------------------
+	
+	/**
+	 * Variable registering the default density of a bullet.
+	 */
+	protected final static double Default_Density = 7.8*(Math.pow(10, 12));
 	
 	
-/*
- * position x,y
- * velocity x, y
- * speed
- * maxSpeed
- * radius
- * minRadius 1
- * mass
- * density
- * hasBeenFired()
- * 
- * getWorld(){
- * 
- * }
- * 
- * getSource(){
- * 
- * }
- * 
- * Either loaded or fired by the ship which it has as source.
- * getState(){
- * }
- * 
- * 
- * 
- */
+	/**
+	 * Variable registering the density of this bullet.
+	 * @Override
+	 */
+	private double density = Default_Density;
+	
+	/**
+	 * Variable registering the mass of this bullet.
+	 * @Override
+	 */
+	private double mass = Default_Mass;
+	
+	/**
+	 * Variable registering the Default_Mass of a bullet
+	 */
+	protected final static double Default_Mass = Default_Density*(4/3)*Math.PI*(Math.pow(Min_Radius, 3));
+	
+	
 }

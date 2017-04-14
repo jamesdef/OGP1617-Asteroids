@@ -92,7 +92,7 @@ public abstract class Entity {
 	}
 
 	
-	// ----------------Termination-------------------
+// ----------------Termination-------------------
 	
 	/**
 	 * This method terminates this entity.
@@ -120,83 +120,9 @@ public abstract class Entity {
 	 */
 	private boolean isTerminated = false;
 	
-	
-	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
-    
-	/**
-	 * Variable registering the xPosition of this Entity.
-	 */
-	protected double xPosition = 0.0;
 
-	/**
-	 * Variable registering the yPosition of this Entity.
-	 */
-	protected double yPosition = 0.0;
-
-
-	/**
-	 * Variable registering the xVelocity of this Entity.
-	 */
-	protected double xVelocity = Min_Velocity;
-
-
-	/**
-	 * Variable registering the yVelocity of this Entity.
-	 */
-	protected double yVelocity = Min_Velocity;
-
-
-	/**
-	 * Variable registering the minimum allowed velocity.
-	 */
-	protected static final double Min_Velocity = 0;
-
-	/**
-	 * Variable registering the maximum allowed velocity.
-	 */
-	protected static final double Max_Velocity = 300000;
-
-	/**
-	 * Variable registering the orientation of this Entity.
-	 */
-	protected double orientation = Min_Orientation;
-
-	/**
-	 * Variable registering the minimum allowed orientation
-	 */
-	protected static final double Min_Orientation = 0.0;
-
-
-	/**
-	 * Variable registering the maximum allowed orientation
-	 */
-	protected static final double Max_Orientation = 2.0*Math.PI;
-
-	
-	/**
-	 * Variable registering the minimum allowed Radius.
-	 */
-	protected static double Min_Radius = 10.0;
-
-	/**
-	 * Variable registering the radius of this Entity.
-	 * @Override
-	 */
-	private double radius = Min_Radius;
-    
-    /**
-     * Variable registering the world to which this entity belongs.
-     * Initialised as null; the entity has no world per default.
-     */
-    private World world = null;
-
-
-	private double density;
-
-//-----------------------------------------
-    
-	//Inspectors
-    
+//----------------------------------------- Standard Inspectors--------------
+        
     /**
      * Return the world to which this entity belongs.
      * @return The world to which this entity belongs.
@@ -322,10 +248,11 @@ public abstract class Entity {
      * Variable registering the mass of this entity.
      */
     protected double mass;
+    
+// ------------SETTERS--------------
 	
-	//Setters
-	
-	
+//---------------WORLD; associations--------------
+    
 	/**
 	 * Sets the given world as the world of this entity.
 	 * 
@@ -378,7 +305,7 @@ public abstract class Entity {
 		return (canHaveAsWorld(getWorld()) && ((getWorld() == null) || getWorld().hasEntity(this)));
 	}
 	
-	//POSITION
+//--------------POSITION-----------------------
 	
 	/** 
 	 * Sets the position to the given coordinates, if these make for a valid position.
@@ -437,7 +364,7 @@ public abstract class Entity {
 	}
 	
 	
-	//VELOCITY
+//--------------------------VELOCITY-----------------
 	
 	/** 
 	 * This method sets the Velocity to the given value.  
@@ -524,9 +451,9 @@ public abstract class Entity {
 		this.yVelocity = scaledyVelocity;
 	}
 	
-// Je programeert hier nominaal, dan moeten mensen maar een valid orientation geven, is ze negatief en mag dat niet?
-// Dat kan jou niets schelen, wij werken met ValidOrientations, dat staat in de pre-conditie, de gebruiker moet daaraan voldoen.
-
+	
+// -------------------- ORIENTATION -----------------
+	
 	/**
 	 *  Sets the orientation to the given angle, if this is a valid angle.
 	 * 
@@ -542,9 +469,6 @@ public abstract class Entity {
 		this.orientation = orientation;	
 	}
 
-// OPLETTEN MET HET GEBRUIK VAN "Min_Orientation" in je documentatie. 
-// dit is immers een private variable, wat betekent dat de gebruiker die niet kan zien. Misschien best een methode
-// getMin_Orientation invoeren.
 	/**
 	 *  Check whether the given orientaton is a valid value.
 	 * 
@@ -556,10 +480,26 @@ public abstract class Entity {
 	 * 
 	 */
 	public static boolean isValidOrientation(double orientation){
-		return ((Min_Orientation <= (orientation)) && (orientation <= Max_Orientation) && (!Double.isNaN(orientation)));	
+		return ((getMin_Orientation() <= (orientation)) && (orientation <= getMax_Orientation()) && (!Double.isNaN(orientation)));	
 	}
 	
+	/**
+	 * Returns the minimum orientation for this entity.
+	 * @return the minimum orientation for this entity.
+	 */
+	public static double getMin_Orientation(){
+		return Min_Orientation;
+	}
+	
+	/**
+	 * Returns the maximium orientation for this entity.
+	 * @return the maximum orientation for this entity.
+	 */
+	public static double getMax_Orientation(){
+		return Max_Orientation;
+	}
     
+// ---------------------------- RADIUS ----------------------------	
 	/** 
 	 * Sets the radius to the given Value, if it is valid.
 	 * 
@@ -594,9 +534,8 @@ public abstract class Entity {
 		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 	
-	// ---------------- Moving -------------------
-	
-	
+// ---------------- Moving -------------------
+		
 	/**
 	 *  Move the entity, given a certain duration.
 	 * 
@@ -642,10 +581,7 @@ public abstract class Entity {
 	}
 	
 	
-	// ---------------------  COLLISION and Relative Postioning ----------------------
-	
-    //  COLLISION PREDICTION  : DEFENSIVE
-	
+// ---------------------  COLLISION and Relative Postioning ----------------------
 	/**
 	 *  Return the distance betwheen two entities.
 	 * 
@@ -709,17 +645,9 @@ public abstract class Entity {
 			throw new IllegalStateException();
 			}
 		
-		List<Double> times = new ArrayList<>();
-		
-		
-		return 0;
-		
+	//.......... James brengt redding 
+			
 	}
-
-// DECLARATIEVE SPECIFICATIE:
-	// HOUDT in dat je duidt op wat het nut is van de functie, wat je kan doen met het resultaat.
-	//Je bespreekt dus niet exact hoe het resultaat bekomen wordt, maar wel wat je ermee kan doen.
-	// Daar heeft de gebruiker immers het meeste aan.
 	
 	/**
 	 *  Calculates the time to the point where the two given entities collide.
@@ -812,4 +740,80 @@ public abstract class Entity {
 
 		return CollisionCoordinates;
 	}	
+	
+	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
+    
+		/**
+		 * Variable registering the xPosition of this Entity.
+		 */
+		protected double xPosition = 0.0;
+
+		/**
+		 * Variable registering the yPosition of this Entity.
+		 */
+		protected double yPosition = 0.0;
+
+
+		/**
+		 * Variable registering the xVelocity of this Entity.
+		 */
+		protected double xVelocity = Min_Velocity;
+
+
+		/**
+		 * Variable registering the yVelocity of this Entity.
+		 */
+		protected double yVelocity = Min_Velocity;
+
+
+		/**
+		 * Variable registering the minimum allowed velocity.
+		 */
+		protected static final double Min_Velocity = 0;
+
+		/**
+		 * Variable registering the maximum allowed velocity.
+		 */
+		protected static final double Max_Velocity = 300000;
+
+		/**
+		 * Variable registering the orientation of this Entity.
+		 */
+		protected double orientation = Min_Orientation;
+
+		/**
+		 * Variable registering the minimum allowed orientation
+		 */
+		protected static final double Min_Orientation = 0.0;
+
+
+		/**
+		 * Variable registering the maximum allowed orientation
+		 */
+		protected static final double Max_Orientation = 2.0*Math.PI;
+
+		
+		/**
+		 * Variable registering the minimum allowed Radius.
+		 */
+		protected static double Min_Radius = 10.0;
+
+		/**
+		 * Variable registering the radius of this Entity.
+		 * @Override
+		 */
+		private double radius = Min_Radius;
+	    
+	    /**
+	     * Variable registering the world to which this entity belongs.
+	     * Initialised as null; the entity has no world per default.
+	     */
+	    private World world = null;
+
+	    /**
+	     * Variable registering the density of this entity.
+	     */
+		private double density;
+
+	
 }

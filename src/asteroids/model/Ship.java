@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class Ship extends Entity {
 
-	//-------------------------------   Constructors: #2 --------------------------------------------
+//-------------------------------   Constructors: #2 --------------------------------------------
 	/**
 	 * Initialize this new ship with given position,radius, speed and mass.
 	 * 
@@ -96,7 +96,7 @@ public class Ship extends Entity {
 	}
 
     
-    //---------------------------- Termination -----------------
+//---------------------------- Termination -----------------
     
     
     /**
@@ -115,55 +115,10 @@ public class Ship extends Entity {
     	//We can now safely terminate the empty ship as an entity.
     	super.terminate();
     }
-    
-	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
 
-	/**
-	 * Variable registering the radius of this Ship.
-	 */
-	private double radius = Min_Radius;
-
-	/**
-	 * Variable registering the minimum allowed Radius.
-	 * The minimum radius may change in the future. 
-	 * But it will always remain the same for all Ships.
-	 *
-	 */
-	// Dit is een waarde die je moet overschrijven maar weet nog niet hoe voorlopig.
-	//@ Override 
-	private static double Min_Radius = 10.0;
-	
-    /**
-     * Variable registering the density of this ship.
-     * @Override
-     */
-    private double density = Min_Density;
-  
-    /**
-     * Variable registering the minimum allowed density.
-     * @Override
-     */
-    
-    private static final double Min_Density = 1.42*(Math.pow(10, 12));
-    
-    /**
-     * Variable registering the Minimum allowed mass.
-     * @Override
-     */
-    private final double Min_Mass = Min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
-    
-    /**
-     * Variable registering the mass of this ship.
-     *
-     */
-    private double mass = Min_Mass;
+// ------------------------------ MASS & DENSITY-------------
    
-   // ------------------------------
-    
-    
-    
 	/**
-	 * Total Programming:
 	 * Sets the mass of this entity to the given value.
 	 * 
 	 * @param mass
@@ -218,18 +173,12 @@ public class Ship extends Entity {
 	public boolean isValidDensity(double density){
 		return (density >= Min_Density);
 	}
-    
-	// ------------------------   The inspectors -------------------------------------------------------
-
-
-    
+        
     //MASS - Total programming
-    
     
     /** 
      * This returns the sum of all the masses of the bullets' on this ship
      */
-    
     public double getMassOfBullets(){
     	double bulletMass=0;
     	
@@ -253,7 +202,7 @@ public class Ship extends Entity {
 	}
 	
 	
-	// ------------------------------------ SETTERS --------------------------
+// ------------------------------------ Radius --------------------------
 	
  
 	 /**
@@ -297,7 +246,7 @@ public class Ship extends Entity {
 
 	
 	
-	//-------- MOVING, TURNING AND ACCELARATING-----
+//-------- MOVING, TURNING AND ACCELERATING-----
 	
 	/**
 	 * The variable thrust defines whether the thrust of this ship is enabled or not.
@@ -433,12 +382,7 @@ public class Ship extends Entity {
 		return ScaledAngle;
 	}
 	
-	
-	
-	
-	
-	
-	//BULLETS --------------------------
+//---------------------BULLETS --------------------------
 	
 	/**
 	 * A variable registering the bullets owned by this ship.
@@ -544,9 +488,6 @@ public class Ship extends Entity {
 		for(int i=0; i<numberOfBullets; i++){
             loadBullet();
        }
-		
-		
-		
 	}
 	
 	/**
@@ -572,8 +513,9 @@ public class Ship extends Entity {
 	
 	/**
 	 * Fires a bullet
+	 * @throws IllegalPositionException 
 	 */
-	public void fireBullet(Bullet bullet){
+	public void fireBullet(Bullet bullet) throws IllegalPositionException{
 		//if not in world, can't fire
 		if(belongsToWorld()){
 			//bullet is fired
@@ -598,32 +540,70 @@ public class Ship extends Entity {
 	
 	/**
 	 * Checks whether a bullet can initially be placed before actually being fired
+	 * @throws IllegalPositionException 
 	 * 
 	 */
-	public boolean canPlaceBullet(Bullet bullet){
+	public boolean canPlaceBullet(Bullet bullet) throws IllegalPositionException{
 		if(belongsToWorld()){
 		//if collides with other entity upon placement
 		double bulletXPos = this.getxPosition() + (this.getRadius() + bullet.getRadius())*Math.cos(this.getOrientation());
 		double bulletYPos=  this.getyPosition() + (this.getRadius() + bullet.getRadius())*Math.sin(this.getOrientation());
 	
-		try {
+		
 			bullet.setPosition(bulletXPos, bulletYPos);
-		} catch (IllegalPositionException e) {
 			return false;
 		}
-		
 			if(getWorld().overlaps(bullet)){
 				return false;
 			}
-			
-		}
 		return true;
 	}
-	
+
 	public boolean belongsToWorld(){
 		 if (getWorld() != null) return true;
-		 return false;
-		
+		 return false;	
 	}
 	
+    
+// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
+
+	/**
+	 * Variable registering the radius of this Ship.
+	 */
+	private double radius = Min_Radius;
+
+	/**
+	 * Variable registering the minimum allowed Radius.
+	 * The minimum radius may change in the future. 
+	 * But it will always remain the same for all Ships.
+	 *
+	 */
+	// Dit is een waarde die je moet overschrijven maar weet nog niet hoe voorlopig.
+	//@ Override 
+	private static double Min_Radius = 10.0;
+	
+    /**
+     * Variable registering the density of this ship.
+     * @Override
+     */
+    private double density = Min_Density;
+  
+    /**
+     * Variable registering the minimum allowed density.
+     * @Override
+     */
+    
+    private static final double Min_Density = 1.42*(Math.pow(10, 12));
+    
+    /**
+     * Variable registering the Minimum allowed mass.
+     * @Override
+     */
+    private final double Min_Mass = Min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+    
+    /**
+     * Variable registering the mass of this ship.
+     *
+     */
+    private double mass = Min_Mass;
 }
