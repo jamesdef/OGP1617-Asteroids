@@ -430,15 +430,41 @@ public class World {
 	 */
 	public void evolve(double Dt) throws IllegalCollisionException{
 		double tC = getTimetoFirstCollision();
-		if (tC < Dt){
-			Dt = Dt - tC;
-		}
-		// tC heeft nu de waarde waarmee we stappen id tijd.
-		// We verplaatsen nu alle schepen en bullets over deze time frame.
 		
-		We hebben zowel de tijd nodig tot de eerste entiteit-botsing; zowel als de eerste botsing met een muur.
-		Immers, in die gevallen moeten we (als dat eerst gebeurt) exact dan iets aanpassen in de wereld.
-		--> TODO: getTimeToBoundaryCollision() en getPositionBoundaryCollision()
+		
+		//HANDLE move
+		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
+		
+		
+		
+		if (tC > Dt){
+			//handle collision
+			for(Entity entity: ArrayofEntities){
+				entity.move(Dt);
+				if(entity instanceof Ship){
+					entity.updateVelocity(dt);
+				}
+								
+			}
+			
+		} else
+		{
+			// tC2 heeft nu de waarde waarmee we stappen id tijd.
+			// We verplaatsen nu alle schepen en bullets over deze time frame.
+			double tC2 = Dt-tC;
+			evolve(tC2);
+			
+			
+		}
+		
+		
+		
+		
+		
+//		We hebben zowel de tijd nodig tot de eerste entiteit-botsing; 
+//		zowel als de eerste botsing met een muur.
+//		Immers, in die gevallen moeten we (als dat eerst gebeurt) exact dan iets aanpassen in de wereld.
+//		--> TODO: getTimeToBoundaryCollision() en getPositionBoundaryCollision()
 	}
 	
 
@@ -474,6 +500,64 @@ public class World {
 		}
 		return TimetoFirstCollision;
 	}
+	
+	public double getTimetoFirstBoundaryCollision(){
+		
+	}
+	
+	
+	
+	
+	
+	
+	//--- COLLISION HANDLERS
+	
+	public void handleEntityBoundaryCollision(Entity entity, boolean horizontally){
+		if(horizontally){
+			entity.setVelocity(-entity.getxVelocity(), entity.getyVelocity());
+		} else {
+			entity.setVelocity(entity.getxVelocity(), -entity.getyVelocity());
+		}
+		
+		if(entity instanceof Bullet){
+			entity.updateCollisionsNb();
+		}
+		
+	}
+	
+	public void handleEntityEntityCollision(Entity entityA, Entity entityB){
+		
+	if(entityA instanceof Ship){
+		if(entityB instanceof Ship) handleShipShipCollision((Ship) entityA, (Ship) entityB);
+		if(entityB instanceof Bullet) handleBulletShipCollision((Bullet) entityB, (Ship) entityA);
+	}
+	else{
+		if(entityB instanceof Ship) handleBulletShipCollision((Bullet) entityA, (Ship) entityB);
+		if(entityB instanceof Bullet) handleBulletBulletCollision((Bullet) entityB, (Bullet) entityA);
+	}
+	
+	}
+	
+	public void handleShipShipCollision(Ship shipA, Ship shipB){
+		
+		
+		shipA.setVelocity(xVelocity, yVelocity);
+		shipB.setVelocity(xVelocity, yVelocity);
+	}
+	
+	public void handleBulletShipCollision(Bullet bullet, Ship ship){
+		if(bullet.getShip() == ship){
+			
+		} else {
+			
+		}
+	}
+	
+	public void handleBulletBulletCollision(Bullet bulletA, Bullet bulletB){
+		
+	}
+	
+	
 	
 	public boolean overlaps(Entity entity){
 		

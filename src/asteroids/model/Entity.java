@@ -645,8 +645,6 @@ public abstract class Entity {
 			throw new IllegalStateException();
 			}
 		
-		double xVelocity = this.getxVelocity();
-		
 		
 		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(), this.getWorld().getWidth());
 		double yTime = getTimeToBoundaryAxisCollsion(this.getyVelocity(), this.getyPosition(), this.getWorld().getHeight());
