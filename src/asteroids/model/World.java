@@ -422,49 +422,70 @@ public class World {
 				);
 	}
 	
-	
+	public void moveAllentities( double Dt){
+		for(Entity entity: ArrayofEntities){
+			entity.move(Dt);
+			if(entity instanceof Ship){
+				entity.updateVelocity(dt);
+			}			
+		}
+	}
 	/**
 	 * 
 	 * @param Dt
 	 * @throws IllegalCollisionException
 	 */
 	public void evolve(double Dt) throws IllegalCollisionException{
-		double tC = getTimetoFirstCollision();
 		
 		
-		//HANDLE move
+		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
+		double tNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
+		Entity nextEntityBoundaryCollisionEntity = this.getNextEntityBoundaryCollisionEntity();
+		
+		
+		//NEXT ENTITY-ENTITY COLLISSION INFO
+		double tNextEntityEntityPosition = this.getTimeToNextEntityEntityCollision();
+		HashSet<Entity> nextEntityEntityPositionEntities = this.getNextEntityEntityCollisionEntities();
+		
+		
+		
+		double tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
+
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
 		
-		
-		
-		if (tC > Dt){
-			//handle collision
-			for(Entity entity: ArrayofEntities){
-				entity.move(Dt);
-				if(entity instanceof Ship){
-					entity.updateVelocity(dt);
-				}
-								
+
+		if (tC >= Dt){
+			//NO COLLISION DURING DT, MOVE ALL ENTITIES
+			this.moveAllentities(Dt);
+			
+		} else{
+			//tC <= Dt
+			//move entities during DT-TC
+			this.moveAllentities(tC);
+			
+			//now, handle collision
+			//get type of collison
+			
+			
+			if (tNextEntityBoundaryCollision<=tNextEntityEntityPosition) {
+				
+				//handle entity boundary collision
+				this.handleEntityBoundaryCollision(nextEntityBoundaryCollisionEntity);
 			}
+			else {
+				
+				//handle entity entity collision
+				
+				entityC1.collide(entityC2);
+				this.handleEntityEntityCollision(entityA, entityB);
+				}
 			
-		} else
-		{
-			// tC2 heeft nu de waarde waarmee we stappen id tijd.
-			// We verplaatsen nu alle schepen en bullets over deze time frame.
-			double tC2 = Dt-tC;
-			evolve(tC2);
-			
+			this.moveAllentities(Dt-tC);
+
+			}
 			
 		}
 		
-		
-		
-		
-		
-//		We hebben zowel de tijd nodig tot de eerste entiteit-botsing; 
-//		zowel als de eerste botsing met een muur.
-//		Immers, in die gevallen moeten we (als dat eerst gebeurt) exact dan iets aanpassen in de wereld.
-//		--> TODO: getTimeToBoundaryCollision() en getPositionBoundaryCollision()
 	}
 	
 
@@ -501,7 +522,124 @@ public class World {
 		return TimetoFirstCollision;
 	}
 	
-	public double getTimetoFirstBoundaryCollision(){
+	public double getTimeToNextEntityBoundaryCollision(){
+		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
+		double boundaryCollisionTime = Double.POSITIVE_INFINITY;
+		for (int i = 0; i < getAllEntities().size(); i++){
+			double time = (ArrayofEntities.get(i)).getTimeToBoundaryCollision();
+			if (time < boundaryCollisionTime){
+				boundaryCollisionTime = time;
+			}
+		}
+		return boundaryCollisionTime;
+		
+	}
+	
+	public Entity getNextEntityBoundaryCollisionEntity(){
+		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
+		double boundaryCollisionTime = Double.POSITIVE_INFINITY;
+		Entity entity = null;
+		for (int i = 0; i < getAllEntities().size(); i++){
+			double time = (ArrayofEntities.get(i)).getTimeToBoundaryCollision();
+			if (time < boundaryCollisionTime){
+				boundaryCollisionTime = time;
+				entity = ArrayofEntities.get(i);
+			}
+		}
+		return entity;
+		
+	}
+	
+	
+	
+	
+	public double getTimeToNextEntityEntityCollision(){
+		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
+		double TimetoFirstEntityEntityCollision = Double.POSITIVE_INFINITY;
+		for (int i = 0; i < getAllEntities().size(); i++){
+			for (int j = i +1; j < getAllEntities().size(); j++){
+				double time = (ArrayofEntities.get(i)).getTimeToEntityCollision((ArrayofEntities.get(j)));
+				if (time < TimetoFirstEntityEntityCollision){
+					TimetoFirstEntityEntityCollision = time;
+				}
+			}
+		}
+		return TimetoFirstEntityEntityCollision;
+		
+	}
+
+	
+	public HashSet<Entity> getNextEntityEntityCollisionEntities(){
+		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
+		
+		double TimetoFirstEntityEntityCollision = Double.POSITIVE_INFINITY;
+
+		Entity entityA = null;
+		Entity entityB = null;
+		
+		// Initialise the time to something way bigger than what you expect to find.
+		double TimetoFirstEntityEntityCollision = Double.POSITIVE_INFINITY;
+		for (int i = 0; i < getAllEntities().size(); i++){
+			for (int j = i +1; j < getAllEntities().size(); j++){
+				double time = (ArrayofEntities.get(i)).getTimeToEntityCollision((ArrayofEntities.get(j)));
+				if (time < TimetoFirstEntityEntityCollision){
+					TimetoFirstEntityEntityCollision = time;
+					entityA = ArrayofEntities.get(i);
+					entityB = ArrayofEntities.get(j);
+				}
+			}
+		}
+		
+		HashSet<Entity> entitiesSet = new HashSet<Entity>();
+		entitiesSet.add(entityA);
+		entitiesSet.add(entityB);
+		
+		return entitiesSet;
+	}
+	
+	
+	
+	
+	
+	public List<Entity> getNextCollision(){
+		
+		// do some work
+		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
+		// Initialise the time to something way bigger than what you expect to find.
+		
+		Entity entityA;
+		Entity entityB;
+		double TimetoFirstCollision = Double.POSITIVE_INFINITY;
+
+		for (int i = 0; i < getAllEntities().size(); i++){
+			for (int j = i +1; j < getAllEntities().size(); j++){
+				double time = (ArrayofEntities.get(i)).getTimeToEntityCollision((ArrayofEntities.get(j)));
+				if (time < TimetoFirstCollision){
+					entityA = ArrayofEntities.get(i);
+					entityB = ArrayofEntities.get(j);
+				}
+			}
+			//If the entity that is being handled in the primary for-loop, collides with the boundary of it's world, sooner than with another entity;
+			//then this shorter time will be our result (for now). This is because if an entity bounces with a wall, 
+			// we also need to change things to it's properties befor going further.
+			double time = (ArrayofEntities.get(i)).getTimeToBoundaryCollision();
+			if (time < TimetoFirstCollision){
+				entityA = ArrayofEntities.get(i);
+				entityB = null;
+			}
+		}		
+		
+		//entity entity -> botsint
+		// entity null -> boundarycollision
+		
+		return [entityA];
+		
+	}
+	
+	
+
+	public boolean overlaps(Entity entity){
+		
 		
 	}
 	
@@ -511,6 +649,8 @@ public class World {
 	
 	
 	//--- COLLISION HANDLERS
+	
+	
 	
 	public void handleEntityBoundaryCollision(Entity entity, boolean horizontally){
 		if(horizontally){
@@ -538,6 +678,10 @@ public class World {
 	
 	}
 	
+	
+	
+	//SPECIFIC EE CASES
+	
 	public void handleShipShipCollision(Ship shipA, Ship shipB){
 		
 		
@@ -559,10 +703,6 @@ public class World {
 	
 	
 	
-	public boolean overlaps(Entity entity){
-		
-		
-	}
 	
 }
 
