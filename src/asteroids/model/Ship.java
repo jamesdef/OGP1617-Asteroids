@@ -177,7 +177,10 @@ public class Ship extends Entity {
     //MASS - Total programming
     
     /** 
-     * This returns the sum of all the masses of the bullets' on this ship
+     * This method returns the sum of all the masses of the bullets on this ship.
+     * 
+     * @return The sum of all the masses of the bullets on this ship.
+     * 		   
      */
     public double getMassOfBullets(){
     	double bulletMass=0;
@@ -290,13 +293,10 @@ public class Ship extends Entity {
 		return force/getTotalMass();
 	}
 	
-	
 	/**
 	 * A variable defining the force that an active thruster can exert on a ship.
 	 */
 	private final double force = 1.1E21;
-	
-
 	
 	/**
 	 *  Raises the velocity of the ship if the thruster is enabled.
