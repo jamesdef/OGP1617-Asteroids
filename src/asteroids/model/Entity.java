@@ -1,13 +1,8 @@
 package asteroids.model;
-import java.util.ArrayList;
-import java.util.List;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 
-//The goal is to create a class that involves all the thinggs that entities (ie ships and bullets)
-//have in common. Bullet and ship will then be made subclasses of Entity. If needed, the methods within
-//these classes can override the methods of ENtity.
 
 /** 
 *  A class for dealing with entities. We could define these as 'objects that can move through space'.
@@ -27,7 +22,7 @@ import be.kuleuven.cs.som.annotate.Immutable;
 * 			|isValidPosition(getxPosition,getyPosition);
 * 
 * @invar  	The entity has to belong to a proper world at all times.
-* 			| hasProperWorld()
+* 			|hasProperWorld()
 * 
 * @invar   The mass of an entity must be valid.
 * 		    |isValidMass(this.getEntityMass)
@@ -45,7 +40,7 @@ public abstract class Entity {
 	//-------------------------------- CONSTRUCTOR -------------------------------- 
 	
 	/**
-	 * Initialize this new entity with given position,radius, speed, orientation and mass.
+	 * Initialize this new entity with given position,radius, speed and orientation.
 	 * 
 	 * 
 	 * @param  xPosition
@@ -624,9 +619,14 @@ public abstract class Entity {
 	/**
 	 * This method returns the time until an entity will reach a certain boundary of the world it is in.
 	 * 
+	 * 
 	 * @return If this entity will never collide with a boundary, the method will return infinity.
-	 * 		   Otherwise it will return the time until the entity reaches a boundary.
-	 * 		   A use for the following method: 
+	 * 		   Otherwise it will return the shortest time until the entity reaches a boundary.
+	 * 		   It simply calculates both the times to reach either the vertical or horizontal boundary.
+	 * 		   And then takes the smallest of both times.
+	 * 		   @see implementation 
+	 *         
+	 *         A use for this method: 
 	 * 		   One can use the result to move the given entity by the resulted duration to place the
 	 * 		   entity directly against the boundary. If one were to move the ship for a slightly longer duration; 
 	 * 		   the ship would be out of the world's boundary.
@@ -645,21 +645,29 @@ public abstract class Entity {
 			throw new IllegalStateException();
 			}
 		
-		
 		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(), this.getWorld().getWidth());
 		double yTime = getTimeToBoundaryAxisCollsion(this.getyVelocity(), this.getyPosition(), this.getWorld().getHeight());
 		
-		return Math.min(xTime, yTime);
-		
-		
-	//.......... En alweer is de stad gered dankzij
-	//			<*<*< JAMES DEFAUW >*>*>
-	//			Follow me on
-	//				- Instagram: 	james.defauw
-	//				- Twitter:		@jamesdef
-			
+		return Math.min(xTime, yTime);		
 	}
 	
+	
+	/**
+	 * This method calculaties the time until this entity collides with a boundary.
+	 * This either in the x- or y- direction. 
+	 * There is a zero border (can be seen as the x- or y-axis) and a far boundary (paralel to the axis, at a certain length).
+	 * 
+	 * 
+	 * @param axisVelocity
+	 * 		  The velocity in the direction of a certain axis (x or y)
+	 * @param axisPosition
+	 * 		  The position as according to a certain axis (x or y)
+	 * @param worldAxisLength
+	 * 		  The length of this wordth (either the height or the width, depending on the given axis (x or y) )
+	 * @return The time to the furthest boundary or to the zero boundary, depending on which is the smallest.
+	 * 		   It returns the smallest of the two.
+	 * 		  @see implementation
+	 */
 	public double getTimeToBoundaryAxisCollsion(double axisVelocity, double axisPosition, double worldAxisLength){
 		
 		double time = Double.POSITIVE_INFINITY;
@@ -667,9 +675,8 @@ public abstract class Entity {
 			double timeToLongBorder = (worldAxisLength-axisPosition-this.getRadius())/axisVelocity;
 			double timeToZeroBorder = -(axisPosition -this.getRadius())/axisVelocity;
 			
-			time = Math.max(timeToZeroBorder,timeToLongBorder);
-		}
-		
+			time = Math.min(timeToZeroBorder,timeToLongBorder);
+		}	
 		return time;
 	}
 	
