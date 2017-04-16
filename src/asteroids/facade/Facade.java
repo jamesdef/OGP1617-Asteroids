@@ -19,17 +19,17 @@ import asteroids.util.ModelException;
 
 public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 
-//	@Override
-//	public Ship createShip()throws ModelException{
-//		
-//		try {
-//			return new Ship();
-//		} catch (IllegalPositionException exc) {
-//			throw new ModelException("ILLEGAL POSITION");
-//		} catch (IllegalRadiusException exc) {
-//			throw new ModelException("ILLEGAL RADIUS");
-//		}
-//	}
+	@Override
+	public Ship createShip()throws ModelException{
+		
+		try {
+			return new Ship();
+		} catch (IllegalPositionException exc) {
+			throw new ModelException("ILLEGAL POSITION");
+		} catch (IllegalRadiusException exc) {
+			throw new ModelException("ILLEGAL RADIUS");
+		}
+	}
 
 //	@Override
 //	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double orientation)
@@ -226,6 +226,7 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 	public World createWorld(double width, double height) throws ModelException {
 		return new World(width,height);
 	}
+	
 
 	@Override
 	public void terminateWorld(World world) throws ModelException {
