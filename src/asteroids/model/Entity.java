@@ -643,7 +643,7 @@ public abstract class Entity {
 			double timeToLongBorder = (worldAxisLength-axisPosition-this.getRadius())/axisVelocity;
 			double timeToZeroBorder = -(axisPosition -this.getRadius())/axisVelocity;
 			
-			time = Math.min(timeToZeroBorder,timeToLongBorder);
+			time = Math.max(timeToZeroBorder,timeToLongBorder);
 		}	
 		return time;
 	}

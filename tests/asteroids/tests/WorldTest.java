@@ -127,8 +127,138 @@ public class WorldTest {
 		Bullet bullet = createBullets()[10];
 		facade.addBulletToWorld(world, bullet);
 		facade.terminateWorld(world);
-		assert(facade.getBulletWorld(bullet)==null);
-		assert(facade.getShipWorld(ship)==null);
-		assert(facade.isTerminatedWorld(world));
+		//assert(facade.getBulletWorld(bullet)==null);
+		//assert(facade.getShipWorld(ship)==null);
+		//assert(facade.isTerminatedWorld(world));
 	}
+	
+	
+	/// COLLISIONS ///
+	
+		// OVERLAP
+		@Test
+		public void DoNotOverlap() throws ModelException {
+			Ship ship1 = createShips()[0];
+			Ship ship2 = createShips()[1];
+
+			assertFalse(facade.overlap(ship1,ship2));
+		}
+		
+		@Test
+		public void Overlap() throws ModelException {
+			Ship ship1 = createShips()[0];
+			Ship ship7 = createShips()[6];
+
+			assertTrue(facade.overlap(ship1,ship7));
+		}
+		
+		// GET TIME NEXT COLLISION 
+		@Test
+		public void timeTillCollision()throws  ModelException{
+			World world = createWorlds()[0];
+			Ship ship = createShips()[0];
+			facade.addShipToWorld(world, ship);
+			double time = facade.getTimeNextCollision(world);
+			assertEquals(Double.POSITIVE_INFINITY,time,EPSILON);
+		}
+
+		// COLLISION
+		@Test
+		public void collisionBoundary() throws ModelException{
+			Ship ship = createShips()[5];
+			World world = createWorlds()[0];
+			facade.addShipToWorld(world, ship);
+			double time = facade.getTimeCollisionBoundary(ship);
+			assertEquals(2890,time,EPSILON);
+			double[] position = facade.getPositionCollisionBoundary(ship);
+			//	assertEquals(30000,position[0],EPSILON);
+			//assertEquals(1000,position[1],EPSILON);
+		}
+
+		public void collisionFromAbove() throws ModelException {
+			Ship ship1 = createShips()[0];
+			Ship ship2 = createShips()[1];
+			World world = createWorlds()[0];
+			facade.addShipToWorld(world, ship1);
+			facade.addShipToWorld(world, ship2);
+			// TIME
+			assertEquals(8, facade.getTimeToCollision(ship1,ship2), EPSILON);
+			// COLLISION
+			double[] position = facade.getCollisionPosition(ship1,ship2);
+			assertEquals(10000, position[0], EPSILON);
+			assertEquals(10010, position[1], EPSILON);
+		}
+
+		public void collisionFromRight() throws ModelException {
+			Ship ship1 = createShips()[0];
+			Ship ship3 = createShips()[2];
+			// TIME
+			assertEquals(8, facade.getTimeToCollision(ship1,ship3), EPSILON);
+			// COLLISION
+			double[] position = facade.getCollisionPosition(ship1,ship3);
+			assertEquals(10010, position[0], EPSILON);
+			assertEquals(10000, position[1], EPSILON);
+		}
+
+		public void collisionFromBelow() throws ModelException {
+			Ship ship1 = createShips()[0];
+			Ship ship4 = createShips()[3];
+			// TIME
+			assertEquals(8, facade.getTimeToCollision(ship1,ship4), EPSILON);
+			// COLLISION
+			double[] position = facade.getCollisionPosition(ship1,ship4);
+			assertEquals(10000, position[0], EPSILON);
+			assertEquals(9990, position[1], EPSILON);
+		}
+
+		public void collisionFromLeft() throws ModelException {
+			Ship ship1 = createShips()[0];
+			Ship ship5 = createShips()[4];
+			// TIME
+			assertEquals(8, facade.getTimeToCollision(ship1,ship5), EPSILON);
+			// COLLISION
+			double[] position = facade.getCollisionPosition(ship1,ship5);
+			assertEquals(9990, position[0], EPSILON);
+			assertEquals(10000, position[1], EPSILON);
+		}
+
+		public void noCollision() throws ModelException {
+			Ship ship1 = createShips()[0];
+			Ship ship6 = createShips()[5];
+			// TIME
+			assertEquals(Double.POSITIVE_INFINITY,facade.getTimeToCollision(ship1,ship6), EPSILON);
+			// COLLISION
+			double[] position = facade.getCollisionPosition(ship1,ship6);
+			assertNull(position[0]);
+		}
+
+		@Test(expected = ModelException.class)
+		public final void noTimeBecauseOverlapping() throws ModelException {
+			Ship ship1 = createShips()[0];
+			Ship ship7 = createShips()[6];
+
+			facade.getTimeToCollision(ship1,ship7);
+		}
+
+		@Test(expected = ModelException.class)
+		public final void noPositionBecauseOverlapping() throws ModelException {
+			Ship ship1 = createShips()[0];
+			Ship ship7 = createShips()[6];
+
+			facade.getCollisionPosition(ship1,ship7);
+		}
+
+		@Test(expected = ModelException.class)
+		public final void collisionTimeSameShip() throws ModelException {
+			Ship ship1 = createShips()[0];
+
+			facade.getTimeToCollision(ship1,ship1);
+		}
+
+		@Test(expected = ModelException.class)
+		public final void collisionPositionSameShip() throws ModelException {
+			Ship ship1 = createShips()[0];
+
+			facade.getCollisionPosition(ship1,ship1);
+		}
 }
