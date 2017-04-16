@@ -82,7 +82,7 @@ public class World {
 	public void terminate(){
 		for (Entity entity : this.getAllEntities())
 			this.removeEntity(entity);
-		this.terminated = true;
+		this.isTerminated = true;
 	}
 
 	/**
@@ -91,46 +91,17 @@ public class World {
 	 */
 	@Basic
 	public boolean isTerminated(){
-		return this.terminated;
+		return this.isTerminated;
 	}
 
 	/**
 	 * Variable registering whether or not this world is terminated.
 	 */
-	private boolean terminated = false;
-
-
-	/**
-	 * The given entity is removed from the set of entities that this world holds.
-	 * 
-	 * @param  entity
-	 *         The entity which will be removed.
-	 * @post   The world no longer has the entity as one of its entities
-	 *         | !new.hasAsEntity(entity)
-	 *       
-	 * @post	If this world has the given entity as one of its entities,
-	 * 			the given entity is no longer attached to any world.
-	 * 			|if (hasAsEntity(entity){
-	 * 			|	((new entity).getWorld == null)}
-	 * @throws IllegalArgumentException 
-	 * 		   If the given entity is not active or the given entity does not belong to this
-	 * 		   world, this exception is thrown.
-	 * 		
-	 */
-	public void removeEntity(Entity entity) throws IllegalArgumentException{
-		if (entity == null || !hasEntity(entity)){
-			throw new IllegalArgumentException();
-		}
-		this.entities.remove(entity.getPosition());
-		entity.setWorld(null);
-	}
+	private boolean isTerminated = false;
 
 	
-// -------------------- Registers; variables; maps; sets ---------------------------------
-	/**
-	 * A map containing the different entities in this world, allong with the position of their center.
-	 */
-	private final HashMap <double[], Entity> entities = new HashMap<double[],Entity>();
+// --------------------  Sets; Maps; Getters---------------------------------
+
 	
 	/**
 	 * Return the entities located in this world at a certain positionas a map (using location as the key of each entity).
@@ -149,6 +120,35 @@ public class World {
 	}
 	
 	/**
+	 * Returns a set of all ships that belong to this world.
+	 * @return a set of all ships that belong to this world.
+	 */
+	public Set<Ship> getAllShips(){
+		Set<Ship> ships = new HashSet<>();
+		for(Entity entityToCheck: this.getAllEntities()){
+			if (entityToCheck instanceof Ship){
+				ships.add((Ship)entityToCheck);
+			}
+		}
+		return ships;
+	}
+	
+	/**
+	 * Returns a set of all bullets that belong to this world.
+	 * @return a set of all bullets that belong to this world.
+	 */
+	public Set<Bullet> getAllBullets(){
+		Set<Bullet> bullets = new HashSet<>();
+		for(Entity entityToCheck: this.getAllEntities()){
+			if (entityToCheck instanceof Bullet){
+				bullets.add((Bullet)entityToCheck);
+			}
+		}
+		return bullets;
+	}
+	
+	
+	/**
 	 * A method returning the amount of entities within this world.
 	 * 
 	 * @return The number of entities within this world.
@@ -158,52 +158,9 @@ public class World {
 		return getAllEntities().size();
 	}
 	
-	/**
-	 * A variable containing the ships that are within this world.
-	 */
-	private final HashSet<Ship> ships = new HashSet<Ship>();
-	
-	/**
-	 * A variable containing the bullets that are within this world.
-	 */
-	private final HashSet<Bullet> bullets = new HashSet<Bullet>();
-	
-	/**
-	 * A method that returns the ships located in this world.
-	 * @return The ships located in this world.
-	 */
-	public HashSet<Ship> getships(){
-			return this.ships;
-	}
-	
-	/**
-	 * A method that returns the bullets located in this world.
-	 * @return The bullets located in this worl.
-	 */
-	public HashSet<Bullet> getBullets(){
-		return this.bullets;
-	}
+
 	
 // ----------------- HEIGHT AND WIDTH------------------
-	
-	/**
-	 * Variable registering the maxium possible width and heigth for all worlds.
-	 * The default value for this is set to be the largest number achievable.
-	 */
-	private static double Upper_Bound = Double.MAX_VALUE;
-
-	/**
-	 * Variable registering the width of this world. The default value is set to
-	 * be half of the maximum possible Value.
-	 */
-	private static double width = (1/2)*Upper_Bound;
-
-	/**
-	 * Variable registering the height of this world. The default value is set to
-	 * be half of the maximum possible Value.
-	 */
-	private static double height = (1/2)*Upper_Bound;
-	
 	
 	/**
 	 * Return the width of this world.
@@ -279,29 +236,53 @@ public class World {
 	
 //--------------- ASSOCIATIONS WITH ENTITIES -------------------------
 	
-	/** DEFENSIVE PROGRAMMING
+	/**
+	 * This method adds a certain entity to this world.
+	 * @param entity
+	 * 		  The entity to add to this world.
 	 * 
+	 * @post This world has the given entity as one of its entities
+	 * 		 and this entity has this world as its world.
+	 * 		  |  new.hasAsEntity(entity) == true
+	 * 		  |	 entity.getWorld() == this
 	 * 
-	 * 
-	 * @param ship
+	 * @throws IllegalArgumentException()
+	 * 		   If this world can not have the given entity as one of its entities 
+	 * 			or the given entity already has a world, this exception is thrown.
+	 * 		   |(!canHaveAsEntity(entity) || entity.getWorld()!=null)
 	 */
-	public void addAsShip(Ship ship){
-		this.ships.add(ship);
+	public void addEntity(Entity entity){
+		if (!canHaveAsEntity(entity) || entity.getWorld()!=null)
+				throw new IllegalArgumentException();
+		// Add entity to the map: with its position as key.
+		this.entities.put(entity.getPosition(), entity);
+		//This entity has the world as its world.
+		entity.setWorld(this);
 	}
 	
-
-	
-	public void addAsBullet(Bullet bullet){
-		this.bullets.add(bullet);
-	}
-	
-	
-	public Set<Ship> getAllShips(){
-		return this.ships;
-	}
-	
-	public Set<Bullet> getAllBullets(){
-		return this.bullets;
+	/**
+	 * The given entity is removed from the set of entities that this world holds.
+	 * 
+	 * @param  entity
+	 *         The entity which will be removed.
+	 * @post   The world no longer has the entity as one of its entities
+	 *         | !new.hasAsEntity(entity)
+	 *       
+	 * @post	If this world has the given entity as one of its entities,
+	 * 			the given entity is no longer attached to any world.
+	 * 			|if (hasAsEntity(entity){
+	 * 			|	((new entity).getWorld == null)}
+	 * @throws IllegalArgumentException 
+	 * 		   If the given entity is not active or the given entity does not belong to this
+	 * 		   world, this exception is thrown.
+	 * 		
+	 */
+	public void removeEntity(Entity entity) throws IllegalArgumentException{
+		if (entity == null || !hasEntity(entity)){
+			throw new IllegalArgumentException();
+		}
+		this.entities.remove(entity.getPosition());
+		entity.setWorld(null);
 	}
 	
 	/**
@@ -330,7 +311,7 @@ public class World {
 	 * 			- The entity is within the worlds boundaries 
 	 * 			- In the case that the entity is a bullet, it must not have a ship ascribed to it. 
 	 * 					(otherwise the bullet should belong to the ship, not the world)
-	 * 			-If the given entity overlaps with another entity, it can not belong to this world.
+//TODO			-If the given entity overlaps with another entity, it can not belong to this world.
 	 * 
 	 */
 	public Boolean canHaveAsEntity(Entity entity){
@@ -422,16 +403,19 @@ public class World {
 				);
 	}
 	
+// ---------------------- EVOLVING AND COLLISION ----------------------
+	
 	public void moveAllentities( double Dt){
-	List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
 
-		for(Entity entity: ArrayofEntities){
+		for(Entity entity: this.getAllEntities()){
 			//entity.move(Dt);
 			if(entity instanceof Ship){
 				//entity.updateVelocity(dt);
 			}			
 		}
 	}
+	
+	
 	/**
 	 * 
 	 * @param Dt
@@ -559,14 +543,23 @@ public class World {
 		return entitiesSet;
 	}
 	
+	// TODO : Added methode om tijd tot eerst volgende gebeurtenis te berekenen? Die was verdwenen? 
+	// Is dit een goede implementatie dan?
+	
+	/**
+	 * Returns the time until the next collision in this world.
+	 * This can be the time until the first boundary collision or entity collision.
+	 * @return
+	 * @throws IllegalCollisionException
+	 */
+	public double getTimeToFirstCollision() throws IllegalCollisionException{
+		return Math.min(this.getTimeToNextEntityBoundaryCollision(),this.getTimeToNextEntityEntityCollision());
+	}
 	
 
 	
 	
-	
-	
-	
-	//--- COLLISION HANDLERS
+//------------------- COLLISION HANDLERS -------------------
 	
 	public void handleEntityBoundaryCollision(Entity entity){
 		
@@ -677,8 +670,30 @@ public class World {
 	}
 	
 	
+// ----------------------------------  VARIABLES --------
 	
+	/**
+	 * A map containing the different entities in this world, allong with the position of their center.
+	 */
+	private final HashMap <double[], Entity> entities = new HashMap<double[],Entity>();
 	
+	/**
+	 * Variable registering the maxium possible width and heigth for all worlds.
+	 * The default value for this is set to be the largest number achievable.
+	 */
+	private static double Upper_Bound = Double.MAX_VALUE;
+
+	/**
+	 * Variable registering the width of this world. The default value is set to
+	 * be half of the maximum possible Value.
+	 */
+	private static double width = (1/2)*Upper_Bound;
+
+	/**
+	 * Variable registering the height of this world. The default value is set to
+	 * be half of the maximum possible Value.
+	 */
+	private static double height = (1/2)*Upper_Bound;
 }
 
 

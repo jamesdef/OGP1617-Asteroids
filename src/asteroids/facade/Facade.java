@@ -8,7 +8,6 @@ import asteroids.model.Bullet;
 import asteroids.model.Entity;
 import asteroids.model.IllegalBulletException;
 import asteroids.model.IllegalCollisionException;
-import asteroids.model.IllegalDurationException;
 import asteroids.model.IllegalPositionException;
 import asteroids.model.IllegalRadiusException;
 import asteroids.model.Ship;
@@ -165,12 +164,11 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 		return ship.getAcceleration();
 	}
 
-	//Zelf minimum orientation bijgevoegd.
 	@Override
 	public Bullet createBullet(double x, double y, double xVelocity, double yVelocity, double radius)
 			throws ModelException {
 		try {
-			return new Bullet(x, y,  xVelocity,  yVelocity,  radius, Bullet.getMin_Orientation());
+			return new Bullet(x, y,  xVelocity,  yVelocity,  radius);
 		} catch (IllegalPositionException e) {
 			throw new ModelException("Illegal Position");
 		} catch (IllegalRadiusException e) {
@@ -255,7 +253,7 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 
 	@Override
 	public void addShipToWorld(World world, Ship ship) throws ModelException {
-		world.addAsShip(ship);
+		world.addEntity(ship);
 	}
 
 	@Override
@@ -265,7 +263,7 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 
 	@Override
 	public void addBulletToWorld(World world, Bullet bullet) throws ModelException {
-		world.addAsBullet(bullet);
+		world.addEntity(bullet);
 	}
 
 	@Override
@@ -352,7 +350,7 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 	@Override
 	public double getTimeNextCollision(World world) throws ModelException {
 		try {
-			return world.getTimetoFirstCollision();
+			return world.getTimeToFirstCollision();
 		} catch (IllegalCollisionException e) {
 			throw new ModelException("Illegal Collision");
 		}
@@ -366,8 +364,7 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 
 	@Override
 	public void evolve(World world, double dt, CollisionListener collisionListener) throws ModelException {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
 
 	@Override
