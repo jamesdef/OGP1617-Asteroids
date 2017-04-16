@@ -1,7 +1,4 @@
 
-// TODO: Michiel: We hebben nog geen tests, ik heb deze gewoon gekopieerd om te kijken hoe goed we bezig zijn.
-//     Voorlopig 22 fouten van de 40 tests, hopelijk beter nadat je klaar bent vanavond.
-
 package asteroids.tests;
 
 import static org.junit.Assert.assertEquals;
@@ -20,14 +17,8 @@ import asteroids.model.*;
 import asteroids.facade.Facade;
 import asteroids.part2.facade.IFacade;
 import asteroids.util.ModelException;
-/**
- * A test class for the class Ship.
- * 
- * @version 10th of march
- * @authors Sieben Bocklandt and Ruben Broekx
- *
- */
-public class Tests_Part2 {
+
+public class ILLEGALETESTS {
 
 	/// CONSTANTS ///
 	

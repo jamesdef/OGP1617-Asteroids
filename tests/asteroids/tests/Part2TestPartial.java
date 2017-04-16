@@ -52,6 +52,17 @@ public class Part2TestPartial {
 		assertEquals(1000.0, facade.getShipAcceleration(ship), EPSILON);
 		assertTrue(facade.isShipThrusterActive(ship));
 		facade.evolve(world, 1, null);
+		System.out.println(ship.getxPosition());
+		System.out.println(ship.getxVelocity());
+		// TODO Uit de print blijkt dat het schip niet bewogen is en geen aangepaste snelheid heeft.
+		// Snelheid moet normaal wel zijn aangepast.
+		// Gezien zijn thruster aanstaat, moet ergens een fout zitten daaromtrent.
+		// Ik denk dat de methodes allemaal kloppen, maar de functie accelerate van ship niet wordt aangeroepen.
+		// Dat moet wel gebeuren. Er zit een fout in evolve want sowieso moet het schip bewogen zijn maar dat is niet zo.
+		//  for (Ship ship : this.getShips()) {
+		//      ship.accelerate(duration); 
+		// Moet worden toegevoegd onderaan evolve denk ik.
+		// Dat blijkt ook nog niet genoeg, waarschijnlijk redeneer fout in evolve.
 		assertEquals(-990, facade.getShipVelocity(ship)[0], EPSILON);
 		assertEquals(0, facade.getShipVelocity(ship)[1], EPSILON);
 	}
