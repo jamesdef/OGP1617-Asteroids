@@ -423,10 +423,12 @@ public class World {
 	}
 	
 	public void moveAllentities( double Dt){
+	List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
+
 		for(Entity entity: ArrayofEntities){
-			entity.move(Dt);
+			//entity.move(Dt);
 			if(entity instanceof Ship){
-				entity.updateVelocity(dt);
+				//entity.updateVelocity(dt);
 			}			
 		}
 	}
@@ -447,41 +449,28 @@ public class World {
 		double tNextEntityEntityPosition = this.getTimeToNextEntityEntityCollision();
 		HashSet<Entity> nextEntityEntityPositionEntities = this.getNextEntityEntityCollisionEntities();
 		
-		
-		
 		double tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
-
-		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
 		
 
-		if (tC >= Dt){
-			//NO COLLISION DURING DT, MOVE ALL ENTITIES
-			this.moveAllentities(Dt);
-			
-		} else{
-			//tC <= Dt
-			//move entities during DT-TC
+		if (tC <= Dt){
 			this.moveAllentities(tC);
-			
-			//now, handle collision
-			//get type of collison
-			
-			
+
 			if (tNextEntityBoundaryCollision<=tNextEntityEntityPosition) {
 				
 				//handle entity boundary collision
 				this.handleEntityBoundaryCollision(nextEntityBoundaryCollisionEntity);
 			}
 			else {
-				
 				//handle entity entity collision
-				
-				entityC1.collide(entityC2);
-				this.handleEntityEntityCollision(entityA, entityB);
-				}
-			
-			this.moveAllentities(Dt-tC);
+				List<Entity> ArrayofEntities = new ArrayList<>(nextEntityEntityPositionEntities);
+				Entity entityA = ArrayofEntities.get(0);
+				Entity entityB = ArrayofEntities.get(1);
 
+				this.handleEntityEntityCollision(entityA, entityB);
+			}
+				this.evolve(Dt-tC);
+			} else {
+				this.moveAllentities(Dt);
 			}
 		
 	}
@@ -497,28 +486,6 @@ public class World {
 	 * @throws IllegalCollisionException 
 	 * 			--> Handled within getTimeToCollision
 	 */
-	public double getTimetoFirstCollision() throws IllegalCollisionException{
-		// We need a list so we can use the concept of order in efficiently comparing entities.
-		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
-		// Initialise the time to something way bigger than what you expect to find.
-		double TimetoFirstCollision = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < getAllEntities().size(); i++){
-			for (int j = i +1; j < getAllEntities().size(); j++){
-				double time = (ArrayofEntities.get(i)).getTimeToEntityCollision((ArrayofEntities.get(j)));
-				if (time < TimetoFirstCollision){
-					TimetoFirstCollision = time;
-				}
-			}
-			//If the entity that is being handled in the primary for-loop, collides with the boundary of it's world, sooner than with another entity;
-			//then this shorter time will be our result (for now). This is because if an entity bounces with a wall, 
-			// we also need to change things to it's properties befor going further.
-			double time = (ArrayofEntities.get(i)).getTimeToBoundaryCollision();
-			if (time < TimetoFirstCollision){
-				TimetoFirstCollision = time;
-			}
-		}
-		return TimetoFirstCollision;
-	}
 	
 	public double getTimeToNextEntityBoundaryCollision(){
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
@@ -544,18 +511,16 @@ public class World {
 				entity = ArrayofEntities.get(i);
 			}
 		}
-		return entity;
-		
+		return entity;	
 	}
 	
 	
-	
-	
-	public double getTimeToNextEntityEntityCollision(){
+	public double getTimeToNextEntityEntityCollision() throws IllegalCollisionException {
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
 		double TimetoFirstEntityEntityCollision = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < getAllEntities().size(); i++){
 			for (int j = i +1; j < getAllEntities().size(); j++){
+				
 				double time = (ArrayofEntities.get(i)).getTimeToEntityCollision((ArrayofEntities.get(j)));
 				if (time < TimetoFirstEntityEntityCollision){
 					TimetoFirstEntityEntityCollision = time;
@@ -567,7 +532,7 @@ public class World {
 	}
 
 	
-	public HashSet<Entity> getNextEntityEntityCollisionEntities(){
+	public HashSet<Entity> getNextEntityEntityCollisionEntities() throws IllegalCollisionException{
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
 		
 		double TimetoFirstEntityEntityCollision = Double.POSITIVE_INFINITY;
@@ -576,7 +541,6 @@ public class World {
 		Entity entityB = null;
 		
 		// Initialise the time to something way bigger than what you expect to find.
-		double TimetoFirstEntityEntityCollision = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < getAllEntities().size(); i++){
 			for (int j = i +1; j < getAllEntities().size(); j++){
 				double time = (ArrayofEntities.get(i)).getTimeToEntityCollision((ArrayofEntities.get(j)));
@@ -596,51 +560,7 @@ public class World {
 	}
 	
 	
-	
-	
-	
-	public List<Entity> getNextCollision(){
-		
-		// do some work
-		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
-		// Initialise the time to something way bigger than what you expect to find.
-		
-		Entity entityA;
-		Entity entityB;
-		double TimetoFirstCollision = Double.POSITIVE_INFINITY;
 
-		for (int i = 0; i < getAllEntities().size(); i++){
-			for (int j = i +1; j < getAllEntities().size(); j++){
-				double time = (ArrayofEntities.get(i)).getTimeToEntityCollision((ArrayofEntities.get(j)));
-				if (time < TimetoFirstCollision){
-					entityA = ArrayofEntities.get(i);
-					entityB = ArrayofEntities.get(j);
-				}
-			}
-			//If the entity that is being handled in the primary for-loop, collides with the boundary of it's world, sooner than with another entity;
-			//then this shorter time will be our result (for now). This is because if an entity bounces with a wall, 
-			// we also need to change things to it's properties befor going further.
-			double time = (ArrayofEntities.get(i)).getTimeToBoundaryCollision();
-			if (time < TimetoFirstCollision){
-				entityA = ArrayofEntities.get(i);
-				entityB = null;
-			}
-		}		
-		
-		//entity entity -> botsint
-		// entity null -> boundarycollision
-		
-		return [entityA];
-		
-	}
-	
-	
-
-	public boolean overlaps(Entity entity){
-		
-		
-	}
-	
 	
 	
 	
@@ -648,23 +568,33 @@ public class World {
 	
 	//--- COLLISION HANDLERS
 	
-	
-	
-	public void handleEntityBoundaryCollision(Entity entity, boolean horizontally){
+	public void handleEntityBoundaryCollision(Entity entity){
+		
+		if(entity instanceof Bullet){
+			Bullet bullet = (Bullet) entity;
+			int nbBouncesLeft = bullet.getBouncesLeft();
+			
+			if(nbBouncesLeft == 0){
+				entity.terminate();
+			} else {
+				bullet.decrementBouncesLeft();
+			}
+		}
+		
+		boolean horizontally = (entity.getxPosition()< 1.01 * entity.getRadius()) || (entity.getxPosition() > (entity.getWorld().getWidth() - 1.01 * entity.getRadius()));
+		
 		if(horizontally){
 			entity.setVelocity(-entity.getxVelocity(), entity.getyVelocity());
 		} else {
 			entity.setVelocity(entity.getxVelocity(), -entity.getyVelocity());
 		}
 		
-		if(entity instanceof Bullet){
-			entity.updateCollisionsNb();
-		}
+		
 		
 	}
 	
 	public void handleEntityEntityCollision(Entity entityA, Entity entityB){
-		
+
 	if(entityA instanceof Ship){
 		if(entityB instanceof Ship) handleShipShipCollision((Ship) entityA, (Ship) entityB);
 		if(entityB instanceof Bullet) handleBulletShipCollision((Bullet) entityB, (Ship) entityA);
@@ -683,20 +613,67 @@ public class World {
 	public void handleShipShipCollision(Ship shipA, Ship shipB){
 		
 		
-		shipA.setVelocity(xVelocity, yVelocity);
-		shipB.setVelocity(xVelocity, yVelocity);
+		double shipAPositionX = shipA.getxPosition();
+		double shipAPositionY = shipA.getyPosition();
+		
+		double shipAVelocityX = shipA.getxVelocity();
+		double shipAVelocityY = shipA.getyVelocity();
+		
+		double shipARadius = shipA.getRadius();
+		double shipAmass = shipA.getMass();
+		
+		
+		double shipBPositionX = shipB.getxPosition();
+		double shipBPositionY = shipB.getyPosition();
+		
+		double shipBVelocityX = shipB.getxVelocity();
+		double shipBVelocityY = shipB.getyVelocity();
+		
+		double shipBRadius = shipB.getRadius();
+		double shipBmass = shipB.getMass();
+
+		
+
+		double deltaPosx = shipAPositionX - shipBPositionX;
+		double deltaPosy = shipAPositionY - shipBPositionY;
+		
+		double deltaVelX = shipAVelocityX - shipBVelocityX;
+		double deltaVelY = shipAVelocityY - shipBVelocityY;
+		
+		double delta = deltaPosx * deltaVelX + deltaVelY * deltaVelY;
+
+		double sumRadius = shipARadius + shipBRadius;
+		
+		double BigJ = 
+				(2 * shipAmass * shipBmass * delta) / 
+				(sumRadius * (shipAmass + shipBmass));
+		
+		double Jx = (BigJ * deltaPosx) / sumRadius;
+		double Jy = (BigJ * deltaPosy) / sumRadius;
+		
+		double shipAnewXVel = shipAVelocityX + Jx / shipAmass;
+		double shipAnewYVel = shipAVelocityY + Jy / shipAmass;
+		
+		double shipBnewXVel = shipAVelocityX + Jx / shipAmass;
+		double shipBnewYVel = shipAVelocityY + Jy / shipAmass;
+				
+		
+		shipA.setVelocity(shipAnewXVel, shipAnewYVel);
+		shipB.setVelocity(shipBnewXVel, shipBnewYVel);
 	}
 	
 	public void handleBulletShipCollision(Bullet bullet, Ship ship){
 		if(bullet.getShip() == ship){
-			
+			//ship.ge
 		} else {
-			
+			bullet.terminate();
+			ship.terminate();
 		}
 	}
 	
 	public void handleBulletBulletCollision(Bullet bulletA, Bullet bulletB){
-		
+		bulletA.terminate();
+		bulletB.terminate();
 	}
 	
 	
