@@ -4,7 +4,7 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 
 /**
- * A class for signaling illegal duration for moving ships.
+ * A class for signaling illegal duration for moving entities.
  * 
  * @version 1.0
  * @author Michiel

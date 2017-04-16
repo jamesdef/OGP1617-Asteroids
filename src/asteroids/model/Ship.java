@@ -1,6 +1,8 @@
 package asteroids.model;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +15,15 @@ import java.util.Set;
  *
  *@invar Each ship has proper bullets as its belongings.
  *		 |hasProperBullets()
+ *
+ * @invar 	The radius of each ship must be a valid value.
+ * 			|isValidRadius(getRadius())
+ *
+ * @invar   The mass of a ship must be valid.
+ * 		    |isValidMass(this.getEntityMass)
+ * 
+ * @invar   The density of a ship must be valid.
+ * 		    |isValidDensity(this.getDensity)
  *   
  * @version 2.0     
  * @author James Defauw & Michiel De Koninck
@@ -57,13 +68,8 @@ public class Ship extends Entity {
 	 * 		   |setMass(mass);
 	 * 
 	 * @effect The given parameters are set as the properties of the new ship.
-	 * 		   |setPosition(xPosition,yPosition);
-	 *	       |setVelocity(xVelocity,yVelocity);
-	 *	       |setRadius(radius);
-	 *	       |setOrientation(orientation);
+	 * 		   |super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation);
 	 *
-	 *
-	 * 
 	 *@note    Any new ship initialized with this constructor (via superclass Entity)
 	 * 		   will satisfy all its class invariants. The setters will see to this in their implementation.
 	 */
@@ -143,6 +149,7 @@ public class Ship extends Entity {
 	 * @return Whether the mass is valid for a ship to have.
 	 * 		   |result == (mass >= 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getMassDensity())
 	 */
+	@Raw
 	public boolean isValidMass(double mass){
         return (mass >= 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getDensity());
 	}
@@ -151,6 +158,7 @@ public class Ship extends Entity {
 	 * Returns the mass of this ship.
 	 * @return the mass of this ship.
 	 */
+	@Basic
 	public double getMass(){
 		return this.mass;
 	}
@@ -159,10 +167,22 @@ public class Ship extends Entity {
 	 * Returns the density of this ship.
 	 * @return the density of this ship.
 	 */
+	@Basic
 	public double getDensity(){
 		return this.density;
 	}
 	
+	/**
+	 * Sets the density of this ship to the given value, if this is valid.
+	 * @param density
+	 * 		  The density to change to.
+	 * @post If the given value is valid, it is changed.
+	 * 		 |if isValidDensity(density)
+	 * 		 |	then new.getDensity() == density
+	 * @post If the given value is not valid, the density is set to the minimum density.
+	 * 		|if (!isValidDensity(density)){
+	 *		|	then new.density = Min_Density;
+	 */
 	public void setDensity(double density){
 		if (!isValidDensity(density)){
 			density = Min_Density;
@@ -170,6 +190,14 @@ public class Ship extends Entity {
 		this.density = density;
 	}
 	
+	/**
+	 * Returns whether the given density is valid.
+	 * 
+	 * @param density
+	 * 		  The density to check.
+	 * @return True if the given density is greater than or equal to the Minimum Density
+	 * 		   |density >= Min_Density
+	 */
 	public boolean isValidDensity(double density){
 		return (density >= Min_Density);
 	}
@@ -180,6 +208,8 @@ public class Ship extends Entity {
      * This method returns the sum of all the masses of the bullets on this ship.
      * 
      * @return The sum of all the masses of the bullets on this ship.
+     * 		   It does this by adding the mass of all bullets together
+     * 			|@see implementation
      * 		   
      */
     public double getMassOfBullets(){
@@ -255,20 +285,20 @@ public class Ship extends Entity {
 	 * The variable thrust defines whether the thrust of this ship is enabled or not.
 	 * It is initialised as being disabled.
 	 */
-	private boolean thrust = false;
+	private boolean thrusterActivity = false;
 	
 	/**
 	 * This method can enable the thrust for this ship.
 	 */
 	public void thrustOn(){
-		this.thrust = true;
+		this.thrusterActivity = true;
 	}
 	
 	/**
 	 * This method can disable the thrust for this ship.
 	 */
 	public void thrustOff(){
-		this.thrust = false;
+		this.thrusterActivity = false;
 	}
 	
 	/**
@@ -278,9 +308,23 @@ public class Ship extends Entity {
 	 */
 	@Basic
 	public Boolean getthrustState(){
-		return thrust;
+		return this.thrusterActivity;
 	}
 	
+	/**
+	 * This method sets the activity of the thruster to the given value.
+	 * @param thrusterActivity
+	 * 		  The new thursterActivity
+	 * @effect The thrusterActivity of this ship is equal to the given boolean.
+	 */
+	public void setThrusterActivity(boolean thrusterActivity){
+		if (thrusterActivity == true){
+			thrustOn();
+		}
+		else{
+			thrustOff();
+		}
+	}
 	
 	/**
 	 * This method returns the acceleration that this ship would get when the thruster is enabled.
@@ -289,14 +333,49 @@ public class Ship extends Entity {
 	 * @return The acceleration of this ship.
 	 * 		   |return (force/getTotalMass())
 	 */
+	@Basic
 	public double getPossibleAcceleration(){
-		return force/getTotalMass();
+		return getThrustForce()/getTotalMass();
 	}
 	
 	/**
-	 * A variable defining the force that an active thruster can exert on a ship.
+	 * Returns the acceleration of this ship.
+	 * @return The possible acceleration if the thruster is on.
+	 * 		   If the thruster is off, return zero; the ship is not accelerating.
+	 * 		   |@see implementation
 	 */
-	private final double force = 1.1E21;
+	public double getAcceleration(){
+		if (this.getthrustState()==true){
+			return this.getPossibleAcceleration();
+		}
+		else{
+			return 0.0;
+		}
+	}
+	
+	/**
+	 * This method returns the force of the thruster of this ship.
+	 * @return The force of the thruster of this ship.
+	 */
+	@Basic
+	public double getThrustForce(){
+		return this.thrustforce;
+	}
+	
+	/**
+	 * This method sets the thrustforce for this ship to a new value.
+	 * @param thrustforce
+	 * 		  The thrustforce to be set.
+	 * @effect The thrustforce is changed to the given value.
+	 * 		   This only if the given value is greater than zero, else nothing is changed.
+	 * 		   |if (thrustforce > 0){
+			   |	then new.thrustforce = thrustforce;
+	 */
+	public void setThrustForce(double thrustforce){
+		if (thrustforce > 0){
+			this.thrustforce = thrustforce;
+		}
+	}
 	
 	/**
 	 *  Raises the velocity of the ship if the thruster is enabled.
@@ -329,22 +408,23 @@ public class Ship extends Entity {
 
 	
 	/**
-	 * Move this ship and all it's on-board belongings with it.
-	 * 
-	 * @throws IllegalDurationException 
-	 * @throws IllegalPositionException 
+	 * Move this ship and all it's on-board belongings with it. 
 	 * 
 	 * @effect The ship itself is moved, as well as all the entities that are in it.
+	 * 		   |super.move(duration);
+	 *	
+	 *			|for (Bullet bullet: this.bullets)
+	 *			|		bullet.move(duration);
+	 *
+	 *@note Throws imposed via move, handled in documentation there.
 	 */
 	@Override
 	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
 		super.move(duration);
 		
-		// Je zou misschien gewoon de bullets kunnen plaatsen op de plaats waar het schip staat wanneer het klaar is met bewegen.
-		// Immers moeten de bullets toch niks doen tijdens de beweging? (maar is dat dan niet verkeerd omdat de bullets blijven staan op de oude coordinaten
-		// tijdens het bewegen van het schip?
-//	     for (Bullet bullet: this.bullets) {
-//	            bullet.setPosition(this.getPosition());
+		for (Bullet bullet: this.bullets){
+			bullet.move(duration);
+		}
 	}
 
 	/**
@@ -378,7 +458,7 @@ public class Ship extends Entity {
 	 *         | result = angle % getMax_Orientation;
 	 */
 	public double scaleangle(double angle){
-		double ScaledAngle = angle % Max_Orientation;
+		double ScaledAngle = angle % getMax_Orientation();
 		return ScaledAngle;
 	}
 	
@@ -402,6 +482,7 @@ public class Ship extends Entity {
 	 * Returns the number of bullets this ship contains.
 	 * @return this.getBullets().size()
 	 */
+	@Basic
 	public int getNbOfBullets(){
 		return this.getBullets().size();
 	}
@@ -434,6 +515,7 @@ public class Ship extends Entity {
      *         |					&& (bullet.getRadius()<this.getRadius())  )
     }
      */
+	@Raw
     public boolean canHaveAsBullet(Bullet bullet) {
     	  return ( (bullet != null) 
     			       && ((!this.isTerminated()) || (bullet.isTerminated()))
@@ -450,6 +532,7 @@ public class Ship extends Entity {
      * 		   |for bullet in getBullets():
      * 		   |    result == ( canHaveAsBullet(bullet) && bullet.getShip() == this )	   
      */
+	@Raw
     public boolean hasProperBullets(){
     	for (Bullet bullet : getBullets()) {
     		if (!canHaveAsBullet(bullet)){
@@ -465,30 +548,93 @@ public class Ship extends Entity {
     
 	
 	/**
-	
-	/**
-	 * Adds a bullet to the bullets loaded on the ship
+	 * Adds a 'default' bullet to the bullets loaded on the ship.
+	 *  
+	 * @post   A new bullet is created withd default properties, it is associated with this ship and 
+	 * 		   this ships' collection of bullets is extended.
+	 * 		   | new.bullet.getShip() == this
+	 * 		   | this.hasBullet(bullet) == true
 	 * @throws IllegalRadiusException 
 	 * @throws IllegalPositionException 
+	 * 		   We are obliged to throw these exceptions, even though we know that the default bullet will be legal.
 	 */
 	public void loadBullet() throws IllegalPositionException, IllegalRadiusException{
 		Bullet bullet = new Bullet(this.getxPosition(), this.getyPosition(), this.getxVelocity(), this.getyVelocity(),
-												Bullet.Min_Radius, this.getOrientation());
-		this.getBullets().add(bullet);
+												Bullet.getMinRadius(), this.getOrientation());
+		bullet.setShip(this);
+		this.bullets.add(bullet);
 	}
 	
 	/**
-	 * Adds a specified amount of bullets to the ship
+	 * Adds a certain bullet to this ship.
+	 * 
+	 * @param bullet
+	 * 		  That bullet to add to this ships collection of bullets.
+	 * @post   The specific bullet is now within this ship.
+	 * 		   | new.bullet.getShip() == this
+	 * 		   | this.hasBullet(bullet) == true		
+	 * @post  If the bullet was previously in a world, it is removed from the collection of this world.
+	 * 		  |if (bullet.getWorld()!=null){
+	 *		  | 	then bullet.getWorld().removeEntity(bullet);	
+	 *
+	 * @throws  If both the bullet and the ship are in a world but not the same one, we throw a bulletexception. 
+	 * 			Same thing if this ship can't have the given bullet as a bullet or if the bullet already has a ship.
+	 * 		   |(  ((this.getWorld()!=null)&&(bullet.getWorld()!=null)	
+	 * 		   |				&&(this.getWorld()!=bullet.getWorld())) 
+	 * 		   | 							|| !canHaveAsBullet(bullet) 
+	 * 		   | 									|| bullet.getShip() != null   )
+	 * 		 
+	 */
+	public void loadBullet(Bullet bullet) throws IllegalPositionException, IllegalBulletException{
+		if (((this.getWorld()!=null)&&(bullet.getWorld()!=null)&&(this.getWorld()!=bullet.getWorld())) 
+							|| !canHaveAsBullet(bullet) || bullet.getShip()!= null){
+			throw new IllegalBulletException(bullet);
+		}
+		//If the bullet was previously associated to a world, now remove it from that world.
+		if (bullet.getWorld()!=null){
+			bullet.getWorld().removeEntity(bullet);	
+		}
+		bullet.setShip(this);
+		this.bullets.add(bullet);
+		bullet.setPosition(this.getxPosition(), this.getyPosition());
+		bullet.setVelocity(this.getxVelocity(), this.getyVelocity());
+	}
+	
+	/**
+	 * Adds a specified amount of  default bullets to the ship
 	 * 
 	 * @param numberOfBullets
+	 * 		  The number of bullets to add to this ship.
+	 * @effect loadBullet is called upon a "numberOfBullets" amount of times.
+	 * 		   |@see implementation
 	 * @throws IllegalRadiusException 
 	 * @throws IllegalPositionException 
+	 * 		   We are obliged to throw these exceptions, even though we know that the default bullet will be legal.
 	 */
 	public void addMultipleBullets(int numberOfBullets) throws IllegalPositionException, IllegalRadiusException{
 		for(int i=0; i<numberOfBullets; i++){
             loadBullet();
        }
 	}
+	
+	/**
+	 * This method adds a collection of bullets to its collection.
+	 * It only does this if each bullet can in fact be safely added to this ship.
+	 * If not, it throws an illegal Bulletexception.
+	 * 
+	 * @param bullets
+	 * 		  The collection of bullets to add to this ship.
+	 * @effect For each bullet in the given collection, the loadBullet function is called upon.
+	 * 		   That means that for each adding, the documentation of loadBullet applies.
+	 * 		   |@see implementation.
+	 */
+	public void loadBullets(Collection<Bullet> bullets) throws IllegalBulletException, IllegalPositionException{
+        for (Bullet bullet : bullets){
+            this.loadBullet(bullet);
+        }
+    }
+	
+	
 	
 	/**
 	 * Removes a specified bullet from the ships' bullets.
@@ -512,55 +658,96 @@ public class Ship extends Entity {
 	}
 	
 	/**
-	 * Fires a bullet
+	 * Fires a bullet by putting it within this world, in front of the ship in the direction 
+	 * to where the ship is oriented. This with a small margin and a speed of 250.
+	 * 
+	 * @post If this ship does not have any bullets or does not belong to a world, nothing happens.
+	 * 	
+	 * @post The bullet is removed from the ship's collection of bullets and the ship becomes the bullets' source.
+	 * 	     | new.bullet.getShip()==null
+	 * 		 | new.bullet.getSource() == this
+	 *
+	 * @post The bullet is placed next to the ship with a small margin between both, place depending on the ships orientation, 
+	 * 	     and its initial velocity is set to 250 orientated in the same direction as the ship.
+	 * 		|@see implementation
+	 * 
+	 * @post If, upon creation, the bullet is outside of the boundaries of this world, it is immediatly terminated.
+	 * 		| if (!(this.getWorld().withinWorldBoundaries(bullet)))
+	 * 		| 		then bullet.terminate()
+	 * 
+	 * @post If, upon creation, the bullet overlaps with another entity, both are immediatly terminated.
+	 * 
+	 * 			|for (Entity entity : getWorld().getAllEntities()){
+	 *			|	if (bullet.overlap(entity) == true){
+	 *			|		then bullet.terminate();
+	 *			|		 	 entity.terminate();
+	 * 
+	 * 
 	 * @throws IllegalPositionException 
+	 * 		   The position to which the bullet is set must be legal.
 	 */
-	public void fireBullet(Bullet bullet) throws IllegalPositionException{
-		//if not in world, can't fire
-		if(belongsToWorld()){
-			//bullet is fired
-			if(canPlaceBullet(bullet)){
-				//fire bullet
-				
-				double Bulletspeed = 10;
-				double xSpeed = Bulletspeed*Math.cos(this.getOrientation());
-				double ySpeed = Bulletspeed*Math.sin(this.getOrientation());
-				
-				//remove bullet from ship qs it's fired
-				removeBullet(bullet);
-				bullet.setVelocity(xSpeed, ySpeed);
-				
-			} else {
-				
-			}
-		}
+	public void fireBullet() throws IllegalPositionException, IllegalRadiusException{
+		if (this.getNbOfBullets()!= 0 && belongsToWorld()){
+			Bullet bullet = this.getBullets().iterator().next();
+			
+			double margin = 1.05;
+			
+			double bulletXPos = this.getxPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.cos(this.getOrientation());
+			double bulletYPos=  this.getyPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.sin(this.getOrientation());
 		
+			double Bulletspeed = 250;
+			double xSpeed = Bulletspeed*Math.cos(this.getOrientation());
+			double ySpeed = Bulletspeed*Math.sin(this.getOrientation());
+			
+			this.removeBullet(bullet);
+			bullet.setSource(this);
+			
+			//bullet is now set to where it will start its movement, after some checks.
+			bullet.setPosition(bulletXPos, bulletYPos);
+			
+			// Check whether the bullet is within the worlds' boundaries, if not: terminate it.
+			if (!(this.getWorld().withinWorldBoundaries(bullet))){
+				//Bullet is outside world upon creation. 
+				bullet.terminate();
+				//Get out of this method, further checks don't apply anymore.
+				return;
+			}
+			
+			// Check whether this bullet overlaps with another entity upon creation, if so: delete both.
+			for (Entity entity : getWorld().getAllEntities()){
+				if (bullet.overlap(entity) == true){
+					
+					//If somehow the overlapping entity is the one that fired the bullet, 
+					// the bullet is added once more to the collection of its bullets.
+					if (bullet.getSource() == entity){
+						// this ship is in fact the overlapping entity: load a bullet to this ship.
+						// The bullet will be terminated anyway upon exiting this if-clause.
+						if (this.equals(entity)){
+							this.loadBullet();
+						}
+					}
+					bullet.terminate();
+					entity.terminate();
+					
+					//Further running of this code is unneccesary and possibly unsafe
+					return;
+				}
+			}
+			
+			// The bullet is in a legal spot and can start moving. It's velocity is now assigned.
+			bullet.setVelocity(xSpeed, ySpeed);	
+		}
 	}
-
+	
 	
 	/**
-	 * Checks whether a bullet can initially be placed before actually being fired
-	 * @throws IllegalPositionException 
-	 * 
+	 * This method simply checks whether this ship belongs to a world.
+	 * @return True if and only if this ship belongs to a world.
 	 */
-	public boolean canPlaceBullet(Bullet bullet) throws IllegalPositionException{
-		if(belongsToWorld()){
-		//if collides with other entity upon placement
-		double bulletXPos = this.getxPosition() + (this.getRadius() + bullet.getRadius())*Math.cos(this.getOrientation());
-		double bulletYPos=  this.getyPosition() + (this.getRadius() + bullet.getRadius())*Math.sin(this.getOrientation());
-	
-		
-			bullet.setPosition(bulletXPos, bulletYPos);
-			return false;
-		}
-			if(getWorld().overlaps(bullet)){
-				return false;
-			}
-		return true;
-	}
-
 	public boolean belongsToWorld(){
-		 if (getWorld() != null) return true;
+		 if (getWorld() != null) {
+			 return true;
+		 }
 		 return false;	
 	}
 	
@@ -606,4 +793,10 @@ public class Ship extends Entity {
      *
      */
     private double mass = Min_Mass;
+    
+	
+	/**
+	 * A variable defining the force that an active thruster can exert on a ship.
+	 */
+	private double thrustforce = 1.1E21;
 }

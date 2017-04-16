@@ -2,6 +2,7 @@ package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
+import be.kuleuven.cs.som.annotate.Raw;
 
 
 /** 
@@ -23,12 +24,6 @@ import be.kuleuven.cs.som.annotate.Immutable;
 * 
 * @invar  	The entity has to belong to a proper world at all times.
 * 			|hasProperWorld()
-* 
-* @invar   The mass of an entity must be valid.
-* 		    |isValidMass(this.getEntityMass)
-* 
-* @invar   The density of an entity must be valid.
-* 		    |isValidDensity(this.getEntityDensity)
 * 
 * 
 * @version 1.0
@@ -105,6 +100,7 @@ public abstract class Entity {
 	 * Checks whether this entity is terminated.
 	 * @return The state of this entity; whether it is terminated or not.
 	 */
+	@Basic
 	public boolean isTerminated(){
 		return this.isTerminated;
 	}
@@ -123,6 +119,7 @@ public abstract class Entity {
      * @return The world to which this entity belongs.
      * 		   null is returned if this entity does not belong to any world.
      */
+	@Basic
     public World getWorld() {
     	return this.world;
     }
@@ -173,6 +170,7 @@ public abstract class Entity {
 	 * 		   |double[] Velocity = {getxVelocity(),getyVelocity()}
 	 * 		   |return Velocity
 	 */
+	@Basic
 	public double[] getVelocity(){
 		double[] Velocity = {getxVelocity(),getyVelocity()};
 		return Velocity;
@@ -226,6 +224,7 @@ public abstract class Entity {
 	 * Returns the density of this ship.
 	 * @return the density of this ship.
 	 */
+	@Basic
 	public double getDensity(){
 		return this.density;
 	}
@@ -284,6 +283,7 @@ public abstract class Entity {
 	 * @return True if the given world is effective and the given world can has this entity as one of its entities.
 	 * 		   | result == (world != null && world.canHaveAsEntity(this));
 	 */
+	@Raw
 	public boolean canHaveAsWorld(World world){
 		return (world != null && world.canHaveAsEntity(this));
 	}
@@ -296,6 +296,7 @@ public abstract class Entity {
 	 * 		   |result == (   (canHaveAsWorld(getWorld()) &&
 	 * 						  ((getWorld() == null) || getWorld().hasEntity(this)))   )
 	 */
+	@Raw
 	public boolean hasProperWorld(){
 		return (canHaveAsWorld(getWorld()) && ((getWorld() == null) || getWorld().hasEntity(this)));
 	}
@@ -318,6 +319,7 @@ public abstract class Entity {
 	 * 		 The given xPosition or yPosition is not valid.
 	 * 	     | !isValidPosition(xPosition,yPosition)
 	 */
+	@Raw
 	public void setPosition(double xPosition, double yPosition) 
 			throws IllegalPositionException{
 		if (!isValidPosition(xPosition,yPosition)){
@@ -338,6 +340,7 @@ public abstract class Entity {
 	 * @return True if and only if neither of the coordinates is either infinity or NaN
 	 *		  | result == (isValidCoordinate(xPosition) && isValidCoordinate(yPosition))
 	 */
+	@Raw
 	public static boolean isValidPosition(double xPosition, double yPosition){
 	
 		return (isValidCoordinate(xPosition) && isValidCoordinate(yPosition));
@@ -353,6 +356,7 @@ public abstract class Entity {
 	 * 		   |result == (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
 				&& (coordinate != Double.NEGATIVE_INFINITY));
 	 */
+	@Raw
 	public static boolean isValidCoordinate(double coordinate){
 		return (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
 				&& (coordinate != Double.NEGATIVE_INFINITY));
@@ -386,6 +390,7 @@ public abstract class Entity {
 	 * 		|   then new.scaleVelocity()
 	 * 
 	 */
+	@Raw
 	public void setVelocity(double xVelocity, double yVelocity){
 		
 		if ((!Double.isNaN(xVelocity)) && (!Double.isNaN(yVelocity))){
@@ -416,6 +421,7 @@ public abstract class Entity {
 	 * 		 Otherwise it will return false.
 	 * 		 | (Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2)) > Max_Velocity);	
 	 */
+	@Raw
 	public boolean exceedsMaxVelocity(double xVelocity, double yVelocity){
 		return (Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2)) > Max_Velocity);
 
@@ -459,6 +465,7 @@ public abstract class Entity {
 	 * @post The orientation of the ship is now changed to the given value
 	 *		|new.getOrientation()== orientation
 	 */
+	@Raw
 	public void setOrientation(double orientation){
 		assert isValidOrientation(orientation);
 		this.orientation = orientation;	
@@ -482,6 +489,7 @@ public abstract class Entity {
 	 * Returns the minimum orientation for this entity.
 	 * @return the minimum orientation for this entity.
 	 */
+	@Basic @Immutable
 	public static double getMin_Orientation(){
 		return Min_Orientation;
 	}
@@ -490,6 +498,7 @@ public abstract class Entity {
 	 * Returns the maximium orientation for this entity.
 	 * @return the maximum orientation for this entity.
 	 */
+	@Basic @Immutable
 	public static double getMax_Orientation(){
 		return Max_Orientation;
 	}
@@ -508,6 +517,7 @@ public abstract class Entity {
 	 * 		   The given radius is not a valid radius.
 	 * 		   | ! isValidRadius(radius)
 	 */
+	@Raw
 	public void setRadius(double radius) throws IllegalRadiusException{
 		if (!isValidRadius(radius)){
 			throw new IllegalRadiusException(radius);}
@@ -525,6 +535,7 @@ public abstract class Entity {
 	 * 		   Or if the radius is Infinity or not a number.
 	 * 		   | radius >= getMin_Radius;
 	 */
+	@Raw
 	public static boolean isValidRadius(double radius){
 		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
@@ -571,6 +582,7 @@ public abstract class Entity {
 	 * @return true if the duration is a non-negative number and finite.
 	 * 		   | return (duration >= 0 && !Double.isNaN(duration) && (duration != Double.POSITIVE_INFINITY))
 	 */			
+	@Raw
 	public boolean isValidDuration(double duration){
 		return ((duration >= 0) && (!Double.isNaN(duration)) && (duration != Double.POSITIVE_INFINITY));
 	}

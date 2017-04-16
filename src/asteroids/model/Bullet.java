@@ -5,22 +5,33 @@ import be.kuleuven.cs.som.annotate.Raw;
 
 
 /**
- * A class for dealing with bullets, which are a kind of entity in space. These have a certain position, velocity, radius, speed and orientation.
+ * A class for dealing with bullets, which are a kind of entity in space. 
+ * These have a certain position, velocity, radius, speed and orientation.
+ * The orientation does not come in to play for now, 
+ * but is inherited from entity anyway as it does not impose problems.
  * The bullet also has a mass and a certain density.
  * A bullet can have an owner: a ship or a world. If it has a ship as its owner, it can not have a world as its owner.
+ * If a bullet is fired, it has a source (a ship that fired it).
+ * A bullet can only bounce of a boundary a given number of times.
+ * If a bullet reenters its owner, its previous bounces are not forgotten.
  * 
- * @invar   The highest possible absolute, total velocity is lower than a certain maximum the ship can never exceed this speed.
- * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
- *  
- * @invar	The orientation of the ship must be a valid value.
- * 			|isValidOrientation(getOrientation())
- * 
- * @invar 	The radius of each ship must be a valid value.
+ * @invar The invariants of the superclass 'Entity' are described there.
+ *
+ * @invar Each bullet must have a proper owner at all times.
+ *		  |hasProperOwner()
+ *
+ * @invar Each bullet should have a proper ship, if this is its owner.
+ * 		  |hasProperShip()
+ *
+ * @invar 	The radius of each bullet must be a valid value.
  * 			|isValidRadius(getRadius())
+ *
+ * @invar   The mass of a bullet must be valid.
+ * 		    |isValidMass(this.getEntityMass)
  * 
- * @invar   The coordinates of a ship must be finit numbers.
- * 			|isValidPosition(getxPosition,getyPosition);
- *   
+ * @invar   The density of a ship must be valid.
+ * 		    |isValidDensity(this.getDensity)
+ * 
  * @version 2.0     
  * @author James Defauw & Michiel De Koninck
 
@@ -31,8 +42,6 @@ public class Bullet extends Entity {
 		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation);
 		setRadius(radius);
 	}
-	
-	
 	
 	
 // -------------- Termination -------------------------
@@ -82,16 +91,27 @@ public class Bullet extends Entity {
 		 * Returns the mass of this bullet.
 		 * @return the mass of this bullet.
 		 */
+		@Basic
 		public double getMass(){
 			return this.mass;
 		}
 		
 		/**
-		 * Returns the density of this ship.
-		 * @return the density of this ship.
+		 * Returns the density of this bullet.
+		 * @return the density of this bullet.
 		 */
+		@Basic
 		public double getDensity(){
 			return this.density;
+		}
+		
+		/**
+		 * Returns the minimum radius for bullets.
+		 * @return the minimum radius bullets should have.
+		 */
+		@Basic 
+		public static double getMinRadius(){
+			return Bullet.Min_Radius;
 		}
 
 
@@ -121,6 +141,7 @@ public class Bullet extends Entity {
 	 * @return True if and only if this bullet has only one owner.
 	 * 		   | result !((this.getShip() != null && this.getWorld() != null)
 	 */
+    @Raw
 	public boolean hasProperOwner(){
 		return !(this.getShip() != null && this.getWorld() != null);
 	}
@@ -176,18 +197,20 @@ public class Bullet extends Entity {
 	 * 		 |new.getShip() = ship;
 	 * 			
 	 */
-	public void setShip(Ship ship) {
+    @Raw
+	public void setShip(Ship ship){
         assert((ship != null) || (getShip() == null) || (!getShip().hasBullet(this)));
 		assert((ship == null) || (ship.hasBullet(this)));
         this.ship = ship;
         //If the ship is effective, the location of this bullet is changed to the center of the ship.
-//        if (ship!=null)
-////        	this.setPosition(ship.getxPosition(),ship.getyPosition());
+        if (ship!=null)
+			try {
+				this.setPosition(ship.getxPosition(),ship.getyPosition());
+			} catch (IllegalPositionException e) {
+				// Zal niet voorkomen; de positie van een schip moet op elk moment legaal zijn.
+				// Java verplicht ons enkel deze try/Catch in te voeren.
+			}
 	}
-	
-	
-	
-	//setWorld is handled within entity class.
 	
 	
 	//--------------- Source----------------------
@@ -235,7 +258,6 @@ public class Bullet extends Entity {
 	
 	/**
 	 * Variable registering the radius of this Ship.
-	 * @Override
 	 */
 	protected double radius = Min_Radius;
 
@@ -271,6 +293,7 @@ public class Bullet extends Entity {
 	 * @return Whether the minimum radius is positive or not.
 	 * 			| result == (Min_Radius > 0)
 	 */
+    @Raw
 	public static boolean isValidMinimumRadius(double Min_Radius){
 		return (Min_Radius > 0);
 	}
@@ -289,6 +312,7 @@ public class Bullet extends Entity {
 	 * 		   The given radius is not a valid radius.
 	 * 		   | ! isValidRadius(radius)
 	 */
+    @Raw
 	public void setRadius(double radius) throws IllegalRadiusException{
 		if (!isValidRadius(radius)){
 			throw new IllegalRadiusException(radius);}
@@ -306,8 +330,9 @@ public class Bullet extends Entity {
 	 * 		   Or if the radius is Infinity or not a number.
 	 * 		   | radius >= getMin_Radius;
 	 */
+    @Raw
 	public static boolean isValidRadius(double radius){
-		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+		return (radius >= getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 	
 	
@@ -317,6 +342,7 @@ public class Bullet extends Entity {
 	/**
 	 * Return the munber of times this bullet can still bounce of a boundary without 'dying'.
 	 */
+    @Basic
 	public int getBouncesLeft() {
 		return this.bounces_left;
 	}
