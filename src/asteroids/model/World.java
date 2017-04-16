@@ -483,8 +483,6 @@ public class World {
 			this.moveAllentities(Dt-tC);
 
 			}
-			
-		}
 		
 	}
 	
