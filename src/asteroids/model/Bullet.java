@@ -7,9 +7,13 @@ import be.kuleuven.cs.som.annotate.Raw;
 /**
  * A class for dealing with bullets, which are a kind of entity in space. 
  * These have a certain position, velocity, radius, speed and orientation.
+ * The orientation does not come in to play for now, 
+ * but is inherited from entity anyway as it does not impose problems.
  * The bullet also has a mass and a certain density.
  * A bullet can have an owner: a ship or a world. If it has a ship as its owner, it can not have a world as its owner.
  * If a bullet is fired, it has a source (a ship that fired it).
+ * A bullet can only bounce of a boundary a given number of times.
+ * If a bullet reenters its owner, its previous bounces are not forgotten.
  * 
  * @invar The invariants of the superclass 'Entity' are described there.
  *

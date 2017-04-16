@@ -2,6 +2,7 @@ package asteroids.model;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -310,20 +311,20 @@ public class Ship extends Entity {
 		return this.thrusterActivity;
 	}
 	
-//	/**
-//	 * This method sets the activity of the thruster to the given value.
-//	 * @param thrusterActivity
-//	 * 		  The new thursterActivity
-//	 * @effect The thrusterActivity of this ship is equal to the given boolean.
-//	 */
-//	private void setThrusterActivity(boolean thrusterActivity){
-//		if (thrusterActivity == true){
-//			thrustOn();
-//		}
-//		else{
-//			thrustOff();
-//		}
-//	}
+	/**
+	 * This method sets the activity of the thruster to the given value.
+	 * @param thrusterActivity
+	 * 		  The new thursterActivity
+	 * @effect The thrusterActivity of this ship is equal to the given boolean.
+	 */
+	public void setThrusterActivity(boolean thrusterActivity){
+		if (thrusterActivity == true){
+			thrustOn();
+		}
+		else{
+			thrustOff();
+		}
+	}
 	
 	/**
 	 * This method returns the acceleration that this ship would get when the thruster is enabled.
@@ -335,6 +336,21 @@ public class Ship extends Entity {
 	@Basic
 	public double getPossibleAcceleration(){
 		return getThrustForce()/getTotalMass();
+	}
+	
+	/**
+	 * Returns the acceleration of this ship.
+	 * @return The possible acceleration if the thruster is on.
+	 * 		   If the thruster is off, return zero; the ship is not accelerating.
+	 * 		   |@see implementation
+	 */
+	public double getAcceleration(){
+		if (this.getthrustState()==true){
+			return this.getPossibleAcceleration();
+		}
+		else{
+			return 0.0;
+		}
 	}
 	
 	/**
@@ -533,9 +549,8 @@ public class Ship extends Entity {
 	
 	/**
 	 * Adds a 'default' bullet to the bullets loaded on the ship.
-	 *
-	 * @effect Add a new 'default' bullet to the collection of this ship.
-	 * 		   A new bullet is created withd default properties, it is associated with this ship and 
+	 *  
+	 * @post   A new bullet is created withd default properties, it is associated with this ship and 
 	 * 		   this ships' collection of bullets is extended.
 	 * 		   | new.bullet.getShip() == this
 	 * 		   | this.hasBullet(bullet) == true
@@ -551,10 +566,47 @@ public class Ship extends Entity {
 	}
 	
 	/**
-	 * Adds a specified amount of bullets to the ship
+	 * Adds a certain bullet to this ship.
+	 * 
+	 * @param bullet
+	 * 		  That bullet to add to this ships collection of bullets.
+	 * @post   The specific bullet is now within this ship.
+	 * 		   | new.bullet.getShip() == this
+	 * 		   | this.hasBullet(bullet) == true		
+	 * @post  If the bullet was previously in a world, it is removed from the collection of this world.
+	 * 		  |if (bullet.getWorld()!=null){
+	 *		  | 	then bullet.getWorld().removeEntity(bullet);	
+	 *
+	 * @throws  If both the bullet and the ship are in a world but not the same one, we throw a bulletexception. 
+	 * 			Same thing if this ship can't have the given bullet as a bullet or if the bullet already has a ship.
+	 * 		   |(  ((this.getWorld()!=null)&&(bullet.getWorld()!=null)	
+	 * 		   |				&&(this.getWorld()!=bullet.getWorld())) 
+	 * 		   | 							|| !canHaveAsBullet(bullet) 
+	 * 		   | 									|| bullet.getShip() != null   )
+	 * 		 
+	 */
+	public void loadBullet(Bullet bullet) throws IllegalPositionException, IllegalBulletException{
+		if (((this.getWorld()!=null)&&(bullet.getWorld()!=null)&&(this.getWorld()!=bullet.getWorld())) 
+							|| !canHaveAsBullet(bullet) || bullet.getShip()!= null){
+			throw new IllegalBulletException(bullet);
+		}
+		//If the bullet was previously associated to a world, now remove it from that world.
+		if (bullet.getWorld()!=null){
+			bullet.getWorld().removeEntity(bullet);	
+		}
+		bullet.setShip(this);
+		this.bullets.add(bullet);
+		bullet.setPosition(this.getxPosition(), this.getyPosition());
+		bullet.setVelocity(this.getxVelocity(), this.getyVelocity());
+	}
+	
+	/**
+	 * Adds a specified amount of  default bullets to the ship
 	 * 
 	 * @param numberOfBullets
 	 * 		  The number of bullets to add to this ship.
+	 * @effect loadBullet is called upon a "numberOfBullets" amount of times.
+	 * 		   |@see implementation
 	 * @throws IllegalRadiusException 
 	 * @throws IllegalPositionException 
 	 * 		   We are obliged to throw these exceptions, even though we know that the default bullet will be legal.
@@ -564,6 +616,25 @@ public class Ship extends Entity {
             loadBullet();
        }
 	}
+	
+	/**
+	 * This method adds a collection of bullets to its collection.
+	 * It only does this if each bullet can in fact be safely added to this ship.
+	 * If not, it throws an illegal Bulletexception.
+	 * 
+	 * @param bullets
+	 * 		  The collection of bullets to add to this ship.
+	 * @effect For each bullet in the given collection, the loadBullet function is called upon.
+	 * 		   That means that for each adding, the documentation of loadBullet applies.
+	 * 		   |@see implementation.
+	 */
+	public void loadBullets(Collection<Bullet> bullets) throws IllegalBulletException, IllegalPositionException{
+        for (Bullet bullet : bullets){
+            this.loadBullet(bullet);
+        }
+    }
+	
+	
 	
 	/**
 	 * Removes a specified bullet from the ships' bullets.
@@ -652,7 +723,7 @@ public class Ship extends Entity {
 						// this ship is in fact the overlapping entity: load a bullet to this ship.
 						// The bullet will be terminated anyway upon exiting this if-clause.
 						if (this.equals(entity)){
-							this.loadBullet();	
+							this.loadBullet();
 						}
 					}
 					bullet.terminate();
