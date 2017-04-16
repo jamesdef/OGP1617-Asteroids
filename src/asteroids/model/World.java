@@ -200,7 +200,7 @@ public class World {
 	 *
 	 */
 	public void setWidth(double width){
-		if (width > Upper_Bound) {
+		if (width > Upper_Bound || width < 0) {
 			World.width = Upper_Bound;
 		}
 		else if (width >0){
@@ -225,7 +225,7 @@ public class World {
 	 *       | new.getHeight() == height
 	 */
 	public void setHeight(double height){
-		if (height > Upper_Bound) {
+		if (height > Upper_Bound || height <0) {
 			World.height = Upper_Bound;
 		}
 		else if (height >0){
@@ -319,8 +319,8 @@ public class World {
 				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
 			return false;
 		}
-		for (Entity other : this.getAllEntities()) {
-			if (entity.overlap(other)){
+		for (Entity ship : this.getAllShips()) {
+			if (entity.overlap(ship)){
 				return false;
 			}
 	    }
