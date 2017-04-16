@@ -1,5 +1,6 @@
 package asteroids.model;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.Collection;
@@ -8,13 +9,16 @@ import java.util.Set;
 
 
 /**
- * A class for dealing with ships, which are a kind of entity in space. These have a certain position, velocity, radius, speed and orientation.
+ * A class for dealing with ships, which are a kind of entity in space. 
+ * These have a certain position, velocity, radius, speed and orientation.
  * The ship has a thrusther with which it can accelerate. The ship also has a mass and a certain density.
+ * A ship can have bullets, which it can fire. A ship can collide with other things in it's world.
  * 
- *@invar The invariants of the superclass 'Entity' are described there.
+ * @invar 	The invariants of the superclass 'Entity' are described there.
+ * 			They ofcourse hold for this subclass.
  *
- *@invar Each ship has proper bullets as its belongings.
- *		 |hasProperBullets()
+ * @invar 	Each ship has proper bullets as its belongings.
+ *		 	|hasProperBullets()
  *
  * @invar 	The radius of each ship must be a valid value.
  * 			|isValidRadius(getRadius())
@@ -24,6 +28,9 @@ import java.util.Set;
  * 
  * @invar   The density of a ship must be valid.
  * 		    |isValidDensity(this.getDensity)
+ * 
+ * @invar	The orientation of the ship must be a valid value.
+* 			|isValidOrientation(getOrientation())
  *   
  * @version 2.0     
  * @author James Defauw & Michiel De Koninck
@@ -62,7 +69,8 @@ public class Ship extends Entity {
 	 * 		   Expressed in radians.    
 	 * 
 	 * @param mass
-	 * 		  The mass of this vessel.
+	 * 		  The mass of this vessel. 
+	 * 		  Expressed in kg.
 	 * 
 	 * @effect The given mass is set as the mass of this new ship.
 	 * 		   |setMass(mass);
@@ -77,7 +85,8 @@ public class Ship extends Entity {
 	// Position X and Y are described seperatly, this proves to be the easiest to work with. Same goes for velocity.
 	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation,double mass) 
 							throws IllegalPositionException, IllegalRadiusException{
-		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation);
+		super(xPosition, yPosition, xVelocity, yVelocity, radius);
+		setOrientation( orientation);
 		setMass(mass);
 	}
 	/**
@@ -87,18 +96,19 @@ public class Ship extends Entity {
 	 * 			It's radius will be set to it's lowest possible value.
 	 * 			It's velocity will be set to it's minimal value: 0. The ship will not be moving.
 	 * 			It's orientation is to the right (Minimum value=0), i.e.: it has an angle of 0 radians to the x-axis.
-	 * 			|this.xPosition = 0.0
-	 * 			|this.yPosition = 0.0
-	 * 			|this.getxVelocity = Min_Velocity
-	 * 			|this.getyVelocity = Max_Velocity
-	 * 			|this.getOrientation = Min_Orientation
-	 * 			|this.getRadius = Min_Radius
-	 * i.e. :   |this(0.0,0.0,Min_Velocity,Max_Velocity,Min_Radius,Min_Orientation);
-	 * 
-	 * @note We know that the exceptions can never be thorwn in this default case, but JAVA makes us throw them anyway.
+	 *			It's mass is set to the default value (being the mass for the smallest ship with the lowest density).
+	 * 			|this.getxPosition() = 0.0
+	 * 			|this.getyPosition() = 0.0
+	 * 			|this.getxVelocity() = getMinVelocity()
+	 * 			|this.getyVelocity() = getMinVelocity()
+	 * 			|this.getOrientation() = getMinOrientation()
+	 * 			|this.getRadius() = getMinRadius()
+	 * 			|this.getMass() = getDefaultMass()
+	 * i.e. :  |this(0.0,0.0,getMinVelocity(),getMinVelocity(),getMinRadius(),getMinOrientation(),getDefaultMass())
 	 */
+	@Raw
     public Ship() throws IllegalPositionException, IllegalRadiusException{
-		this(0.0,0.0,Min_Velocity,Min_Velocity,Min_Radius,Min_Orientation,0.0);
+    	this(0.0,0.0,getMinVelocity(),getMinVelocity(),getMinRadius(),getMinOrientation(),getDefaultMass());	
 	}
 
     
@@ -110,7 +120,9 @@ public class Ship extends Entity {
      * It does this by first deleting it's on board bullets and than terminating the ship itself.
      * 
      * @effect All bullets are first removed and then the ship itself is terminated.
-     * 		| new.getNbOfBullets  == 0 
+     * 			@see implementation
+     * @post After the termination, this ship has no more bullets, and is terminated.
+     *		| new.getNbOfBullets  == 0 
 	 * 		| new.isTerminated() == true
 	 * 
      */
@@ -125,15 +137,17 @@ public class Ship extends Entity {
 // ------------------------------ MASS & DENSITY-------------
    
 	/**
-	 * Sets the mass of this entity to the given value.
+	 * Sets the mass of this ship to the given value.
 	 * 
 	 * @param mass
-	 * 		 The given mass to which we want to set the mass of this entity.
+	 * 		 The given mass to which we want to set the mass of this ship.
 	 * @post if the given mass is valid, this mass is set as the new mass.
 	 * 		|if (isValidMass(double mass))
-	 * 		|	then new.mass == mass
-	 * @post if the given mass does not 
+	 * 		|	then new.getMass() == mass
+	 * @post else: the given mass is not valid; the mass is set to a default value:
+	 * 		@ see implementation
 	 */
+    @Raw 
 	public void setMass(double mass){
 		if(!isValidMass(mass)){
 	        mass = 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getDensity();
@@ -152,15 +166,6 @@ public class Ship extends Entity {
 	@Raw
 	public boolean isValidMass(double mass){
         return (mass >= 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getDensity());
-	}
-	
-	/**
-	 * Returns the mass of this ship.
-	 * @return the mass of this ship.
-	 */
-	@Basic
-	public double getMass(){
-		return this.mass;
 	}
 	
 	/**
@@ -185,7 +190,7 @@ public class Ship extends Entity {
 	 */
 	public void setDensity(double density){
 		if (!isValidDensity(density)){
-			density = Min_Density;
+			density = min_Density;
 		}
 		this.density = density;
 	}
@@ -199,7 +204,7 @@ public class Ship extends Entity {
 	 * 		   |density >= Min_Density
 	 */
 	public boolean isValidDensity(double density){
-		return (density >= Min_Density);
+		return (density >= min_Density);
 	}
         
     //MASS - Total programming
@@ -234,6 +239,86 @@ public class Ship extends Entity {
 		return (this.getMass() + getMassOfBullets());
 	}
 	
+	/**
+	 * Return the minimum mass a ship can have.
+	 * @return the minimum mass a ship can have.
+	 */
+	public double getMinMass(){
+		return this.min_Mass;
+	}
+	
+	/**
+	 * Return the default mass of a ship.
+	 * 
+	 * @return 	The default mass is actually not the same for all ships. 
+	 * 			However here we have implemented a default mass as that of a ship with minimal radius.
+	 * 			@see implementation
+	 */
+	@Immutable 
+	private static double getDefaultMass() {
+		return (4.0 / 3.0) * Math.PI * Math.pow(getMinRadius(), 3) * min_Density;
+	}
+	
+//--------------------------------------Orientation-----------------------
+	
+	/**
+	 *  Return the orientation of this ship.
+	 * @return the orientation of this ship.
+	 */
+	@Basic
+	public double getOrientation(){
+		return this.orientation;	
+	}	
+	
+	/**
+	 *  Sets the orientation to the given angle, if this is a valid angle.
+	 * 
+	 * @param orientation
+	 * 		  The new, given orientation of the ship.
+	 * @pre The given orientation must be a valid one.
+	 * 		|isValidOrientation(orientation)
+	 * @post The orientation of the ship is now changed to the given value
+	 *		|new.getOrientation()== orientation
+	 */
+	@Raw
+	public void setOrientation(double orientation){
+		assert isValidOrientation(orientation);
+		this.orientation = orientation;	
+	}
+
+	/**
+	 *  Check whether the given orientaton is a valid value.
+	 * 
+	 * @param orientations
+	 * 		  The orientation of which we need to check whether it is legal.
+	 * 
+	 * @return True if and only if the given orientation is within the boundaries opposed upon orientation. (And has to be a number)
+	 * 		   |result == (getMin_Orientation() <= orientation) && (orientation < getMax_Orientation()) && !Double.isNaN(orientation)
+	 * 
+	 */
+	public static boolean isValidOrientation(double orientation){
+		return ((getMinOrientation() <= (orientation)) && (orientation <= getMaxOrientation()) && (!Double.isNaN(orientation)));	
+	}
+
+	/**
+	 * Returns the minimum orientation for this ship.
+	 * @return the minimum orientation for this ship.
+	 */
+	@Basic @Immutable
+	public static double getMinOrientation(){
+		return min_Orientation;
+	}
+
+	/**
+	 * Returns the maximium orientation for this ship.
+	 * @return the maximum orientation for this ship.
+	 */
+	@Basic @Immutable
+	public static double getMaxOrientation(){
+		return max_Orientation;
+	}	
+	
+	
 	
 // ------------------------------------ Radius --------------------------
 	
@@ -254,7 +339,7 @@ public class Ship extends Entity {
      */
     public void setMin_Radius(double Lower_Bound){
     	if (Lower_Bound > 0){
-    		Ship.Min_Radius = Lower_Bound;
+    		Ship.min_Radius = Lower_Bound;
     	}
     	else{
     		throw new IllegalArgumentException(Double.toString(Lower_Bound));
@@ -274,7 +359,7 @@ public class Ship extends Entity {
 	 * 		   | radius >= getMin_Radius;
 	 */
 	public static boolean isValidRadius(double radius){
-		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+		return (radius >= min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 
 	
@@ -458,16 +543,11 @@ public class Ship extends Entity {
 	 *         | result = angle % getMax_Orientation;
 	 */
 	public double scaleangle(double angle){
-		double ScaledAngle = angle % getMax_Orientation();
+		double ScaledAngle = angle % getMaxOrientation();
 		return ScaledAngle;
 	}
 	
 //---------------------BULLETS --------------------------
-	
-	/**
-	 * A variable registering the bullets owned by this ship.
-	 */
-    private Set<Bullet> bullets = new HashSet<Bullet>();
     
     
     /**
@@ -560,7 +640,7 @@ public class Ship extends Entity {
 	 */
 	public void loadBullet() throws IllegalPositionException, IllegalRadiusException{
 		Bullet bullet = new Bullet(this.getxPosition(), this.getyPosition(), this.getxVelocity(), this.getyVelocity(),
-												Bullet.getMinRadius(), this.getOrientation());
+												Bullet.getMinRadius());
 		bullet.setShip(this);
 		this.bullets.add(bullet);
 	}
@@ -667,15 +747,15 @@ public class Ship extends Entity {
 	 * 	     | new.bullet.getShip()==null
 	 * 		 | new.bullet.getSource() == this
 	 *
-	 * @post The bullet is placed next to the ship with a small margin between both, place depending on the ships orientation, 
+	 * @effect The bullet is placed next to the ship with a small margin between both, place depending on the ships orientation, 
 	 * 	     and its initial velocity is set to 250 orientated in the same direction as the ship.
 	 * 		|@see implementation
 	 * 
-	 * @post If, upon creation, the bullet is outside of the boundaries of this world, it is immediatly terminated.
-	 * 		| if (!(this.getWorld().withinWorldBoundaries(bullet)))
-	 * 		| 		then bullet.terminate()
+	 * @effect If, upon creation, the bullet is outside of the boundaries of this world, it is immediatly terminated.
+	 * 			| if (!(this.getWorld().withinWorldBoundaries(bullet)))
+	 * 			| 		then bullet.terminate()
 	 * 
-	 * @post If, upon creation, the bullet overlaps with another entity, both are immediatly terminated.
+	 * @effect If, upon creation, the bullet overlaps with another entity, both are immediatly terminated.
 	 * 
 	 * 			|for (Entity entity : getWorld().getAllEntities()){
 	 *			|	if (bullet.overlap(entity) == true){
@@ -685,6 +765,8 @@ public class Ship extends Entity {
 	 * 
 	 * @throws IllegalPositionException 
 	 * 		   The position to which the bullet is set must be legal.
+	 * @throws IllegalRadiusException
+	 * 		   The radius of the fired bullet must be legal.
 	 */
 	public void fireBullet() throws IllegalPositionException, IllegalRadiusException{
 		if (this.getNbOfBullets()!= 0 && belongsToWorld()){
@@ -695,9 +777,8 @@ public class Ship extends Entity {
 			double bulletXPos = this.getxPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.cos(this.getOrientation());
 			double bulletYPos=  this.getyPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.sin(this.getOrientation());
 		
-			double Bulletspeed = 250;
-			double xSpeed = Bulletspeed*Math.cos(this.getOrientation());
-			double ySpeed = Bulletspeed*Math.sin(this.getOrientation());
+			double xSpeed = getInitialBulletSpeed()*Math.cos(this.getOrientation());
+			double ySpeed = getInitialBulletSpeed()*Math.sin(this.getOrientation());
 			
 			this.removeBullet(bullet);
 			bullet.setSource(this);
@@ -739,6 +820,14 @@ public class Ship extends Entity {
 		}
 	}
 	
+	/**
+	 * Returns the initial speed at which a ship fires a bullet.
+	 * @return the initial speed at which a ship fires a bullet.
+	 */
+	@Basic
+	public double getInitialBulletSpeed(){
+		return 250;
+	}
 	
 	/**
 	 * This method simply checks whether this ship belongs to a world.
@@ -753,11 +842,16 @@ public class Ship extends Entity {
 	
     
 // -----------------------  VARIABLES (DEFAULTS & FINAL) --------
+	
+	/**
+	 * A variable registering the bullets owned by this ship.
+	 */
+    private Set<Bullet> bullets = new HashSet<Bullet>();
 
 	/**
 	 * Variable registering the radius of this Ship.
 	 */
-	private double radius = Min_Radius;
+	private double radius = min_Radius;
 
 	/**
 	 * Variable registering the minimum allowed Radius.
@@ -765,34 +859,45 @@ public class Ship extends Entity {
 	 * But it will always remain the same for all Ships.
 	 *
 	 */
-	// Dit is een waarde die je moet overschrijven maar weet nog niet hoe voorlopig.
-	//@ Override 
-	private static double Min_Radius = 10.0;
+	private static double min_Radius = 10.0;
+	
+	/**
+	 * Variable registering the orientation of this ship.
+	 */
+	protected double orientation = min_Orientation;
+	
+	/**
+	 * Variable registering the minimum allowed orientation.
+	 */
+	protected static final double min_Orientation = 0.0;
+
+
+	/**
+	 * Variable registering the maximum allowed orientation.
+	 */
+	protected static final double max_Orientation = 2.0*Math.PI;
 	
     /**
      * Variable registering the density of this ship.
-     * @Override
      */
-    private double density = Min_Density;
+    private double density = min_Density;
   
     /**
      * Variable registering the minimum allowed density.
-     * @Override
      */
     
-    private static final double Min_Density = 1.42*(Math.pow(10, 12));
+    private static final double min_Density = 1.42*(Math.pow(10, 12));
     
     /**
      * Variable registering the Minimum allowed mass.
-     * @Override
      */
-    private final double Min_Mass = Min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+    private final double min_Mass = min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
     
     /**
      * Variable registering the mass of this ship.
      *
      */
-    private double mass = Min_Mass;
+    protected double mass = min_Mass;
     
 	
 	/**

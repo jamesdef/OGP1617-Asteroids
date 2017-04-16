@@ -6,28 +6,28 @@ import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with bullets, which are a kind of entity in space. 
- * These have a certain position, velocity, radius, speed and orientation.
- * The orientation does not come in to play for now, 
- * but is inherited from entity anyway as it does not impose problems.
+ * These have a certain position, velocity, radius, speed.
  * The bullet also has a mass and a certain density.
  * A bullet can have an owner: a ship or a world. If it has a ship as its owner, it can not have a world as its owner.
- * If a bullet is fired, it has a source (a ship that fired it).
+ * If a bullet is fired, it has a source (a ship that fired it); unless this ship has been destroyed in the meanwhile.
  * A bullet can only bounce of a boundary a given number of times.
+ * If a bullet hits it source, it is reloaded upon this ship.
  * If a bullet reenters its owner, its previous bounces are not forgotten.
  * 
- * @invar The invariants of the superclass 'Entity' are described there.
+ * @invar 	The invariants of the superclass 'Entity' are described there.
+ * 			They ofcourse hold for this subclass.
  *
- * @invar Each bullet must have a proper owner at all times.
- *		  |hasProperOwner()
+ * @invar 	Each bullet must have a proper owner at all times.
+ *		  	|hasProperOwner()
  *
- * @invar Each bullet should have a proper ship, if this is its owner.
- * 		  |hasProperShip()
+ * @invar 	Each bullet should have a proper ship, if this is its owner.
+ * 		  	|hasProperShip()
  *
  * @invar 	The radius of each bullet must be a valid value.
  * 			|isValidRadius(getRadius())
  *
  * @invar   The mass of a bullet must be valid.
- * 		    |isValidMass(this.getEntityMass)
+ * 		    |isValidMass(this.getMass)
  * 
  * @invar   The density of a ship must be valid.
  * 		    |isValidDensity(this.getDensity)
@@ -38,8 +38,8 @@ import be.kuleuven.cs.som.annotate.Raw;
  */
 public class Bullet extends Entity {
 	
-	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation) throws IllegalPositionException, IllegalRadiusException{
-		super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation);
+	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius) throws IllegalPositionException, IllegalRadiusException{
+		super(xPosition, yPosition, xVelocity, yVelocity, radius);
 		setRadius(radius);
 	}
 	
@@ -111,29 +111,11 @@ public class Bullet extends Entity {
 		 */
 		@Basic 
 		public static double getMinRadius(){
-			return Bullet.Min_Radius;
+			return Bullet.min_Radius;
 		}
 
 
 //-------------------- Ownership; Associations ------------------------
-	
-	/**
-	 * Field initialising the existence of ship.
-	 * Initialised to a value of null.
-	 */
-	private Ship ship = null;
-
-	/**		 
-	 * Field initialising the existence of World.
-	 * Initialised to a value of null.
-	*/
-	private World world = null;
-
-    /**
-     * Variable referencing the source ship (that fired the bullet) of the bullet.
-     * In default; set to null.
-     */
-    private Ship source = null;
     
 	/**
 	 * Check whether this bullet has a proper owner. 
@@ -248,40 +230,26 @@ public class Bullet extends Entity {
 	
 // ----------------- RADIUS ---------------------------------------------
 	
-	
-	/**
-	 * Variable registering the minimum allowed Radius.
-	 * The minimum radius may change in the future. 
-	 * But it will always remain the same for all Bullets.
-	 */
-	protected static double Min_Radius = 1.0;
-	
-	/**
-	 * Variable registering the radius of this Ship.
-	 */
-	protected double radius = Min_Radius;
-
-	
 	 /**
      * This method makes it possible for the user to change the lower bound
-     * imposed upon ships, for all ships.
+     * imposed upon bullets.
      * 
-     * @param Lower_Bound
+     * @param lowerbound
      * 		  The new minimum radius.
      * 
      * @post The new universal lower bound for the radius is equal to the given value.
-     * 		 |new.Min_Radius == Lower_Bound
+     * 		 |new.getMinRadius() == Lower_Bound
      * 
      * @throws IllegalArgumentException
      * 		   The given argument is not valid.
      * 		   | !(Lower_bound > 0)
      */
-    public final void setMin_Radius(double Lower_Bound){
-    	if (isValidMinimumRadius(Lower_Bound)){
-    		Bullet.Min_Radius = Lower_Bound;
+    public final void setMin_Radius(double lowerbound){
+    	if (isValidMinimumRadius(lowerbound)){
+    		Bullet.min_Radius = lowerbound;
     	}
     	else{
-    		throw new IllegalArgumentException(Double.toString(Lower_Bound));
+    		throw new IllegalArgumentException(Double.toString(lowerbound));
     	}
     }
     
@@ -291,11 +259,11 @@ public class Bullet extends Entity {
 	 * @param Min_Radius
 	 * 		  The minimum radius to check.
 	 * @return Whether the minimum radius is positive or not.
-	 * 			| result == (Min_Radius > 0)
+	 * 			| result == (min_Radius > 0)
 	 */
     @Raw
-	public static boolean isValidMinimumRadius(double Min_Radius){
-		return (Min_Radius > 0);
+	public static boolean isValidMinimumRadius(double min_Radius){
+		return (min_Radius > 0);
 	}
     
 
@@ -312,7 +280,7 @@ public class Bullet extends Entity {
 	 * 		   The given radius is not a valid radius.
 	 * 		   | ! isValidRadius(radius)
 	 */
-    @Raw
+    @Raw @Override
 	public void setRadius(double radius) throws IllegalRadiusException{
 		if (!isValidRadius(radius)){
 			throw new IllegalRadiusException(radius);}
@@ -328,7 +296,7 @@ public class Bullet extends Entity {
 	 * @return True if the radius exceeds the minimal radius
 	 * 		   false if the radius is less than the minimal_radius. 
 	 * 		   Or if the radius is Infinity or not a number.
-	 * 		   | radius >= getMin_Radius;
+	 * 		   | radius >= getMinRadius();
 	 */
     @Raw
 	public static boolean isValidRadius(double radius){
@@ -367,8 +335,9 @@ public class Bullet extends Entity {
 	/**
 	 * Return the maximum number of times this bullet can bounce of the boundaries of a world.
 	 */
+	@Basic
 	public int getMaxBounces() {
-		return this.Max_Bounces;
+		return this.max_Bounces;
 	}
 	
 	/**
@@ -380,48 +349,78 @@ public class Bullet extends Entity {
 	 */
 	public void setMaxBounces(int bounces) {
 		if (bounces<0)
-			this.Max_Bounces=3;
+			this.max_Bounces=3;
 		else
-			this.Max_Bounces=bounces;
+			this.max_Bounces=bounces;
 	}
+	
+
+// ---------------------  Initialising Variables & Defaults -------------------------------
+	
 	
 	/**
 	 * A variable registering the maximum number of times this bullet can bounce of the boundaries of a world.
 	 */
-	private int Max_Bounces = 3;
-	
+	private int max_Bounces = 3;
 	
 	/**
 	 * A variable recording the number of times this bullet has bounced off the boundaries of a world.
 	 * It is initialised as the maximum number of times a bullet can bounce.
 	 */
-	private int bounces_left = Max_Bounces;
+	private int bounces_left = max_Bounces;
 	
+	/**
+	 * Variable registering the minimum allowed Radius.
+	 * The minimum radius may change in the future. 
+	 * But it will always remain the same for all Bullets.
+	 */
+	protected static double min_Radius = 1.0;
+	
+	/**
+	 * Variable registering the radius of this Ship.
+	 */
+	protected double radius = min_Radius;
 
-// ---------------------  Initialising Variables & Defaults -------------------------------
+	
+	/**
+	 * Field initialising the existence of ship.
+	 * Initialised to a value of null.
+	 */
+	private Ship ship = null;
+
+	/**		 
+	 * Field initialising the existence of World.
+	 * Initialised to a value of null.
+	*/
+	private World world = null;
+
+    /**
+     * Variable referencing the source ship (that fired the bullet) of the bullet.
+     * In default; set to null.
+     */
+    private Ship source = null;
 	
 	/**
 	 * Variable registering the default density of a bullet.
 	 */
-	protected final static double Default_Density = 7.8*(Math.pow(10, 12));
-	
+	protected final static double default_Density = 7.8*(Math.pow(10, 12));
 	
 	/**
 	 * Variable registering the density of this bullet.
 	 * @Override
 	 */
-	private double density = Default_Density;
+	private double density = default_Density;
 	
 	/**
 	 * Variable registering the mass of this bullet.
 	 * @Override
 	 */
-	private double mass = Default_Mass;
+	private double mass = default_Mass;
 	
 	/**
 	 * Variable registering the Default_Mass of a bullet
 	 */
-	protected final static double Default_Mass = Default_Density*(4/3)*Math.PI*(Math.pow(Min_Radius, 3));
+	protected final static double default_Mass = default_Density*(4/3)*Math.PI*(Math.pow(min_Radius, 3));
 	
 	
 }

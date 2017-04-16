@@ -4,17 +4,13 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
-
 /** 
 *  A class for dealing with entities. We could define these as 'objects that can move through space'.
-*  An example of such an entity can be a ship or a bullet. 
-*  Properties described are: position, velocity,radius and orientation.
+*  An example of such an entity can be a ship or a bullet. It can belong to a certain world.
+*  Properties described are: position, velocity,radius.
 *  
 * @invar   The highest possible absolute, total velocity is lower than a certain maximum, the entity can never exceed this speed.
 * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
-*  
-* @invar	The orientation of the entity must be a valid value.
-* 			|isValidOrientation(getOrientation())
 * 
 * @invar 	The radius of each entity must be a valid value.
 * 			|isValidRadius(getRadius())
@@ -26,7 +22,7 @@ import be.kuleuven.cs.som.annotate.Raw;
 * 			|hasProperWorld()
 * 
 * 
-* @version 1.0
+* @version 2.0
 * @author Michiel De Koninck & James Defauw
 *
 */
@@ -35,7 +31,7 @@ public abstract class Entity {
 	//-------------------------------- CONSTRUCTOR -------------------------------- 
 	
 	/**
-	 * Initialize this new entity with given position,radius, speed and orientation.
+	 * Initialize this new entity with given position,radius, speed.
 	 * 
 	 * 
 	 * @param  xPosition
@@ -51,34 +47,28 @@ public abstract class Entity {
 	 * 		   Expressed in km.	
 	 * 
 	 * @param  xVelocity 
-	 *         The velocity of this vessel, in the x-direction.
+	 *         The velocity of this entity, in the x-direction.
 	 *         Expressed in km/s.
 	 *         
 	 * @param  yVelocity 
-	 * 		   The velocity of the vessel, in the y-direction. 
+	 * 		   The velocity of the entity, in the y-direction. 
 	 * 		   Expressed in km/s.
-	 *         
-	 * @param  orientation
-	 * 		   The orientation of this vessel, i.e., it's direction.
-	 * 		   Expressed in radians.    
-	 * 
+	 *          
 	 * @effect The given parameters are set as the properties of the new entity.
 	 * 		   |setPosition(xPosition,yPosition);
 	 *	       |setVelocity(xVelocity,yVelocity);
 	 *	       |setRadius(radius);
-	 *	       |setOrientation(orientation);
 	 *
 	 *@note    Any new entity initialized with this constructor
 	 * 		   will satisfy all its class invariants. The setters will see to this in their implementation.
 	 */
-	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation)
+	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius)
 		throws IllegalPositionException, IllegalRadiusException{
 		
 		// At this point we can invoke our mutators. They will see to it that the class invariants hold at all times.
 		setPosition(xPosition,yPosition);
 		setVelocity(xVelocity,yVelocity);
 		setRadius(radius);
-		setOrientation(orientation);	
 	}
 
 	
@@ -190,15 +180,6 @@ public abstract class Entity {
 	}
 
 	/**
-	 *  Return the orientation of this ship.
-	 * @return the orientation of this ship.
-	 */
-	@Basic
-	public double getOrientation(){
-		return this.orientation;	
-	}	
-
-	/**
 	 *  Return the radius of this Entity.
 	 * @return the radius of this Entity.
 	 */
@@ -221,8 +202,8 @@ public abstract class Entity {
 	}
 	
 	/**
-	 * Returns the density of this ship.
-	 * @return the density of this ship.
+	 * Returns the density of this entity.
+	 * @return the density of this entity.
 	 */
 	@Basic
 	public double getDensity(){
@@ -238,10 +219,7 @@ public abstract class Entity {
 		return this.mass;
 	}
 	
-    /**
-     * Variable registering the mass of this entity.
-     */
-    protected double mass;
+
     
 // ------------SETTERS--------------
 	
@@ -307,12 +285,12 @@ public abstract class Entity {
 	 * Sets the position to the given coordinates, if these make for a valid position.
 	 * 
 	 * @param xPostion
-	 * 		  The new x-coordinate for this ship.	
+	 * 		  The new x-coordinate for this entity.	
 	 * @param yPosition
-	 * 		  The new y-coordinate for this ship.
-	 * @post The x-coordinate of the  ship equals the given xPosition.
+	 * 		  The new y-coordinate for this entity.
+	 * @post The x-coordinate of the  entity equals the given xPosition.
 	 * 		 |new.getxPosition == xPosition
-	 * @post The y-coordinate of the  ship equals the given yPosition.
+	 * @post The y-coordinate of the  entity equals the given yPosition.
 	 * 		 |new.getyPosition == yPosition
 	 * 
 	 * @throws IllegalPositonException
@@ -419,14 +397,31 @@ public abstract class Entity {
 	 * 		  secondpowers of the horizontal and vertical velocity.
 	 * 		 -> sqrt(Vx^2+Vy^2)) exceeds the maximum. This returns true.
 	 * 		 Otherwise it will return false.
-	 * 		 | (Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2)) > Max_Velocity);	
+	 * 		 | (Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2)) > getMaxVelocity());	
 	 */
 	@Raw
 	public boolean exceedsMaxVelocity(double xVelocity, double yVelocity){
-		return (Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2)) > Max_Velocity);
-
+		return (Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2)) > getMaxVelocity());
 	}
-
+	
+	/**
+	 * Return the maximum velocity an entity can have.
+	 * @return the maximum velocity an entity can have.
+	 */
+	@Basic
+	public static double getMaxVelocity(){
+		return Entity.max_Velocity;
+	}
+	
+	/**
+	 * Return the minimum velocity an entity can have.
+	 * @return the minimum velocity an entity can have.
+	 */
+	@Basic
+	public static double getMinVelocity(){
+		return Entity.min_Velocity;
+	}
+	
 	/** 
 	 * Changes the velocity to it's scaled value (so that the class invariants hold)
 	 *  .
@@ -438,79 +433,29 @@ public abstract class Entity {
 	 * 		 
 	 * @post The velocities are changed to their scaled values. 
 	 * 		 The velocity no longer exceeds the limit.
-	 * 		| new.xVelocity = (xVelocity*Max_Velocity)/this.getTotalVelocity();
-	 *      | new.yVelocity = (yVelocity*Max_Velocity)/this.getTotalVelocity();	    
+	 * 		| new.xVelocity = (xVelocity*getMaxVelocity())/this.getTotalVelocity();
+	 *      | new.yVelocity = (yVelocity*getMaxVelocity())/this.getTotalVelocity();	    
 	 *      
 	 * @note This method is only called upon if the total velocity 
 	 * 		 of the given parameters exceed the maximum velocity.
 	 */
 	public void scaleVelocity(double xVelocity, double yVelocity ){
-		double scaledxVelocity = (xVelocity*Max_Velocity)/this.getTotalVelocity();
-		double scaledyVelocity = (yVelocity*Max_Velocity)/this.getTotalVelocity();
+		double scaledxVelocity = (xVelocity*getMaxVelocity())/this.getTotalVelocity();
+		double scaledyVelocity = (yVelocity*getMaxVelocity())/this.getTotalVelocity();
 
 		this.xVelocity = scaledxVelocity;
 		this.yVelocity = scaledyVelocity;
 	}
 	
-	
-// -------------------- ORIENTATION -----------------
-	
-	/**
-	 *  Sets the orientation to the given angle, if this is a valid angle.
-	 * 
-	 * @param orientation
-	 * 		  The new, given orientation of the ship.
-	 * @pre The given orientation must be a valid one.
-	 * 		|isValidOrientation(orientation)
-	 * @post The orientation of the ship is now changed to the given value
-	 *		|new.getOrientation()== orientation
-	 */
-	@Raw
-	public void setOrientation(double orientation){
-		assert isValidOrientation(orientation);
-		this.orientation = orientation;	
-	}
-
-	/**
-	 *  Check whether the given orientaton is a valid value.
-	 * 
-	 * @param orientations
-	 * 		  The orientation of which we need to check whether it is legal.
-	 * 
-	 * @return True if and only if the given orientation is within the boundaries opposed upon orientation. (And has to be a number)
-	 * 		   |result == (getMin_Orientation <= orientation) && (orientation < getMax_Orientation) && !Double.isNaN(orientation)
-	 * 
-	 */
-	public static boolean isValidOrientation(double orientation){
-		return ((getMin_Orientation() <= (orientation)) && (orientation <= getMax_Orientation()) && (!Double.isNaN(orientation)));	
-	}
-	
-	/**
-	 * Returns the minimum orientation for this entity.
-	 * @return the minimum orientation for this entity.
-	 */
-	@Basic @Immutable
-	public static double getMin_Orientation(){
-		return Min_Orientation;
-	}
-	
-	/**
-	 * Returns the maximium orientation for this entity.
-	 * @return the maximum orientation for this entity.
-	 */
-	@Basic @Immutable
-	public static double getMax_Orientation(){
-		return Max_Orientation;
-	}
     
 // ---------------------------- RADIUS ----------------------------	
 	/** 
 	 * Sets the radius to the given Value, if it is valid.
 	 * 
 	 * @param radius
-	 * 		  The new, given radius of the ship.
+	 * 		  The new, given radius of the entity.
 	 * 
-	 * @post The radius of the ship is now equal to the given, valid radius.
+	 * @post The radius of the entity is now equal to the given, valid radius.
 	 * 		|new.getRadius() == radius	
 	 * 
 	 * @throws  IllegalRadiusException
@@ -528,7 +473,7 @@ public abstract class Entity {
 	 * Checks whether the given radius has a valid value.
 	 * 
 	 * @param  radius
-	 * 		   The radius of the ship.
+	 * 		   The radius of the entity.
 	 * 
 	 * @return True if the radius exceeds the minimal radius
 	 * 		   false if the radius is less than the minimal_radius. 
@@ -537,7 +482,16 @@ public abstract class Entity {
 	 */
 	@Raw
 	public static boolean isValidRadius(double radius){
-		return (radius >= Min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+		return (radius >= getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+	}
+	
+	/**
+	 * Return the minimum radius an entity can have.
+	 * @return the minimum radius an entity can have.
+	 */
+	@Basic
+	public static double getMinRadius(){
+		return Entity.min_Radius;
 	}
 	
 // ---------------- Moving -------------------
@@ -557,7 +511,7 @@ public abstract class Entity {
 	 * 		   | !isValidPosition(newxPosition, newyPosition)
 	 * 
 	 * @effect The new position of the entity is calculated by adding the duration multiplied with the velocity, 
-	 *         to the positon of the ship.
+	 *         to the positon of the entity.
 	 *        |newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
 	 *	      |newyPosition = this.getyPosition() + (duration)*(this.getyVelocity());
 	 *	       |this.setPosition(newxPosition, newyPosition);
@@ -578,7 +532,7 @@ public abstract class Entity {
 	 *  Check whether the given duration is legal.
 	 * 
 	 * @param duration
-	 * 		  The duration of the specific movement of the ship
+	 * 		  The duration of the specific movement of the entity.
 	 * @return true if the duration is a non-negative number and finite.
 	 * 		   | return (duration >= 0 && !Double.isNaN(duration) && (duration != Double.POSITIVE_INFINITY))
 	 */			
@@ -640,8 +594,8 @@ public abstract class Entity {
 	 *         
 	 *         A use for this method: 
 	 * 		   One can use the result to move the given entity by the resulted duration to place the
-	 * 		   entity directly against the boundary. If one were to move the ship for a slightly longer duration; 
-	 * 		   the ship would be out of the world's boundary.
+	 * 		   entity directly against the boundary. If one were to move the entity for a slightly longer duration; 
+	 * 		   the entity would be out of the world's boundary.
 	 * 		   |if (extra > 0){
 	 * 		   | 	this.move(resulting_time + extra)
 	 * 		   |	!this.getWorld().withinBoundaries(this)
@@ -657,9 +611,11 @@ public abstract class Entity {
 			throw new IllegalStateException();
 			}
 		
-		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(), this.getWorld().getWidth());
-		double yTime = getTimeToBoundaryAxisCollsion(this.getyVelocity(), this.getyPosition(), this.getWorld().getHeight());
-		
+		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(),
+				this.getWorld().getWidth());
+		double yTime = getTimeToBoundaryAxisCollsion(this.getyVelocity(), this.getyPosition(),
+				this.getWorld().getHeight());
+
 		return Math.min(xTime, yTime);		
 	}
 	
@@ -769,94 +725,93 @@ public abstract class Entity {
 
 		//Where are the entities after time T?
 
-		double[] FirstEntityPosition = {this.getxPosition() + this.getxVelocity()*T, this.getyPosition() + this.getyVelocity()*T};
-		double[] SecondEntityPosition = {other.getxPosition() + other.getxVelocity()*T, other.getyPosition() + other.getyVelocity()*T};
+		double[] FirstEntityPosition = { this.getxPosition() + this.getxVelocity() * T,
+				this.getyPosition() + this.getyVelocity() * T };
+		double[] SecondEntityPosition = { other.getxPosition() + other.getxVelocity() * T,
+				other.getyPosition() + other.getyVelocity() * T };
 
-		//The position of the first entity, incremented with it's radius 
-		// (in the right direction = direction to the center of the other entity) results in the answer.
+		// The position of the first entity, incremented with it's radius
+		// (in the right direction = direction to the center of the other
+		// entity) results in the answer.
 
-		double[] CenterDistance = {SecondEntityPosition[0] - FirstEntityPosition[0], SecondEntityPosition[1]- FirstEntityPosition[1]};
-		double Norm = Math.sqrt(Math.pow(CenterDistance[0],2.0)+ Math.pow(CenterDistance[1],2.0));
-		double[] NormedCenterDistance = {(SecondEntityPosition[0] - FirstEntityPosition[0])/Norm, (SecondEntityPosition[1]- FirstEntityPosition[1])/Norm};
-		double[]RadiusWithDirection = {this.getRadius()*NormedCenterDistance[0],this.getRadius()*NormedCenterDistance[1]};
-		double[] CollisionCoordinates = {FirstEntityPosition[0]+RadiusWithDirection[0], FirstEntityPosition[1]+RadiusWithDirection[1]};
+		double[] CenterDistance = { SecondEntityPosition[0] - FirstEntityPosition[0],
+				SecondEntityPosition[1] - FirstEntityPosition[1] };
+		double Norm = Math.sqrt(Math.pow(CenterDistance[0], 2.0) + Math.pow(CenterDistance[1], 2.0));
+		double[] NormedCenterDistance = { (SecondEntityPosition[0] - FirstEntityPosition[0]) / Norm,
+				(SecondEntityPosition[1] - FirstEntityPosition[1]) / Norm };
+		double[] RadiusWithDirection = { this.getRadius() * NormedCenterDistance[0],
+				this.getRadius() * NormedCenterDistance[1] };
+		double[] CollisionCoordinates = { FirstEntityPosition[0] + RadiusWithDirection[0],
+				FirstEntityPosition[1] + RadiusWithDirection[1] };
 
 		return CollisionCoordinates;
 	}	
 	
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
-    
-		/**
-		 * Variable registering the xPosition of this Entity.
-		 */
-		protected double xPosition = 0.0;
+	
+	/**
+	 * Variable registering the speed of light; 300000 km/s.
+	 */
+	protected static final double speedoflight = 300000;
 
-		/**
-		 * Variable registering the yPosition of this Entity.
-		 */
-		protected double yPosition = 0.0;
+	/**
+	 * Variable registering the xPosition of this Entity.
+	 */
+	protected double xPosition = 0.0;
 
-
-		/**
-		 * Variable registering the xVelocity of this Entity.
-		 */
-		protected double xVelocity = Min_Velocity;
-
-
-		/**
-		 * Variable registering the yVelocity of this Entity.
-		 */
-		protected double yVelocity = Min_Velocity;
+	/**
+	 * Variable registering the yPosition of this Entity.
+	 */
+	protected double yPosition = 0.0;
 
 
-		/**
-		 * Variable registering the minimum allowed velocity.
-		 */
-		protected static final double Min_Velocity = 0;
-
-		/**
-		 * Variable registering the maximum allowed velocity.
-		 */
-		protected static final double Max_Velocity = 300000;
-
-		/**
-		 * Variable registering the orientation of this Entity.
-		 */
-		protected double orientation = Min_Orientation;
-
-		/**
-		 * Variable registering the minimum allowed orientation
-		 */
-		protected static final double Min_Orientation = 0.0;
+	/**
+	 * Variable registering the xVelocity of this Entity.
+	 */
+	protected double xVelocity = min_Velocity;
 
 
-		/**
-		 * Variable registering the maximum allowed orientation
-		 */
-		protected static final double Max_Orientation = 2.0*Math.PI;
+	/**
+	 * Variable registering the yVelocity of this Entity.
+	 */
+	protected double yVelocity = min_Velocity;
 
-		
-		/**
-		 * Variable registering the minimum allowed Radius.
-		 */
-		protected static double Min_Radius = 10.0;
 
-		/**
-		 * Variable registering the radius of this Entity.
-		 * @Override
-		 */
-		private double radius = Min_Radius;
-	    
-	    /**
-	     * Variable registering the world to which this entity belongs.
-	     * Initialised as null; the entity has no world per default.
-	     */
-	    private World world = null;
+	/**
+	 * Variable registering the minimum allowed velocity.
+	 */
+	protected static final double min_Velocity = 0;
 
-	    /**
-	     * Variable registering the density of this entity.
-	     */
-		private double density;
+	/**
+	 * Variable registering the maximum allowed velocity.
+	 */
+	protected static final double max_Velocity = speedoflight;
+
+	/**
+	 * Variable registering the minimum allowed Radius.
+	 */
+	protected static double min_Radius = 10.0;
+
+	/**
+	 * Variable registering the radius of this Entity.
+	 */
+	protected double radius = min_Radius;
+
+	/**
+	 * Variable registering the mass of this entity.
+	 */
+	protected double mass;
+
+	/**
+	 * Variable registering the world to which this entity belongs.
+	 * Initialised as null; the entity has no world per default.
+	 */
+	protected World world = null;
+
+	/**
+	 * Variable registering the density of this entity.
+	 */
+	protected double density;
 
 	
 }
