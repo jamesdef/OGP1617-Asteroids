@@ -183,7 +183,7 @@ public class World {
 	 
 	
 	/** TOTAL PROGRAMMING
-	 * Sets the width of this world to a given value.
+	 * Sets the width of this world to the absolute of the given value.
 	 * 
 	 * @param width
 	 * 		  The given width
@@ -191,25 +191,26 @@ public class World {
 	 * @post if the given width is greater than the upper bound
 	 * 		 the width is set to be equal to the upper bound.
 	 * 
-	 * @post if the given width is negative, nothing is changed to the width.
-	 * 		 | if (width < 0)
-	 *       |     then new.getWidth() = this.getWidth()
+	 * @post if the given width is negative, it's opposite value is set.
+	 * 	     Via the absolute
+	 * 		|widthpositive = Math.abs(width);
 	 * @post if the given width is positive and smaller than the upper bound:
 	 *       the width is changed to the given value.
 	 *       | new.getWidth() == width
 	 *
 	 */
 	public void setWidth(double width){
-		if (width > Upper_Bound || width < 0) {
+		double widthpositive = Math.abs(width);
+		if (widthpositive  > Upper_Bound) {
 			World.width = Upper_Bound;
 		}
-		else if (width >0){
-			World.width = width;
+		else if (widthpositive  >0){
+			World.width = widthpositive;
 		}
 	}
 	
 	/** TOTAL PROGRAMMING
-	 * Sets the height of this world to a given value.
+	 * Sets the height of this world to the absolute of the given value.
 	 * 
 	 * @param height
 	 * 		  The given height
@@ -217,19 +218,21 @@ public class World {
 	 * @post if the given height is greater than the upper bound
 	 * 		 the height is set to be equal to the upper bound.
 	 * 
-	 * @post if the given height is negative, nothing is changed to the height.
-	 * 		 | if (height < 0)
-	 *       |     then new.getHeight() = this.getHeight()
+	 * @post if the given height is negative, it's opposite value is set. 
+	 * 		 Via it's absolute.
+	 * 		 | heightpositive = Math.abs(height);
+	 * 
 	 * @post if the given height is positive and smaller than the upper bound:
 	 *       the height is changed to the given value.
 	 *       | new.getHeight() == height
 	 */
 	public void setHeight(double height){
-		if (height > Upper_Bound || height <0) {
+		double heightpositive = Math.abs(height);
+		if (heightpositive > Upper_Bound) {
 			World.height = Upper_Bound;
 		}
-		else if (height >0){
-			World.height = height;
+		else if (heightpositive >0){
+			World.height = heightpositive;
 		}
 	}
 	
