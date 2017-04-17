@@ -292,7 +292,7 @@ public class World {
 	 * 			The array to change into a string.			
 	 * @return	The array, converted to a string: form (x,y)
 	 */
-	private String StringMaker(double[] array) {
+	public String StringMaker(double[] array) {
 		return (array[0] + "," + array[1]);
 	}
 	
