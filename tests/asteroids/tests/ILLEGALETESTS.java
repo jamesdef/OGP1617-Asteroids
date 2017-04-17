@@ -257,7 +257,10 @@ public class ILLEGALETESTS {
 		facade.loadBulletOnShip(ship2, bullet);
 		assertEquals(1,facade.getNbBulletsOnShip(ship2),EPSILON);
 		assert(facade.getBulletShip(bullet)== ship2);
+		
 		facade.fireBullet(ship2);
+		
+		
 		assert(facade.isTerminatedShip(ship1));
 		assertFalse(facade.isTerminatedShip(ship2));
 		assert(facade.isTerminatedBullet(bullet));

@@ -794,7 +794,8 @@ public class Ship extends Entity {
 			double ySpeed = getInitialBulletSpeed()*Math.sin(this.getOrientation());
 			
 			this.removeBullet(bullet);
-			bullet.setSource(this);
+
+			
 			
 			//bullet is now set to where it will start its movement, after some checks.
 			bullet.setPosition(bulletXPos, bulletYPos);
@@ -811,23 +812,19 @@ public class Ship extends Entity {
 			for (Entity entity : getWorld().getAllEntities()){
 				if (bullet.overlap(entity) == true){
 					
-					//If somehow the overlapping entity is the one that fired the bullet, 
-					// the bullet is added once more to the collection of its bullets.
-					if (bullet.getSource() == entity){
-						// this ship is in fact the overlapping entity: load a bullet to this ship.
-						// The bullet will be terminated anyway upon exiting this if-clause.
-						if (this.equals(entity)){
-							this.loadBullet();
-						}
-					}
+					
+					
+					
 					bullet.terminate();
 					entity.terminate();
+
 					
 					//Further running of this code is unneccesary and possibly unsafe
 					return;
 				}
 			}
 			
+			bullet.setSource(this);
 			// The bullet is in a legal spot and can start moving. It's velocity is now assigned.
 			bullet.setVelocity(xSpeed, ySpeed);	
 		}
