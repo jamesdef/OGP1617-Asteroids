@@ -317,8 +317,9 @@ public class World {
 		if (entity == null || !hasEntity(entity)){
 			throw new IllegalArgumentException();
 		}
-		this.entities.remove((StringMaker(entity.getPosition())));
-		
+
+		this.entities.values().remove(entity);
+
 		entity.setWorld(null);
 	}
 	
@@ -332,6 +333,10 @@ public class World {
 	 */
 	@Basic
 	public Boolean hasEntity(Entity entity) {
+		
+		System.out.println("hasEntity for " + entity.toString() );
+		System.out.println(getEntities().size());
+		System.out.println(getEntities().containsValue(entity));
 		return getEntities().containsValue(entity);
 	}
 	
@@ -502,6 +507,7 @@ public class World {
 				List<Entity> ArrayofEntities = new ArrayList<>(nextEntityEntityPositionEntities);
 				Entity entityA = ArrayofEntities.get(0);
 				Entity entityB = ArrayofEntities.get(1);
+				
 
 				this.handleEntityEntityCollision(entityA, entityB);
 			}
@@ -664,18 +670,9 @@ public class World {
 	 */
 	public void handleEntityBoundaryCollision(Entity entity){
 		
-		if(entity instanceof Bullet){
-			Bullet bullet = (Bullet) entity;
-			int nbBouncesLeft = bullet.getBouncesLeft();
-			
-			if(nbBouncesLeft == 0){
-				entity.terminate();
-			} else {
-				bullet.decrementBouncesLeft();
-			}
-		}
-		
-		boolean horizontally = (entity.getxPosition()< 1.01 * entity.getRadius()) || (entity.getxPosition() > (entity.getWorld().getWidth() - 1.01 * entity.getRadius()));
+		boolean horizontally = 
+				(entity.getxPosition()< 1.01 * entity.getRadius()) || 
+				(entity.getxPosition() > (entity.getWorld().getWidth() - 1.01 * entity.getRadius()));
 		
 		if(horizontally){
 			entity.setVelocity(-entity.getxVelocity(), entity.getyVelocity());
@@ -683,6 +680,22 @@ public class World {
 			entity.setVelocity(entity.getxVelocity(), -entity.getyVelocity());
 		}
 		
+		if(entity instanceof Bullet){
+			this.handleBulletBoundaryCollision((Bullet) entity);
+		}
+		
+	}
+	
+	public void handleBulletBoundaryCollision(Bullet bullet){
+		int nbBouncesLeft = bullet.getBouncesLeft();
+		System.out.println("NB bounces:" + nbBouncesLeft);
+		if(nbBouncesLeft == 0){
+			System.out.println("Terminate bullet");
+
+			bullet.terminate();
+		} else {
+			bullet.decrementBouncesLeft(); 
+		}
 	}
 	
 	/**
@@ -697,8 +710,10 @@ public class World {
 	 * 		   the collision is handled differently.
 	 * 		   | @see implementation
 	 */
-	public void handleEntityEntityCollision(Entity entityA, Entity entityB){
-
+	public void handleEntityEntityCollision(Entity entityA, Entity entityB) throws IllegalBulletException, IllegalPositionException{
+	
+		System.out.println("handleEntityEntityCollision");
+		
 	if(entityA instanceof Ship){
 		if(entityB instanceof Ship) handleShipShipCollision((Ship) entityA, (Ship) entityB);
 		if(entityB instanceof Bullet) handleBulletShipCollision((Bullet) entityB, (Ship) entityA);
@@ -784,15 +799,21 @@ public class World {
 	 * 		  The bullet in this collision
 	 * @param ship
 	 * 		  The ship in this collision.
+	 * 
 	 * @effect Both entities are terminated.
 	 * 
 	 */
-	public void handleBulletShipCollision(Bullet bullet, Ship ship){
-		if(bullet.getShip() == ship){
-			//ship.ge
+	public void handleBulletShipCollision(Bullet bullet, Ship ship) throws IllegalBulletException, IllegalPositionException{
+		
+		System.out.println("handleBulletShipCollision");
+		
+		if(bullet.getSource() == ship){
+			ship.loadBullet(bullet);
 		} else {
-			bullet.terminate();
+			System.out.println("terminate");
+
 			ship.terminate();
+			bullet.terminate();
 		}
 	}
 	

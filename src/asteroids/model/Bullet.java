@@ -63,8 +63,6 @@ public class Bullet extends Entity {
         else if (this.getWorld() != null)
             this.getWorld().removeEntity(this);
 
-        //The bullet no longer references its source ship.
-        this.setSource(null);
         // The bullet is terminated as an entity, now that all other links have been undone.
         super.terminate();
     }
@@ -333,9 +331,7 @@ public class Bullet extends Entity {
 	 * 		 | 		then  this.isTerminated() == true;
 	 */
 	public void decrementBouncesLeft(){
-		bounces_left = bounces_left - 1;
-		if (this.getBouncesLeft()<= 0)
-	          this.terminate();  
+		this.bounces_left = bounces_left-1;
 	}
 	
 	/**
