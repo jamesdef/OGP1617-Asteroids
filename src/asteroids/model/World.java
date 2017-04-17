@@ -318,6 +318,7 @@ public class World {
 			throw new IllegalArgumentException();
 		}
 		this.entities.remove((StringMaker(entity.getPosition())));
+		
 		entity.setWorld(null);
 	}
 	

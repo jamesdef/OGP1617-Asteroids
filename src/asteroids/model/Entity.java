@@ -248,6 +248,8 @@ public abstract class Entity {
 		assert((world == null) || (world.hasEntity(this)));
 		// If the world is not effective, and this entity belongs to an effective world, 
 		// then that world can not reference this entity as one of its entities.
+		System.out.println("entities in wolrd");
+	//	System.out.println(this.getWorld().getEntities().size());
 		assert((world != null) || (this.getWorld() == null) || (!this.getWorld().hasEntity(this)));
 		
 		this.world = world;

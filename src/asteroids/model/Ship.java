@@ -793,12 +793,16 @@ public class Ship extends Entity {
 			double xSpeed = getInitialBulletSpeed()*Math.cos(this.getOrientation());
 			double ySpeed = getInitialBulletSpeed()*Math.sin(this.getOrientation());
 			
+			
 			this.removeBullet(bullet);
+			
+
 
 			
 			
 			//bullet is now set to where it will start its movement, after some checks.
 			bullet.setPosition(bulletXPos, bulletYPos);
+			
 			
 			// Check whether the bullet is within the worlds' boundaries, if not: terminate it.
 			if (!(this.getWorld().withinWorldBoundaries(bullet))){
@@ -821,10 +825,18 @@ public class Ship extends Entity {
 			}
 			
 			bullet.setSource(this);
+
+			//1
+			this.getWorld().addEntity(bullet);
+			
+
+
 		//	bullet.setWorld(this.getWorld());
 			// The bullet is in a legal spot and can start moving. It's velocity is now assigned.
 			bullet.setVelocity(xSpeed, ySpeed);	
-			this.getWorld().addEntity(bullet);
+			
+
+
 		}
 	}
 	
