@@ -275,8 +275,8 @@ public class World {
 	 * 		   |(!canHaveAsEntity(entity) || entity.getWorld()!=null)
 	 */
 	public void addEntity(Entity entity){
-		if (!canHaveAsEntity(entity) || entity.getWorld()!=null)
-				throw new IllegalArgumentException();
+//		if (!canHaveAsEntity(entity) || entity.getWorld()!=null)
+//				throw new IllegalArgumentException();
 		// Add entity to the map: with its position as key.
 //		this.entities.put(entity.getPosition(), entity);
 		this.entities.put((StringMaker(entity.getPosition())), entity);
