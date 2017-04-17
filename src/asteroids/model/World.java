@@ -279,20 +279,20 @@ public class World {
 				throw new IllegalArgumentException();
 		// Add entity to the map: with its position as key.
 //		this.entities.put(entity.getPosition(), entity);
-		this.entities.put((arrayToString(entity.getPosition())), entity);
+		this.entities.put((StringMaker(entity.getPosition())), entity);
 		//This entity has the world as its world.
 		entity.setWorld(this);
 	}
 	
-	/**
-	 * This method is used to create the keys in the map "entity_positions".
+	/** HELPER FUNCTION 
+	 * This method makes an array (with 2 elements) into a string.
+	 *  Example:  {x,y} => (x,y)
 	 * 
 	 * @param	array
-	 * 			An array, which will always represent a position in this class.
-	 * 			
-	 * @return	A position in form of a string.
+	 * 			The array to change into a string.			
+	 * @return	The array, converted to a string: form (x,y)
 	 */
-	private String arrayToString(double[] array) {
+	private String StringMaker(double[] array) {
 		return (array[0] + "," + array[1]);
 	}
 	
@@ -317,7 +317,7 @@ public class World {
 		if (entity == null || !hasEntity(entity)){
 			throw new IllegalArgumentException();
 		}
-		this.entities.remove(entity.getPosition());
+		this.entities.remove((StringMaker(entity.getPosition())));
 		entity.setWorld(null);
 	}
 	
@@ -364,9 +364,11 @@ public class World {
 	    return true;
 	}
 	
-	/** Returns within constant time because we use a map that has positions of entities as keys.
+	/** Returns within constant time because we use a map that has positions (as strings) of entities as keys.
 	 * Returns the entity (ship or bullet) or entities, if there is one, at the given Position.
-	 *	 
+	 * Positions are made into strings so that the keys in the map are exactly equal to
+	 * the given position (which is also made into a string)	 
+	 *
 	 *@param The xPosition at which we want to find an entity.
 	 *
 	 *@param The yPosition at which we want to find an entity.
@@ -382,10 +384,10 @@ public class World {
    	 */
 	public Entity getEntityAt(double xPosition, double yPosition){
 		
-	String searchPosition = (xPosition + "," + yPosition);
+	String KeyPosition = (xPosition + "," + yPosition);
 	 
-	if (this.entities.containsKey(searchPosition)){
-		return this.getEntities().get(searchPosition);
+	if (this.entities.containsKey(KeyPosition)){
+		return this.getEntities().get(KeyPosition);
 	}
 	else{
 		return null;
@@ -608,9 +610,6 @@ public class World {
 		return entitiesSet;
 	}
 	
-	// TODO : Added methode om tijd tot eerst volgende gebeurtenis te berekenen? Die was verdwenen? 
-	// Is dit een goede implementatie dan?
-	
 	/**
 	 * Returns the time until the next collision in this world.
 	 * This can be the time until the first boundary collision or entity collision.
@@ -790,7 +789,10 @@ public class World {
 // ----------------------------------  VARIABLES --------
 	
 	/**
-	 * A map containing the different entities in this world, allong with the position of their center.
+	 * A map containing the different entities (values) in this world,
+	 * allong with the position of their center (the key).
+	 * The key will be a string so that we can seek through the map without having problems
+	 * by creating new objects.
 	 */
 	private HashMap<String, Entity> entities = new HashMap<String,Entity>();
 	
