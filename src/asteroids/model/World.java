@@ -486,18 +486,17 @@ public class World {
 		
 	}
 	
-
 	
 	/**
-	 * This method returns the time to the next collision. 
-	 * This collision can be one between two entities, or between an entity and a boundary.
+	 * This method returns the time to the next collision between an entity and a boundary.
 	 * 
-	 * @return The time to the first collision which will happen.
-	 * 
+	 * @return the time to the next collision between an entity and a boundary.
+	 * 		   It does this by checking the time until each entity reaches a boundary;
+	 * 		   and then taking the smallest of times.
+	 * 		   | @see implementation
 	 * @throws IllegalCollisionException 
 	 * 			--> Handled within getTimeToCollision
 	 */
-	
 	public double getTimeToNextEntityBoundaryCollision(){
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
 		double boundaryCollisionTime = Double.POSITIVE_INFINITY;
@@ -511,6 +510,14 @@ public class World {
 		
 	}
 	
+	/**
+	 * This method returns the entity which will collide with a boundary the fastest.
+	 * 
+	 * @return the entity which will collide with a boundary the fastest.
+	 * 		   It runs through the list of all entities and looks up which has the
+	 * 		   smallest time until the next boundary collision and returns that entity.
+	 * 		   | @see implementation.
+	 */
 	public Entity getNextEntityBoundaryCollisionEntity(){
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
 		double boundaryCollisionTime = Double.POSITIVE_INFINITY;
@@ -525,7 +532,14 @@ public class World {
 		return entity;	
 	}
 	
-	
+	/**
+	 * This method returns the time until the next collision between two entities.
+	 * 
+	 * @return the time until the next collision between two entities.
+	 * 		   It does this by checking for each pair of entities, and taking the smallest time.
+	 * 		   | @see implementation
+	 * @throws IllegalCollisionException
+	 */
 	public double getTimeToNextEntityEntityCollision() throws IllegalCollisionException {
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
 		double TimetoFirstEntityEntityCollision = Double.POSITIVE_INFINITY;
@@ -542,7 +556,15 @@ public class World {
 		
 	}
 
-	
+	/**
+	 * This method gets the two entities which will collide with eachother the soonest.
+	 * 
+	 * @return the two entities which will collide with eachother the soonest.
+	 * 		   It does this by taking those 2 entities who have the smallest time until
+	 * 		   they collide with eachother.
+	 * 		   | @see implementation
+	 * @throws IllegalCollisionException
+	 */
 	public HashSet<Entity> getNextEntityEntityCollisionEntities() throws IllegalCollisionException{
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
 		
@@ -576,7 +598,10 @@ public class World {
 	/**
 	 * Returns the time until the next collision in this world.
 	 * This can be the time until the first boundary collision or entity collision.
-	 * @return
+	 * 
+	 * @return The time until the first collision happens. 
+	 * 		   It does this by taking the smallest time of the 2 possible kinds of collisions.
+	 * 		   | @see implementation
 	 * @throws IllegalCollisionException
 	 */
 	public double getTimeToFirstCollision() throws IllegalCollisionException{
@@ -588,6 +613,14 @@ public class World {
 	
 //------------------- COLLISION HANDLERS -------------------
 	
+	
+	/**
+	 * This method handles a collision between an entity and a boundary.
+	 * @param entity
+	 * 		  The entity to handle.
+	 * @effect handles a collision between an entity and a boundary.
+	 * 		   | @see implementation
+	 */
 	public void handleEntityBoundaryCollision(Entity entity){
 		
 		if(entity instanceof Bullet){
@@ -609,10 +642,20 @@ public class World {
 			entity.setVelocity(entity.getxVelocity(), -entity.getyVelocity());
 		}
 		
-		
-		
 	}
 	
+	/**
+	 * This method handles the collision between two different entities.
+	 * 
+	 * @param entityA
+	 * 		  One of the 2 entities in this collision.
+	 * @param entityB
+	 * 		  One of the 2 entities in this collision.
+	 * @effect handles the collision between two different entities.
+	 * 		   Depening on whether it is a collision between ships or bullets or a bullet and a ship,
+	 * 		   the collision is handled differently.
+	 * 		   | @see implementation
+	 */
 	public void handleEntityEntityCollision(Entity entityA, Entity entityB){
 
 	if(entityA instanceof Ship){
@@ -630,6 +673,16 @@ public class World {
 	
 	//SPECIFIC EE CASES
 	
+	/**
+	 * This method handles the specific case of a collision between 2 ships.
+	 * @param shipA
+	 * 		  One of the ships in this collision.
+	 * @param shipB
+	 * 		  One of the ships in this collision.
+	 * @effect The collision is resolved by changing the ships directions and velocity;
+	 *         the mathematical way of doing this was provided to us.
+	 *         | @see implementation
+	 */
 	public void handleShipShipCollision(Ship shipA, Ship shipB){
 		
 		
@@ -682,6 +735,17 @@ public class World {
 		shipB.setVelocity(shipBnewXVel, shipBnewYVel);
 	}
 	
+	
+	/**
+	 * Handles the collision between a bullet and a ship.
+	 * 
+	 * @param bullet
+	 * 		  The bullet in this collision
+	 * @param ship
+	 * 		  The ship in this collision.
+	 * @effect Both entities are terminated.
+	 * 
+	 */
 	public void handleBulletShipCollision(Bullet bullet, Ship ship){
 		if(bullet.getShip() == ship){
 			//ship.ge
@@ -691,6 +755,16 @@ public class World {
 		}
 	}
 	
+	/**
+	 * Handles the collision between two bullets.
+	 * 
+	 * @param bulletA
+	 * 		  One bullet in this collision
+	 * @param bulletB
+	 * 		  One bullet in this collision
+	 * @effect Both bullets are terminated.
+	 * 
+	 */
 	public void handleBulletBulletCollision(Bullet bulletA, Bullet bulletB){
 		bulletA.terminate();
 		bulletB.terminate();
