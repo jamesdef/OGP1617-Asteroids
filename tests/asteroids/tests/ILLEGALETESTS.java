@@ -596,6 +596,7 @@ public class ILLEGALETESTS {
 		facade.addShipToWorld(world, ship11);
 		assertEquals(world, facade.getShipWorld(ship11));
 		assertEquals(200,facade.getShipVelocity(ship11)[1],EPSILON);
+		System.out.println(facade.getTimeNextCollision(world));
 		assertEquals(4.0,facade.getTimeNextCollision(world),EPSILON);
 		assertEquals(10000,facade.getPositionNextCollision(world)[0],EPSILON);
 		assertEquals(30000,facade.getPositionNextCollision(world)[1],EPSILON);
