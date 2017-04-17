@@ -215,7 +215,9 @@ public class ILLEGALETESTS {
 //	Ship ship2 = facade.createShip(10000, 10100, 0, -10, 10, 3 * Math.PI / 2,5E16);
 //  Bullet bullet12 = facade.createBullet(10001, 10100, 0, 0, 3);
 	@Test 
+
 	public void firingBullets2() throws ModelException, IllegalPositionException, IllegalRadiusException, IllegalCollisionException{
+
 		World world = createWorlds()[0];
 		Ship ship1 = createShips()[0];
 		Ship ship2 = createShips()[1];

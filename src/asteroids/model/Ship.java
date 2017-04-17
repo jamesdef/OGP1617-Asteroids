@@ -812,21 +812,19 @@ public class Ship extends Entity {
 			for (Entity entity : getWorld().getAllEntities()){
 				if (bullet.overlap(entity) == true){
 					
-					
-					
-					
 					bullet.terminate();
 					entity.terminate();
 
-					
 					//Further running of this code is unneccesary and possibly unsafe
 					return;
 				}
 			}
 			
 			bullet.setSource(this);
+		//	bullet.setWorld(this.getWorld());
 			// The bullet is in a legal spot and can start moving. It's velocity is now assigned.
 			bullet.setVelocity(xSpeed, ySpeed);	
+			this.getWorld().addEntity(bullet);
 		}
 	}
 	
