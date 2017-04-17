@@ -214,6 +214,7 @@ public class ILLEGALETESTS {
 
 	@Test 
 	public void firingBullets2() throws ModelException, IllegalPositionException, IllegalRadiusException{
+		System.out.println("firingBullets2");
 		World world = createWorlds()[0];
 		Ship ship1 = createShips()[0];
 		Ship ship2 = createShips()[1];

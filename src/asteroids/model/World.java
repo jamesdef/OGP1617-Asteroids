@@ -469,7 +469,7 @@ public class World {
 	
 
 	public void evolve(double Dt) throws IllegalCollisionException, IllegalPositionException, IllegalDurationException{
-		
+		System.out.println("evolve------");
 		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
 		double tNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
 		Entity nextEntityBoundaryCollisionEntity = this.getNextEntityBoundaryCollisionEntity();
@@ -481,7 +481,14 @@ public class World {
 		
 		double tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
 
+		System.out.println("tBE is " + tNextEntityBoundaryCollision);
+
+		System.out.println("tEE is " + tNextEntityEntityPosition);
+		System.out.println("tC is " + tC);
+
+
 		if (tC <= Dt){
+			
 			this.moveAllentities(tC);
 
 			if (tNextEntityBoundaryCollision<=tNextEntityEntityPosition) {
