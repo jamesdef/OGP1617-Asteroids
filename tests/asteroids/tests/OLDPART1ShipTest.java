@@ -12,7 +12,7 @@ import asteroids.model.IllegalRadiusException;
 import asteroids.model.Ship;
 import asteroids.util.ModelException;
 
-public class ShipTest {
+public class OLDPART1ShipTest {
 
 	private static final double EPSILON = 0.0001;
 

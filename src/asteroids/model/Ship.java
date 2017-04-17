@@ -771,7 +771,7 @@ public class Ship extends Entity {
 	 * @effect If, upon creation, the bullet overlaps with another entity, both are immediatly terminated.
 	 * 
 	 * 			|for (Entity entity : getWorld().getAllEntities()){
-	 *			|	if (bullet.overlap(entity) == true){
+	 *			|	if (bullet.significantOverlap(entity) == true){
 	 *			|		then bullet.terminate();
 	 *			|		 	 entity.terminate();
 	 * 
@@ -812,7 +812,7 @@ public class Ship extends Entity {
 			
 			// Check whether this bullet overlaps with another entity upon creation, if so: delete both.
 			for (Entity entity : getWorld().getAllEntities()){
-				if (bullet.overlap(entity) == true){
+				if (bullet.significantOverlap(entity) == true){
 					
 					bullet.terminate();
 					entity.terminate();

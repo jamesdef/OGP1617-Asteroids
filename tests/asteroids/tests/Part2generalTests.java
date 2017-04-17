@@ -17,7 +17,7 @@ import asteroids.facade.Facade;
 import asteroids.part2.facade.IFacade;
 import asteroids.util.ModelException;
 
-public class generalTests {
+public class Part2generalTests {
 	private static final double EPSILON = 0.0001;
 
 	IFacade facade;

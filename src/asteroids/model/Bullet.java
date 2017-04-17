@@ -267,31 +267,8 @@ public class Bullet extends Entity {
 	public static boolean isValidMinimumRadius(double min_Radius){
 		return (min_Radius > 0);
 	}
-    
 
 	/** 
-	 * Sets the radius to the given Value, if it is valid.
-	 * 
-	 * @param radius
-	 * 		  The new, given radius of the ship.
-	 * 
-	 * @post The radius of the ship is now equal to the given, valid radius.
-	 * 		|new.getRadius() == radius	
-	 * 
-	 * @throws  IllegalRadiusException
-	 * 		   The given radius is not a valid radius.
-	 * 		   | ! isValidRadius(radius)
-	 */
-//    @Raw @Override
-//	public void setRadius(double radius) throws IllegalRadiusException{
-//		if (!isValidRadius(radius)){
-//			throw new IllegalRadiusException(radius);}
-//		System.out.println(radius);
-//		this.radius = radius;
-//		System.out.println(this.getRadius());
-//	}
-
-	/** s
 	 * Checks whether the given radius has a valid value.
 	 * 
 	 * @param  radius
@@ -321,14 +298,11 @@ public class Bullet extends Entity {
 	
 	
 	/**
-	 * This will decrement the bounces that a bullet can still make each time a bullet touches a boundary.
-	 * It then checks to see if this amount has reached zero. If it has, the bullet is terminated.
+	 * This will decrement the bounces that a bullet can still 
+	 * make each time a bullet touches a boundary.
 	 * 
 	 * @post The amount of bounces_left is decremented by 1
 	 * 		 |new.bounces_left = old.bounces_left - 1;
-	 * @post If the new amount equals zero (or lower in case something goes wrong in a corner)
-	 * 		 |if (this.getBouncesLeft()<= 0) 
-	 * 		 | 		then  this.isTerminated() == true;
 	 */
 	public void decrementBouncesLeft(){
 		this.bounces_left = bounces_left-1;
@@ -390,11 +364,11 @@ public class Bullet extends Entity {
 	 */
 	private Ship ship = null;
 
-	/**		 
-	 * Field initialising the existence of World.
-	 * Initialised to a value of null.
-	*/
-	private World world = null;
+//	/**		 
+//	 * Field initialising the existence of World.
+//	 * Initialised to a value of null.
+//	*/
+//	private World world = null;
 
     /**
      * Variable referencing the source ship (that fired the bullet) of the bullet.

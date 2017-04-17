@@ -572,17 +572,23 @@ public abstract class Entity {
 	}
 
 
-	/**
-	 * Check whether two Entities overlap.
+	/** 
+	 * Returns whether two objects (entities) overlap. 
+	 * A certain boundary is set to account for rounding issues with the double-representation.
 	 * 
-	 * @param other
-	 * 		  The other entity of which we want to check if it overlaps with this entity.
-	 * @return True if and only if the distance between the two entities is less than zero.
-	 * 		   | getDistanceBetween(other) < 0
+	 * @param object2
+	 * 		  The other of two enitities that might overlap.
+	 * @return True only if they overlap significantly. 
+	 * 		   For now we have defined this with a -0.1 value, to allow the program to run,
+	 * 		   working with the 99% rule triggers to much.
+	 * 			
+	 * 		 | @see implementation
+	 * 		  
 	 */
-	public boolean overlap(Entity other){
-		return (this.getDistanceBetween(other) < 0);	
+	public Boolean significantOverlap (Entity object2){
+		return (this.getDistanceBetween(object2) < -0.1);
 	}
+	
 	
 	
 	/**
@@ -642,8 +648,6 @@ public abstract class Entity {
 		
 		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(),
 				this.getWorld().getWidth());
-		double yTime = getTimeToBoundaryAxisCollsion(this.getyVelocity(), this.getyPosition(),
-				this.getWorld().getHeight());
 		
 
 		if(T == xTime){
@@ -663,9 +667,7 @@ public abstract class Entity {
 			}
 			
 		}
-		
 		return entityPosition;
-		
 	}
 	
 	
@@ -718,7 +720,7 @@ public abstract class Entity {
 	 * 		   If two entities overlap, this method does not apply.
 	 */
 	public double getTimeToEntityCollision(Entity other) throws IllegalCollisionException {
-		if (overlap(other)){
+		if (this.significantOverlap(other)){
 			throw new IllegalCollisionException(this,other);
 		}
 		
