@@ -762,7 +762,7 @@ public class World {
 		double shipBmass = shipB.getMass();
 
 		
-
+//stien
 		double deltaPosx = shipAPositionX - shipBPositionX;
 		double deltaPosy = shipAPositionY - shipBPositionY;
 		
@@ -773,19 +773,21 @@ public class World {
 
 		double sumRadius = shipARadius + shipBRadius;
 		
-		double BigJ = 
+		double jValue = 
 				(2 * shipAmass * shipBmass * delta) / 
 				(sumRadius * (shipAmass + shipBmass));
 		
-		double Jx = (BigJ * deltaPosx) / sumRadius;
-		double Jy = (BigJ * deltaPosy) / sumRadius;
+		double Jx = (jValue * deltaPosx) / sumRadius;
+		double Jy = (jValue * deltaPosy) / sumRadius;
 		
 		double shipAnewXVel = shipAVelocityX + Jx / shipAmass;
 		double shipAnewYVel = shipAVelocityY + Jy / shipAmass;
 		
-		double shipBnewXVel = shipAVelocityX + Jx / shipAmass;
-		double shipBnewYVel = shipAVelocityY + Jy / shipAmass;
-				
+		double shipBnewXVel = shipAVelocityX + Jx / shipBmass;
+		double shipBnewYVel = shipAVelocityY + Jy / shipBmass;
+		
+
+
 		
 		shipA.setVelocity(shipAnewXVel, shipAnewYVel);
 		shipB.setVelocity(shipBnewXVel, shipBnewYVel);
