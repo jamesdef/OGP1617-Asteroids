@@ -21,6 +21,7 @@ public class generalTests {
 	private static final double EPSILON = 0.0001;
 
 	IFacade facade;
+	
 
 	@Before
 	public void setUp() {
@@ -30,8 +31,26 @@ public class generalTests {
 	
 	//SHIP TESTS----------------------------
 	
-	//WORLD TESTS----------------------------
-	public World[] createWorlds() throws ModelException{
+	
+	public Bullet[] Bullets() throws ModelException{
+		Bullet bulletA = facade.createBullet(10000, 10000, 0, 0, 3);
+		Bullet bulletB = facade.createBullet(10000, 10000, 10, 0, 3);
+		Bullet bulletC = facade.createBullet(10000, 10000, -10, 0, 3);
+		
+		Bullet[] Total ={bulletA, bulletB, bulletC };
+		return Total;
+	}
+	
+	public Ship[] Ships() throws ModelException {
+		Ship shipA = facade.createShip(10000, 10000, 0, 0, 10, 0,5E16);
+		Ship shipB = facade.createShip(10000, 10100, 0, -10, 10, 3 * Math.PI / 2,5E16);
+		Ship shipC = facade.createShip(10100, 10000, -10, 0, 10, Math.PI,0);
+		
+		Ship[] Total = { shipA, shipB, shipC };
+		return Total;
+	}
+	
+	public World[] Worlds() throws ModelException{
 		World worldA = facade.createWorld(200, 200);
 		World worldB = facade.createWorld(-100, -100);
 
@@ -39,42 +58,18 @@ public class generalTests {
 		return Total;
 	}
 	
-	public Bullet[] createBullets() throws ModelException{
-		Bullet bullet1 = facade.createBullet(10000, 10000, 0, 0, 3);
-		Bullet bullet2 = facade.createBullet(10000, 10000, 10, 0, 3);
-		Bullet bullet3 = facade.createBullet(10000, 10000, -10, 0, 3);
-		Bullet bullet4 = facade.createBullet(10000, 10000, 10, 10, 3);
-		Bullet bullet5 = facade.createBullet(10000, 10000, 10, 10, 3);
-		Bullet bullet6 = facade.createBullet(10000, 10000, 10, 10, 3);
-		Bullet bullet7 = facade.createBullet(10000, 10000, 10, 10, 3);
-		Bullet bullet8 = facade.createBullet(10000, 10000, 4999, 3000, 4);
-		Bullet bullet9 = facade.createBullet(29000, 10000, 10000, 0, 3);
-		Bullet bullet10 = facade.createBullet(10000, 10000, 10, 10, 3);
-		Bullet bullet11 = facade.createBullet(29500, 10000, 0, 0, 3);
-		Bullet bullet12 = facade.createBullet(10001, 10100, 0, 0, 3);
-		Bullet bullet13 = facade.createBullet(10000, 12050, 0, 0, 80);
-
-		Bullet[] Total ={bullet1, bullet2,bullet3,bullet4,bullet5,bullet6,bullet7,bullet8,bullet9,bullet10,bullet11,bullet12,bullet13};
-		
-		return Total;
-	}
 	
-	public Ship[] createShips() throws ModelException {
-		Ship ship1 = facade.createShip(10000, 10000, 0, 0, 10, 0,5E16);
-		Ship ship2 = facade.createShip(10000, 10100, 0, -10, 10, 3 * Math.PI / 2,5E16);
-		Ship ship3 = facade.createShip(10100, 10000, -10, 0, 10, Math.PI,0);
+	
+	//WORLD TESTS----------------------------
 		
-		Ship[] Total = { ship1, ship2, ship3 };
-		return Total;
-	}
 
 	
 	
 	//Create Worlds
 	@Test
 	public void testCreateWorld() throws IllegalPositionException, IllegalRadiusException, ModelException{
-		World worldA = createWorlds()[1];
-		World worldB = createWorlds()[1];
+		World worldA = Worlds()[1];
+		World worldB = Worlds()[1];
 		assertEquals(200,facade.getWorldSize(worldA)[0],EPSILON);
 		assertEquals(100,facade.getWorldSize(worldB)[1],EPSILON);
 		//negative position
@@ -84,6 +79,57 @@ public class generalTests {
 	//Ships and World
 	@Test
 	public void testShipsandWorld() throws ModelException{
+		World world = Worlds()[1];
+		Ship ship = Ships()[1];
+		System.out.println(ship.toString());
+		facade.addShipToWorld(world, ship);
+		assert (facade.getShipWorld(ship) == world);
+		assert (facade.getWorldShips(world).contains(ship));
+		
+	}
+	
+	//Bullets and World
+	@Test
+	public void testBulletsAndWorld() throws ModelException{
+		World world = Worlds()[1];
+		Bullet bullet = Bullets()[1];
+		facade.addBulletToWorld(world, bullet);
+		assert (facade.getBulletWorld(bullet) == world);
+		assert (facade.getWorldBullets(world).contains(bullet));
+		
+	}
+	//Overlap
+	@Test
+	public void testShipOverlap() throws ModelException {
+		Ship shipA = Ships()[0];
+		Ship shipB = Ships()[1];
+		Ship shipC = Ships()[2];
+
+		assertTrue(facade.overlap(shipA,shipB));
+		assertFalse(facade.overlap(ship1,ship2));
+
+	}
+	
+	
+	//Ship collision in World
+	@Test
+	public void testShipCollision() throws ModelException{
+		World world = Worlds()[1];
+		Ship ship = Ships()[1];
+		facade.addShipToWorld(world, ship);
+
+		
+		//collision time
+		double time = facade.getTimeNextCollision(world);
+		assertEquals(Double.POSITIVE_INFINITY,time,EPSILON);
+		
+		//collision position
+		
+	}
+	
+	//Ship ship collision
+	@Test
+	public void testShipsandShipsAndWorld() throws ModelException{
 		World world1 = createWorlds()[1];
 		Ship ship1 = createShips()[1];
 		System.out.println(ship1.toString());
@@ -93,6 +139,17 @@ public class generalTests {
 		
 	}
 	
+	//Ship Bullet collision
+		@Test
+		public void testShipandBulletCollsionWorld() throws ModelException{
+			World world1 = createWorlds()[1];
+			Ship ship1 = createShips()[1];
+			System.out.println(ship1.toString());
+			facade.addShipToWorld(world1, ship1);
+			assert (facade.getShipWorld(ship1) == world1);
+//			assert (facade.getWorldShips(world1).contains(ship7));
+			
+		}
 	
 	
 
