@@ -278,7 +278,6 @@ public class World {
 		if (!canHaveAsEntity(entity) || entity.getWorld()!=null)
 				throw new IllegalArgumentException();
 		// Add entity to the map: with its position as key.
-
 //		this.entities.put(entity.getPosition(), entity);
 		this.entities.put((StringMaker(entity.getPosition())), entity);
 		//This entity has the world as its world.
@@ -318,7 +317,6 @@ public class World {
 		if (entity == null || !hasEntity(entity)){
 			throw new IllegalArgumentException();
 		}
-
 		this.entities.remove((StringMaker(entity.getPosition())));
 		entity.setWorld(null);
 	}
@@ -385,7 +383,6 @@ public class World {
    	 * 		  |   	result == null
    	 */
 	public Entity getEntityAt(double xPosition, double yPosition){
-
 		
 	String KeyPosition = (xPosition + "," + yPosition);
 	 
@@ -626,24 +623,6 @@ public class World {
 		return Math.min(this.getTimeToNextEntityBoundaryCollision(),this.getTimeToNextEntityEntityCollision());
 	}
 	
-	
-	public double[] getFirstCollisionPosition() throws IllegalCollisionException{
-		double timeToNextCollsion = this.getTimeToFirstCollision();
-		double timeToNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
-		if(timeToNextCollsion == timeToNextEntityBoundaryCollision){
-			return this.getNextEntityBoundaryCollisionEntity().getBoundaryCollisionPosition();
-			
-		} else {
-			List<Entity> ArrayofEntities = new ArrayList<>(this.getNextEntityEntityCollisionEntities());
-			
-			Entity entityA = ArrayofEntities.get(0);
-			Entity entityB = ArrayofEntities.get(1);
-			
-			return entityA.getEntityCollisionPosition(entityB);
-			
-		}
-	}
-	
 
 	
 	
@@ -835,5 +814,4 @@ public class World {
 	 */
 	private static double height = (1/2)*Upper_Bound;
 }
-
 

@@ -111,11 +111,13 @@ public class generalTests {
 	}
 	
 	
-	//Ship collision in World
+	//Ship Boundary collision
 	@Test
-	public void testShipCollision() throws ModelException{
+	public void testShipBoundaryCollision() throws ModelException{
 		World world = Worlds()[1];
-		Ship ship = Ships()[1];
+		Ship shipA = Ships()[0];
+		Ship shipB = Ships()[1];
+
 		facade.addShipToWorld(world, ship);
 
 		
@@ -150,6 +152,23 @@ public class generalTests {
 //			assert (facade.getWorldShips(world1).contains(ship7));
 			
 		}
+		
+		
+	//Terminate
+		@Test 
+		public void testTerminateWorld() throws ModelException{
+			World world = Worlds()[1];
+			Ship ship = Ships()[0];
+			facade.addShipToWorld(world, ship);
+			
+			Bullet bullet = Bullets()[0];
+			facade.addBulletToWorld(world, bullet);
+			facade.terminateWorld(world);
+			assert(facade.getBulletWorld(bullet)==null);
+			assert(facade.getShipWorld(ship)==null);
+			assert(facade.isTerminatedWorld(world));
+		}
+		
 	
 	
 
