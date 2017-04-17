@@ -211,9 +211,11 @@ public class ILLEGALETESTS {
 		assertFalse(facade.getBulletsOnShip(ship7).contains(bullet));
 	}
 
-
+//	Ship ship1 = facade.createShip(10000, 10000, 0, 0, 10, 0,5E16);
+//	Ship ship2 = facade.createShip(10000, 10100, 0, -10, 10, 3 * Math.PI / 2,5E16);
+//  Bullet bullet12 = facade.createBullet(10001, 10100, 0, 0, 3);
 	@Test 
-	public void firingBullets2() throws ModelException, IllegalPositionException, IllegalRadiusException{
+	public void firingBullets2() throws ModelException, IllegalPositionException, IllegalRadiusException, IllegalCollisionException{
 		World world = createWorlds()[0];
 		Ship ship1 = createShips()[0];
 		Ship ship2 = createShips()[1];
@@ -222,7 +224,17 @@ public class ILLEGALETESTS {
 		Bullet bullet12 = createBullets()[11];
 		facade.loadBulletOnShip(ship2, bullet12);
 		ship2.fireBullet();
+		System.out.println(world.StringMaker(ship1.getPosition()));
+		System.out.println(world.StringMaker(ship2.getPosition()));
+		System.out.println(world.getTimeToFirstCollision());
+		System.out.println(world.getAllBullets());
+		
 		facade.evolve(world, 2, null);
+		
+		System.out.print("AfterEvolve");
+		System.out.println(world.StringMaker(ship1.getPosition()));
+		System.out.println(world.StringMaker(ship2.getPosition()));
+		System.out.print("ln");
 		assert(facade.isTerminatedShip(ship1));
 		assert(facade.isTerminatedBullet(bullet12));	
 	}
@@ -596,28 +608,11 @@ public class ILLEGALETESTS {
 	public final void evolveCollisionUpperBoundary() throws ModelException{
 		Ship ship11 = createShips()[10];	
 		World world = createWorlds()[0];
-//		System.out.println(world.canHaveAsEntity(ship11));
 		facade.addShipToWorld(world, ship11);
-		double [] pos = {ship11.getxPosition(),ship11.getyPosition()};
-//		System.out.println(pos);
-//		System.out.println(world.getAllEntities());
-//		System.out.println(world.hasEntity(ship11));
-//		System.out.println(world.getEntities());
-//		System.out.println(ship11.getPosition());
-//		System.out.println(world.getAllEntities().contains(ship11));
-		double [] position11 = {ship11.getxPosition(), ship11.getyPosition()};
-//		double [] locatie = {10000,29000};
-//		System.out.println(world.getEntities().get(locatie));
-//		System.out.println(ship11);
-//		System.out.println(world.getEntities().containsKey(position11));
-//		System.out.println(ship11.getyPosition());
-//		System.out.println(ship11);
-		System.out.println(world.getEntityAt(position11[0],position11[1]));
 		assertEquals(world, facade.getShipWorld(ship11));
 		assertEquals(200,facade.getShipVelocity(ship11)[1],EPSILON);
 		assertEquals(4.0,facade.getTimeNextCollision(world),EPSILON);
 		assertEquals(10000,facade.getPositionNextCollision(world)[0],EPSILON);
-//		System.out.println(facade.getTimeNextCollision(world));
 		assertEquals(30000,facade.getPositionNextCollision(world)[1],EPSILON);
 		facade.evolve(world, 6,null);
 		assertEquals(-200,facade.getShipVelocity(ship11)[1],EPSILON);
