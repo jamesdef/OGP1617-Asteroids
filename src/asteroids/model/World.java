@@ -108,7 +108,7 @@ public class World {
 	 * Return the entities located in this world at a certain positionas a map (using location as the key of each entity).
 	 * @return a map holding the entities and their positions.
 	 */ 
-	public HashMap<double[],Entity> getEntities() {
+	public HashMap<String,Entity> getEntities() {
 		return this.entities;	
 	}
 	
@@ -278,9 +278,22 @@ public class World {
 		if (!canHaveAsEntity(entity) || entity.getWorld()!=null)
 				throw new IllegalArgumentException();
 		// Add entity to the map: with its position as key.
-		this.entities.put(entity.getPosition(), entity);
+//		this.entities.put(entity.getPosition(), entity);
+		this.entities.put((arrayToString(entity.getPosition())), entity);
 		//This entity has the world as its world.
 		entity.setWorld(this);
+	}
+	
+	/**
+	 * This method is used to create the keys in the map "entity_positions".
+	 * 
+	 * @param	array
+	 * 			An array, which will always represent a position in this class.
+	 * 			
+	 * @return	A position in form of a string.
+	 */
+	private String arrayToString(double[] array) {
+		return (array[0] + "," + array[1]);
 	}
 	
 	/**
@@ -340,6 +353,7 @@ public class World {
 	public Boolean canHaveAsEntity(Entity entity){
 		if (entity.isTerminated() || this.isTerminated() || entity == null  || entity.getWorld() != null 
 				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
+			System.out.println("appel");
 			return false;
 		}
 		for (Entity ship : this.getAllShips()) {
@@ -367,15 +381,17 @@ public class World {
    	 * 		  |   	result == null
    	 */
 	public Entity getEntityAt(double xPosition, double yPosition){
-	  double[] position = {xPosition, yPosition};
-	  if (this.getEntities().containsKey(position)){
-		  	return this.getEntities().get(position);
-	  }
-	  else{
-		  return null;
-	  }
+		
+	String searchPosition = (xPosition + "," + yPosition);
+	 
+	if (this.entities.containsKey(searchPosition)){
+		return this.getEntities().get(searchPosition);
 	}
-	
+	else{
+		return null;
+	}
+	}
+
 	/** 
 	 * Returns whether two objects (entities) overlap. 
 	 * A certain boundary is set to account for rounding issues with the double-representation.
@@ -776,7 +792,7 @@ public class World {
 	/**
 	 * A map containing the different entities in this world, allong with the position of their center.
 	 */
-	private final HashMap <double[], Entity> entities = new HashMap<double[],Entity>();
+	private HashMap<String, Entity> entities = new HashMap<String,Entity>();
 	
 	/**
 	 * Variable registering the maxium possible width and heigth for all worlds.
