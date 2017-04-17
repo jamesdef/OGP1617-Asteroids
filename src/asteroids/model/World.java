@@ -623,6 +623,24 @@ public class World {
 		return Math.min(this.getTimeToNextEntityBoundaryCollision(),this.getTimeToNextEntityEntityCollision());
 	}
 	
+	
+	
+	public double[] getFirstCollisionPosition() throws IllegalCollisionException{
+		double timeToNextCollsion = this.getTimeToFirstCollision();
+		double timeToNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
+		if(timeToNextCollsion == timeToNextEntityBoundaryCollision){
+			return this.getNextEntityBoundaryCollisionEntity().getBoundaryCollisionPosition();
+			
+		} else {
+			List<Entity> ArrayofEntities = new ArrayList<>(this.getNextEntityEntityCollisionEntities());
+			
+			Entity entityA = ArrayofEntities.get(0);
+			Entity entityB = ArrayofEntities.get(1);
+			
+			return entityA.getEntityCollisionPosition(entityB);
+			
+		}
+	}
 
 	
 	
@@ -814,4 +832,3 @@ public class World {
 	 */
 	private static double height = (1/2)*Upper_Bound;
 }
-
