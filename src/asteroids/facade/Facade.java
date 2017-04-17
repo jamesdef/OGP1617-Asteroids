@@ -362,7 +362,12 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 	@Override
 	public double[] getPositionNextCollision(World world) throws ModelException {
 		// TODO Auto-generated method stub
-		return null;
+		try {
+			return world.getFirstCollisionPosition();
+		} catch (IllegalCollisionException e) {
+			// TODO Auto-generated catch block
+			throw new ModelException("Illegal Collision");
+		}
 	}
 
 	@Override

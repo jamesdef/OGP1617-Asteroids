@@ -243,6 +243,7 @@ public abstract class Entity {
 	 * 		|new.getWorld() == world
 	 */
 	public void setWorld(World world){
+
 		// If the world is effective, it already has to have this entity as one if its entities. 
 		assert((world == null) || (world.hasEntity(this)));
 		// If the world is not effective, and this entity belongs to an effective world, 
@@ -250,6 +251,7 @@ public abstract class Entity {
 		assert((world != null) || (this.getWorld() == null) || (!this.getWorld().hasEntity(this)));
 		
 		this.world = world;
+		
 	}
 	
 	

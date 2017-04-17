@@ -74,10 +74,13 @@ public class Bullet extends Entity {
 		 * Returns the world to which this bullet belongs.
 		 * @return the world to which this bullet belongs.
 		 */
-		@Basic
+		/**@Basic
 		public World getWorld(){
+	    	System.out.println("bullet getworld");
+
 			return this.world;
-		}
+
+		}*/
 		
 		/**
 		 * Returns the ship to which this bullet belongs.
