@@ -465,7 +465,8 @@ public abstract class Entity {
 	@Raw
 	public void setRadius(double radius) throws IllegalRadiusException{
 		if (!isValidRadius(radius)){
-			throw new IllegalRadiusException(radius);}
+			throw new IllegalRadiusException(radius);
+		}
 		this.radius = radius;
 	}
 
@@ -481,7 +482,7 @@ public abstract class Entity {
 	 * 		   | radius >= getMin_Radius;
 	 */
 	@Raw
-	public static boolean isValidRadius(double radius){
+	public boolean isValidRadius(double radius){
 		return (radius >= getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 	
@@ -836,12 +837,12 @@ public abstract class Entity {
 	/**
 	 * Variable registering the minimum allowed Radius.
 	 */
-	protected static double min_Radius = 10.0;
+	private static double min_Radius = 10;
 
 	/**
 	 * Variable registering the radius of this Entity.
 	 */
-	protected double radius = min_Radius;
+	private double radius = min_Radius;
 
 	/**
 	 * Variable registering the mass of this entity.

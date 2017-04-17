@@ -38,9 +38,10 @@ import be.kuleuven.cs.som.annotate.Raw;
  */
 public class Bullet extends Entity {
 	
+	//private double radius;
+
 	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius) throws IllegalPositionException, IllegalRadiusException{
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
-		setRadius(radius);
 	}
 	
 	
@@ -109,7 +110,7 @@ public class Bullet extends Entity {
 		 * Returns the minimum radius for bullets.
 		 * @return the minimum radius bullets should have.
 		 */
-		@Basic 
+		@Basic
 		public static double getMinRadius(){
 			return Bullet.min_Radius;
 		}
@@ -280,14 +281,16 @@ public class Bullet extends Entity {
 	 * 		   The given radius is not a valid radius.
 	 * 		   | ! isValidRadius(radius)
 	 */
-    @Raw @Override
-	public void setRadius(double radius) throws IllegalRadiusException{
-		if (!isValidRadius(radius)){
-			throw new IllegalRadiusException(radius);}
-		this.radius = radius;
-	}
+//    @Raw @Override
+//	public void setRadius(double radius) throws IllegalRadiusException{
+//		if (!isValidRadius(radius)){
+//			throw new IllegalRadiusException(radius);}
+//		System.out.println(radius);
+//		this.radius = radius;
+//		System.out.println(this.getRadius());
+//	}
 
-	/** 
+	/** s
 	 * Checks whether the given radius has a valid value.
 	 * 
 	 * @param  radius
@@ -298,9 +301,9 @@ public class Bullet extends Entity {
 	 * 		   Or if the radius is Infinity or not a number.
 	 * 		   | radius >= getMinRadius();
 	 */
-    @Raw
-	public static boolean isValidRadius(double radius){
-		return (radius >= getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+    @Raw @Override
+	public boolean isValidRadius(double radius){
+		return (radius >= Bullet.getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 	
 	
@@ -374,12 +377,12 @@ public class Bullet extends Entity {
 	 * The minimum radius may change in the future. 
 	 * But it will always remain the same for all Bullets.
 	 */
-	protected static double min_Radius = 1.0;
+	private static double min_Radius = 1.0;
 	
-	/**
-	 * Variable registering the radius of this Ship.
-	 */
-	protected double radius = min_Radius;
+//	/**
+//	 * Variable registering the radius of this Ship.
+//	 */
+//	private double radius = 0;
 
 	
 	/**

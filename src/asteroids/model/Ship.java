@@ -350,6 +350,14 @@ public class Ship extends Entity {
     	}
     }
     
+	/**
+	 * Return the minimum radius a ship can have.
+	 * @return the minimum radius a ship can have.
+	 */
+	@Basic
+	public static double getMinRadius(){
+		return Ship.min_Radius;
+	}
 
 	/** 
 	 * Checks whether the given radius has a valid value.
@@ -362,8 +370,9 @@ public class Ship extends Entity {
 	 * 		   Or if the radius is Infinity or not a number.
 	 * 		   | radius >= getMin_Radius;
 	 */
-	public static boolean isValidRadius(double radius){
-		return (radius >= min_Radius && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+    @Override
+	public boolean isValidRadius(double radius){
+		return (radius >= Ship.getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
 
 	
