@@ -9,38 +9,39 @@ import java.util.List;
 import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.Basic;
-
-// Mijn naam is Michiel en Git is mijn vriend 
-
-//git problemen opgelost
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
+ * A class of worlds with a size and a collection of entities
+ * @invar   Each world has a valid width as its width.
+ *          | isValidWidth(this.getWidth())
+ * @invar   Each world has a valid height as its height
+ *          | isValidHeight(this.getHeight())
+ * @invar   Each world must have proper entities.
+ *          | hasProperEntities()
+ * @invar  The entities is an effective collection.
+ *          | entities != null
+ * @author Pieter Claeys, Pieter Mangelschots (2Bcwselt1)
+ * @version 1.0
+ */
+
+/**
+ * A class that handles worlds which have a certain size and possibly a
+ * collection of entities.
  * 
+ * @invar   Every world must have a valid width.
+ *          | isValidWidth(this.getWidth())
+ * @invar   Every world must have a valid height.
+ *          | isValidHeight(this.getHeight()) 
+ *          
+ * @invar   Every world must have proper entities.
+ * 			|hasProperEntities();
+ *          
+ * @version 2.0         
  * @author James Defauw & Michiel De Koninck
  *
  */
 
-/**
- * final width (boundary) final height (boundary) static MAX_VALUE (not final
- * because this value may change in the future)
- * 
- * De grootte van het coordinaten vlak dient als volgt te worden gedefinieerd:
- *  x element of [0, width] , y element of [0,height] 
- *  This means that coordinates can never be negative!
- * 
- * DEFENSIVELY addBullet addShip rmBullet rmShip
- * 
- * All ships must fully lie in this world and not overlap with other ships
- * 
- * getAllBullets (HASHSET ?) getAllShips (HASHSET ?) getAllEntities (Combination
- * of previous sets?) s
- *
- *
- * The advancing of time happens within this class. --> This class should
- * contain a method 'evolve' which advances the state of the world a certain
- * number of seconds Dt. ---> (NO SPECIFICATION REQUIRED FOR THIS METHOD).
- * Implement defensively. (Described within assignment P4)
- */
 
 public class World {
 
@@ -183,7 +184,7 @@ public class World {
 	 
 	
 	/** TOTAL PROGRAMMING
-	 * Sets the width of this world to a given value.
+	 * Sets the width of this world to the absolute of the given value.
 	 * 
 	 * @param width
 	 * 		  The given width
@@ -191,25 +192,26 @@ public class World {
 	 * @post if the given width is greater than the upper bound
 	 * 		 the width is set to be equal to the upper bound.
 	 * 
-	 * @post if the given width is negative, nothing is changed to the width.
-	 * 		 | if (width < 0)
-	 *       |     then new.getWidth() = this.getWidth()
+	 * @post if the given width is negative, it's opposite value is set.
+	 * 	     Via the absolute
+	 * 		|widthpositive = Math.abs(width);
 	 * @post if the given width is positive and smaller than the upper bound:
 	 *       the width is changed to the given value.
 	 *       | new.getWidth() == width
 	 *
 	 */
 	public void setWidth(double width){
-		if (width > Upper_Bound || width < 0) {
+		double widthpositive = Math.abs(width);
+		if (widthpositive  > Upper_Bound) {
 			World.width = Upper_Bound;
 		}
-		else if (width >0){
-			World.width = width;
+		else if (widthpositive  >0){
+			World.width = widthpositive;
 		}
 	}
 	
 	/** TOTAL PROGRAMMING
-	 * Sets the height of this world to a given value.
+	 * Sets the height of this world to the absolute of the given value.
 	 * 
 	 * @param height
 	 * 		  The given height
@@ -217,24 +219,45 @@ public class World {
 	 * @post if the given height is greater than the upper bound
 	 * 		 the height is set to be equal to the upper bound.
 	 * 
-	 * @post if the given height is negative, nothing is changed to the height.
-	 * 		 | if (height < 0)
-	 *       |     then new.getHeight() = this.getHeight()
+	 * @post if the given height is negative, it's opposite value is set. 
+	 * 		 Via it's absolute.
+	 * 		 | heightpositive = Math.abs(height);
+	 * 
 	 * @post if the given height is positive and smaller than the upper bound:
 	 *       the height is changed to the given value.
 	 *       | new.getHeight() == height
 	 */
 	public void setHeight(double height){
-		if (height > Upper_Bound || height <0) {
+		double heightpositive = Math.abs(height);
+		if (heightpositive > Upper_Bound) {
 			World.height = Upper_Bound;
 		}
-		else if (height >0){
-			World.height = height;
+		else if (heightpositive >0){
+			World.height = heightpositive;
 		}
 	}
 	
 	
 //--------------- ASSOCIATIONS WITH ENTITIES -------------------------
+	
+	
+	/**
+	 * This method checks whether all the entities in this world 
+	 * 		are in fact proper entities.
+	 * @return True if this world can have all of the entities that are within it
+	 * 		   as its entities. Also, every entity within this world should reference this world.
+	 * 		   | @see implementation
+	 */
+	@Raw
+	public boolean hasProperEntities(){
+		for (Entity entity : this.getAllEntities()) {
+			if (!canHaveAsEntity(entity))
+				return false;
+			if (entity.getWorld() != this)
+				return false;
+		}
+		return true;
+	}
 	
 	/**
 	 * This method adds a certain entity to this world.
@@ -455,6 +478,10 @@ public class World {
 				this.evolve(Dt-tC);
 			} else {
 				this.moveAllentities(Dt);
+				
+				 for (Ship ship : this.getAllShips()) {
+						ship.accelerate(Dt);
+				 }
 			}
 		
 	}

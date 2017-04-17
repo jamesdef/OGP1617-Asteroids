@@ -209,6 +209,10 @@ public class Ship extends Entity {
         
     //MASS - Total programming
     
+	public double getMass(){
+		return this.mass;
+	}
+	
     /** 
      * This method returns the sum of all the masses of the bullets on this ship.
      * 
@@ -674,8 +678,8 @@ public class Ship extends Entity {
 		if (bullet.getWorld()!=null){
 			bullet.getWorld().removeEntity(bullet);	
 		}
-		bullet.setShip(this);
 		this.bullets.add(bullet);
+		bullet.setShip(this);
 		bullet.setPosition(this.getxPosition(), this.getyPosition());
 		bullet.setVelocity(this.getxVelocity(), this.getyVelocity());
 	}
