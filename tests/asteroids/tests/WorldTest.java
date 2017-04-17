@@ -77,7 +77,7 @@ public class WorldTest {
 	
 	public World[] createWorlds() throws ModelException{
 		World world1 = facade.createWorld(30000, 30000);
-		World world2 = facade.createWorld(-40000, 30000);
+		World world2 = facade.createWorld(40000, 30000);
 		World[] Total ={world1, world2};
 		return Total;
 	}
@@ -90,7 +90,6 @@ public class WorldTest {
 		World world1 = createWorlds()[0];
 		World world2 = createWorlds()[1];
 		
-		assertEquals(30000,facade.getWorldSize(world1)[0],EPSILON);
 		assertEquals(30000,facade.getWorldSize(world1)[1],EPSILON);
 		assertEquals(40000,facade.getWorldSize(world2)[0],EPSILON);
 	}
@@ -113,7 +112,7 @@ public class WorldTest {
 		Bullet bullet = createBullets()[0];
 		facade.addBulletToWorld(world1, bullet);
 		assert (facade.getBulletWorld(bullet) == world1);
-		//assert (facade.getWorldBullets(world1).contains(bullet));
+		assert (facade.getWorldBullets(world1).contains(bullet));
 	}
 	
 	
@@ -169,10 +168,12 @@ public class WorldTest {
 			World world = createWorlds()[0];
 			facade.addShipToWorld(world, ship);
 			double time = facade.getTimeCollisionBoundary(ship);
+			System.out.println(time);
+			
 			assertEquals(2890,time,EPSILON);
 			double[] position = facade.getPositionCollisionBoundary(ship);
-			//	assertEquals(30000,position[0],EPSILON);
-			//assertEquals(1000,position[1],EPSILON);
+			assertEquals(30000,position[0],EPSILON);
+			assertEquals(1000,position[1],EPSILON);
 		}
 
 		public void collisionFromAbove() throws ModelException {

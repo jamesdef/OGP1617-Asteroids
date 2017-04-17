@@ -146,7 +146,7 @@ public class Tests_Part2 {
 		assertEquals(10000, position[1], EPSILON);
 		
 		try {
-			world.addEntity(ship9);
+			world.addAsShip(ship9);
 		} catch (IllegalArgumentException illegalArgumentException) {
 			// Ship9 will not be added into the world
 		}
