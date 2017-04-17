@@ -275,10 +275,9 @@ public class World {
 	 * 		   |(!canHaveAsEntity(entity) || entity.getWorld()!=null)
 	 */
 	public void addEntity(Entity entity){
-//		if (!canHaveAsEntity(entity) || entity.getWorld()!=null)
-//				throw new IllegalArgumentException();
+		if (!canHaveAsEntity(entity) || entity.getWorld()!=null)
+				throw new IllegalArgumentException();
 		// Add entity to the map: with its position as key.
-//		this.entities.put(entity.getPosition(), entity);
 		this.entities.put((StringMaker(entity.getPosition())), entity);
 		//This entity has the world as its world.
 		entity.setWorld(this);
@@ -348,13 +347,11 @@ public class World {
 	 * 			- The entity is within the worlds boundaries 
 	 * 			- In the case that the entity is a bullet, it must not have a ship ascribed to it. 
 	 * 					(otherwise the bullet should belong to the ship, not the world)
-//TODO			-If the given entity overlaps with another entity, it can not belong to this world.
 	 * 
 	 */
 	public Boolean canHaveAsEntity(Entity entity){
 		if (entity.isTerminated() || this.isTerminated() || entity == null  || entity.getWorld() != null 
 				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
-			System.out.println("appel");
 			return false;
 		}
 		for (Entity ship : this.getAllShips()) {
@@ -365,7 +362,8 @@ public class World {
 	    return true;
 	}
 	
-	/** Returns within constant time because we use a map that has positions (as strings) of entities as keys.
+	/** 
+	 * Returns within constant time because we use a map that has positions (as strings) of entities as keys.
 	 * Returns the entity (ship or bullet) or entities, if there is one, at the given Position.
 	 * Positions are made into strings so that the keys in the map are exactly equal to
 	 * the given position (which is also made into a string)	 
@@ -425,9 +423,6 @@ public class World {
 	 * 		  the centre of the object is bigger than 99% of the objectsradius.
 	 * 		  |@ see implementation
 	 * 
-	 *  Math.abs: In onze beschrijving van ship hebben we niet ge�ist
-	 *  dat de position enkel positieve coordinaten kent. Maar: een schip met negatieve 
-	 *  coordinaten ligt toch sowieso niet in de wereld?
 	 */
 	public Boolean withinWorldBoundaries(Entity object){
 		
@@ -460,15 +455,13 @@ public class World {
 	
 	
 	/**
-	 * 
+	 * Method which evolves the state of this world.
+	 * For example, the position of an entity flying through space
+	 * with a certain velocity will change as time passes.
+	 * Also, a ship could collide with an enemy bullet after which it seizes existence.
 	 * @param Dt
-	 * @throws IllegalCollisionException
-	 * @throws IllegalDurationException 
-	 * @throws IllegalPositionException 
+	 * 	      Duration
 	 */
-	
-	
-
 	public void evolve(double Dt) throws IllegalCollisionException, IllegalPositionException, IllegalDurationException{
 		System.out.println("evolve------");
 		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
@@ -626,6 +619,7 @@ public class World {
 	 * 		   It does this by taking the smallest time of the 2 possible kinds of collisions.
 	 * 		   | @see implementation
 	 * @throws IllegalCollisionException
+	 * 		   The collision must be legal.
 	 */
 	public double getTimeToFirstCollision() throws IllegalCollisionException{
 		return Math.min(this.getTimeToNextEntityBoundaryCollision(),this.getTimeToNextEntityEntityCollision());
@@ -659,20 +653,18 @@ public class World {
 	 * This method handles a collision between an entity and a boundary.
 	 * @param entity
 	 * 		  The entity to handle.
-	 * @effect handles a collision between an entity and a boundary.
+	 * @effect Handles a collision between an entity and a boundary.
+	 * 		   If a bullet collides with a boundary, the amount of bounces it can still make
+	 * 		   is decremented.
 	 * 		   | @see implementation
 	 */
 	public void handleEntityBoundaryCollision(Entity entity){
 		
 		if(entity instanceof Bullet){
 			Bullet bullet = (Bullet) entity;
-			int nbBouncesLeft = bullet.getBouncesLeft();
-			
-			if(nbBouncesLeft == 0){
-				entity.terminate();
-			} else {
-				bullet.decrementBouncesLeft();
-			}
+			//The possible termination of this bullet is handled
+			// within decrementBouncesLeft()
+			bullet.decrementBouncesLeft();
 		}
 		
 		boolean horizontally = (entity.getxPosition()< 1.01 * entity.getRadius()) || (entity.getxPosition() > (entity.getWorld().getWidth() - 1.01 * entity.getRadius()));
@@ -697,17 +689,24 @@ public class World {
 	 * 		   the collision is handled differently.
 	 * 		   | @see implementation
 	 */
-	public void handleEntityEntityCollision(Entity entityA, Entity entityB){
+	public void handleEntityEntityCollision(Entity entityA, Entity entityB) throws IllegalBulletException, IllegalPositionException{
 
 	if(entityA instanceof Ship){
-		if(entityB instanceof Ship) handleShipShipCollision((Ship) entityA, (Ship) entityB);
-		if(entityB instanceof Bullet) handleBulletShipCollision((Bullet) entityB, (Ship) entityA);
+		if(entityB instanceof Ship) {
+			handleShipShipCollision((Ship) entityA, (Ship) entityB);
+		}
+		if(entityB instanceof Bullet){
+			handleBulletShipCollision((Bullet) entityB, (Ship) entityA);
+		}
 	}
 	else{
-		if(entityB instanceof Ship) handleBulletShipCollision((Bullet) entityA, (Ship) entityB);
-		if(entityB instanceof Bullet) handleBulletBulletCollision((Bullet) entityB, (Bullet) entityA);
+		if(entityB instanceof Ship){
+			handleBulletShipCollision((Bullet) entityA, (Ship) entityB);
+		}
+		if(entityB instanceof Bullet) {
+			handleBulletBulletCollision((Bullet) entityB, (Bullet) entityA);
+		}
 	}
-	
 	}
 	
 	
@@ -784,12 +783,21 @@ public class World {
 	 * 		  The bullet in this collision
 	 * @param ship
 	 * 		  The ship in this collision.
-	 * @effect Both entities are terminated.
+	 * @effect If the bullet has the ship as its source;
+	 * 		   The bullet is loaded once again upon the ship.
+	 * 	       Otherwise; both entities are terminated.
+	 * @post   If the bullet has the ship as its source;
+	 * 		   The bullet is loaded once again upon the ship.
+	 * 		   |if(bullet.getSource() == ship){
+	 *		   |		then ship.loadBullet(bullet);
+	 * @post   else, both entities are terminated
+	 * 		   |else
+	 * 		   |   bullet.isTerminated() && ship.isTerminated()
 	 * 
 	 */
-	public void handleBulletShipCollision(Bullet bullet, Ship ship){
-		if(bullet.getShip() == ship){
-			//ship.ge
+	public void handleBulletShipCollision(Bullet bullet, Ship ship) throws IllegalBulletException, IllegalPositionException{
+		if(bullet.getSource() == ship){
+			ship.loadBullet(bullet);
 		} else {
 			bullet.terminate();
 			ship.terminate();
@@ -804,7 +812,7 @@ public class World {
 	 * @param bulletB
 	 * 		  One bullet in this collision
 	 * @effect Both bullets are terminated.
-	 * 
+	 * 		   | bulletA.isTerminated() && bulletB.isTerminated()
 	 */
 	public void handleBulletBulletCollision(Bullet bulletA, Bullet bulletB){
 		bulletA.terminate();

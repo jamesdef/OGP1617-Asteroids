@@ -795,13 +795,11 @@ public class Ship extends Entity {
 			
 			
 			this.removeBullet(bullet);
-			
-
-
+			bullet.setPosition(bulletXPos, bulletYPos);
 			
 			
 			//bullet is now set to where it will start its movement, after some checks.
-			bullet.setPosition(bulletXPos, bulletYPos);
+			
 			
 			
 			// Check whether the bullet is within the worlds' boundaries, if not: terminate it.
@@ -825,9 +823,9 @@ public class Ship extends Entity {
 			}
 			
 			bullet.setSource(this);
-
-			//1
 			this.getWorld().addEntity(bullet);
+			//1
+			
 			
 
 

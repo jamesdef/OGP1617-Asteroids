@@ -326,8 +326,6 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 
 	@Override
 	public double[] getPositionCollisionBoundary(Object object) throws ModelException {
-		// TODO Auto-generated method st
-		
 		return ((Entity) object).getBoundaryCollisionPosition();
 
 	}
@@ -361,30 +359,24 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 
 	@Override
 	public double[] getPositionNextCollision(World world) throws ModelException {
-		// TODO Auto-generated method stub
 		try {
 			return world.getFirstCollisionPosition();
 		} catch (IllegalCollisionException e) {
-			// TODO Auto-generated catch block
 			throw new ModelException("Illegal Collision");
 		}
 	}
 
 	@Override
-	public void evolve(World world, double dt, CollisionListener collisionListener) throws ModelException {
-		// TODO Auto-generated method stub	
+	public void evolve(World world, double dt, CollisionListener collisionListener) throws ModelException {	
 		try {
 			world.evolve(dt);
 		} catch (IllegalCollisionException e) {
-			// TODO Auto-generated catch block
 			throw new ModelException("Illegal Collision");
 
 		} catch (IllegalPositionException e) {
-			// TODO Auto-generated catch block
 			throw new ModelException("Illegal Position");
 
 		} catch (IllegalDurationException e) {
-			// TODO Auto-generated catch block
 			throw new ModelException("Illegal Duration");
 
 		}

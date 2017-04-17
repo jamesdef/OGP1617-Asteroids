@@ -226,12 +226,23 @@ public class ILLEGALETESTS {
 		Bullet bullet12 = createBullets()[11];
 		facade.loadBulletOnShip(ship2, bullet12);
 		ship2.fireBullet();
+		System.out.println("-------- amount of entities-----------");
+		System.out.println(world.getEntities().size());
 		System.out.println(world.StringMaker(ship1.getPosition()));
 		System.out.println(world.StringMaker(ship2.getPosition()));
 		System.out.println(world.getTimeToFirstCollision());
 		System.out.println(world.getAllBullets());
 		
+		System.out.println("-------- 1 BULLETPLAATS VERANDERD-----------");
+		System.out.println(world.StringMaker(bullet12.getPosition()));
+		
+		System.out.println(world.getEntities().containsValue(bullet12));
+		System.out.println("-------------------");
+		System.out.println(bullet12.getWorld().toString());
 		facade.evolve(world, 2, null);
+		
+		System.out.println("-------- 2 BULLETPLAATS VERANDERD-----------");
+		System.out.println(world.StringMaker(bullet12.getPosition()));
 		
 		System.out.print("AfterEvolve");
 		System.out.println(world.StringMaker(ship1.getPosition()));
