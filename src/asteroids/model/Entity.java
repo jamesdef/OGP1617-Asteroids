@@ -620,6 +620,52 @@ public abstract class Entity {
 	}
 	
 	
+	
+	public double[] getBoundaryCollisionPosition(){
+		if (this.getWorld() == null){
+			throw new IllegalStateException();
+			}
+		
+		double T = this.getTimeToBoundaryCollision();
+
+		if (T == Double.POSITIVE_INFINITY){
+			return null;
+		}
+
+		//Where are the entities after time T?
+
+		double[] entityPosition = { this.getxPosition() + this.getxVelocity() * T,
+				this.getyPosition() + this.getyVelocity() * T };
+		
+		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(),
+				this.getWorld().getWidth());
+		double yTime = getTimeToBoundaryAxisCollsion(this.getyVelocity(), this.getyPosition(),
+				this.getWorld().getHeight());
+		
+
+		if(T == xTime){
+			if(this.getxVelocity() >0){
+				entityPosition[0]+= this.getRadius();
+			} else {
+				entityPosition[0]-= this.getRadius();
+
+			}
+			
+		} else {
+			if(this.getyVelocity() >0){
+				entityPosition[1]+= this.getRadius();
+			} else {
+				entityPosition[1]-= this.getRadius();
+
+			}
+			
+		}
+		
+		return entityPosition;
+		
+	}
+	
+	
 	/**
 	 * This method calculaties the time until this entity collides with a boundary.
 	 * This either in the x- or y- direction. 

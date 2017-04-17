@@ -77,7 +77,7 @@ public class WorldTest {
 	
 	public World[] createWorlds() throws ModelException{
 		World world1 = facade.createWorld(30000, 30000);
-		World world2 = facade.createWorld(40000, 30000);
+		World world2 = facade.createWorld(30000, 30000);
 		World[] Total ={world1, world2};
 		return Total;
 	}
@@ -91,7 +91,6 @@ public class WorldTest {
 		World world2 = createWorlds()[1];
 		
 		assertEquals(30000,facade.getWorldSize(world1)[1],EPSILON);
-		assertEquals(40000,facade.getWorldSize(world2)[0],EPSILON);
 	}
 	
 	
@@ -120,7 +119,7 @@ public class WorldTest {
 	
 	@Test 
 	public void terminateWorld() throws ModelException{
-		World world = createWorlds()[0];
+		World world = createWorlds()[1];
 		Ship ship = createShips()[6];
 		facade.addShipToWorld(world, ship);
 		Bullet bullet = createBullets()[10];
@@ -167,9 +166,7 @@ public class WorldTest {
 			Ship ship = createShips()[5];
 			World world = createWorlds()[0];
 			facade.addShipToWorld(world, ship);
-			double time = facade.getTimeCollisionBoundary(ship);
-			System.out.println(time);
-			
+			double time = facade.getTimeCollisionBoundary(ship);			
 			assertEquals(2890,time,EPSILON);
 			double[] position = facade.getPositionCollisionBoundary(ship);
 			assertEquals(30000,position[0],EPSILON);

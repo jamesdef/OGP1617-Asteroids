@@ -428,12 +428,13 @@ public class World {
 	
 // ---------------------- EVOLVING AND COLLISION ----------------------
 	
-	public void moveAllentities( double Dt){
+	public void moveAllentities( double Dt) throws IllegalPositionException, IllegalDurationException{
 
 		for(Entity entity: this.getAllEntities()){
-			//entity.move(Dt);
+			entity.move(Dt);
+			
 			if(entity instanceof Ship){
-				//entity.updateVelocity(dt);
+				((Ship) entity).accelerate(Dt);
 			}			
 		}
 	}
@@ -443,9 +444,13 @@ public class World {
 	 * 
 	 * @param Dt
 	 * @throws IllegalCollisionException
+	 * @throws IllegalDurationException 
+	 * @throws IllegalPositionException 
 	 */
-	public void evolve(double Dt) throws IllegalCollisionException{
-		
+	
+	
+
+	public void evolve(double Dt) throws IllegalCollisionException, IllegalPositionException, IllegalDurationException{
 		
 		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
 		double tNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
@@ -457,7 +462,6 @@ public class World {
 		HashSet<Entity> nextEntityEntityPositionEntities = this.getNextEntityEntityCollisionEntities();
 		
 		double tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
-		
 
 		if (tC <= Dt){
 			this.moveAllentities(tC);
@@ -478,10 +482,6 @@ public class World {
 				this.evolve(Dt-tC);
 			} else {
 				this.moveAllentities(Dt);
-				
-				 for (Ship ship : this.getAllShips()) {
-						ship.accelerate(Dt);
-				 }
 			}
 		
 	}
