@@ -206,6 +206,22 @@ public class Bullet extends Entity {
     public Ship getSource() {
         return this.source;
     }
+    
+
+ // ----------------MASS ----------------------
+ 	
+ 	/**
+ 	 * This method sets the mass of this bullet depending on it's size (=defined by radius)
+ 	 * 
+ 	 * @param radius
+ 	 * 		  The radius of this ship.
+ 	 * @post The new mass of this ship now equals the value calculated using the formula with the given radius.
+ 	 * 		 new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+ 	 */
+ 	private void setBulletMass(double radius){
+ 		this.mass = default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+ 	}
+     
 
     /**
 	 * Set the source of this bullet to a given ship.
@@ -221,8 +237,8 @@ public class Bullet extends Entity {
 	 * 		    |(this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
 	 */
 	public void setSource(Ship source) throws IllegalArgumentException {
-		if (this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
-			throw new IllegalArgumentException();
+//		if (this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
+//			throw new IllegalArgumentException();
 		if (source==null)
 			this.source=null;
 		else
@@ -379,7 +395,7 @@ public class Bullet extends Entity {
 	/**
 	 * Variable registering the default density of a bullet.
 	 */
-	protected final static double default_Density = 7.8*(Math.pow(10, 12));
+	protected final static double default_Density = 7.8*(Math.pow(10.0, 12.0));
 	
 	/**
 	 * Variable registering the density of this bullet.
@@ -396,7 +412,7 @@ public class Bullet extends Entity {
 	/**
 	 * Variable registering the Default_Mass of a bullet
 	 */
-	protected final static double default_Mass = default_Density*(4/3)*Math.PI*(Math.pow(min_Radius, 3));
+	protected final static double default_Mass = default_Density*(4.0/3.0)*Math.PI*(Math.pow(min_Radius, 3.0));
 	
 	
 }

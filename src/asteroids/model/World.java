@@ -263,6 +263,9 @@ public class World {
 	 * 		   |(!canHaveAsEntity(entity) || entity.getWorld()!=null)
 	 */
 	public void addEntity(Entity entity){
+		System.out.println("--------------------");
+		System.out.println(canHaveAsEntity(entity));
+		System.out.println(entity.getWorld());
 		if (!canHaveAsEntity(entity) || entity.getWorld()!=null)
 				throw new IllegalArgumentException();
 
@@ -339,12 +342,15 @@ public class World {
 	 * 
 	 */
 	public Boolean canHaveAsEntity(Entity entity){
+
 		if (entity.isTerminated() || this.isTerminated() || entity == null  || entity.getWorld() != null 
 				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
+			System.out.println("hierbinnenn");
 			return false;
 		}
 		for (Entity ship : this.getAllShips()) {
 			if (entity.significantOverlap(ship)){
+				System.out.println("overlap SHIPZ");
 				return false;
 			}
 	    }
@@ -393,7 +399,7 @@ public class World {
 	 * 		  the centre of the object is bigger than 99% of the objectsradius.
 	 * 		  |@ see implementation
 	 * 
-	 *  Math.abs: In onze beschrijving van ship hebben we niet ge�ist
+	 *  Math.abs: In onze beschrijving van ship hebben we niet geï¿½ist
 	 *  dat de position enkel positieve coordinaten kent. Maar: een schip met negatieve 
 	 *  coordinaten ligt toch sowieso niet in de wereld?
 	 */
@@ -426,7 +432,7 @@ public class World {
 	 * 		   A ship can be accelerated if its thruster is on.
 	 * 		  | @see implementation
 	 */
-	public void moveAllentities( double Dt) throws IllegalPositionException, IllegalDurationException{
+	public void moveAllEntities( double Dt) throws IllegalPositionException, IllegalDurationException{
 
 		for(Entity entity: this.getAllEntities()){
 			entity.move(Dt);
@@ -453,6 +459,8 @@ public class World {
 	 */
 	public void evolve(double Dt) throws IllegalCollisionException, IllegalPositionException, IllegalDurationException{
 		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
+//		System.out.println("begin evolve");
+//		System.out.println(Dt);
 		double tNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
 		Entity nextEntityBoundaryCollisionEntity = this.getNextEntityBoundaryCollisionEntity();
 		
@@ -462,13 +470,13 @@ public class World {
 		HashSet<Entity> nextEntityEntityPositionEntities = this.getNextEntityEntityCollisionEntities();
 		
 		double tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
-
+//		System.out.println("-------------------tC-----");
+//		System.out.println(tC);
 		if (tC <= Dt){
 			
-			this.moveAllentities(tC);
+			this.moveAllEntities(tC);
 
 			if (tNextEntityBoundaryCollision<=tNextEntityEntityPosition) {
-				
 				//handle entity boundary collision
 				this.handleEntityBoundaryCollision(nextEntityBoundaryCollisionEntity);
 			}
@@ -477,15 +485,18 @@ public class World {
 				List<Entity> ArrayofEntities = new ArrayList<>(nextEntityEntityPositionEntities);
 				Entity entityA = ArrayofEntities.get(0);
 				Entity entityB = ArrayofEntities.get(1);
-				
+//				System.out.println("entityentitycoll");
+
 
 				this.handleEntityEntityCollision(entityA, entityB);
-			}
+			}	
+//			System.out.println("evolve");
 				this.evolve(Dt-tC);
-			} else {
-				this.moveAllentities(Dt);
+			} 
+		else {
+				this.moveAllEntities(Dt);
 			}
-		
+//		System.out.println("einde evolve");
 	}
 	
 	
@@ -735,13 +746,23 @@ public class World {
 		double shipBRadius = shipB.getRadius();
 		double shipBmass = shipB.getMass();
 		
+//		System.out.println("shipA mass");
+//		System.out.println(shipAmass);		
+//		System.out.println("shipB mass");
+//		System.out.println(shipBmass);
 		// Start mathematical computations
-		
-		double deltaPosX = shipAPositionX - shipBPositionX;
-		double deltaPosY = shipAPositionY - shipBPositionY;
-		
-		double deltaVelX = shipAVelocityX - shipBVelocityX;
-		double deltaVelY = shipAVelocityY - shipBVelocityY;
+//		System.out.println("shipA new pos");
+//		System.out.println(shipAPositionX);
+//		System.out.println(shipAPositionY);
+//		System.out.println("shipB new pos");
+//		System.out.println(shipBPositionX);
+//		System.out.println(shipBPositionY);
+		double deltaPosX = shipBPositionX - shipAPositionX;
+		double deltaPosY = shipBPositionY - shipAPositionY;
+//		System.out.println("DELTA POS X");
+//		System.out.println(deltaPosX);
+		double deltaVelX = shipBVelocityX - shipAVelocityX;
+		double deltaVelY = shipBVelocityY - shipAVelocityY;
 		
 		double delta = deltaPosX * deltaVelX + deltaPosY * deltaVelY;
 
@@ -750,18 +771,48 @@ public class World {
 		double jValue = 
 				(2 * shipAmass * shipBmass * delta) / 
 				(sumRadius * (shipAmass + shipBmass));
-		
+//		System.out.println("J");
+//		System.out.println(jValue);
 		double Jx = (jValue * deltaPosX) / sumRadius;
 		double Jy = (jValue * deltaPosY) / sumRadius;
 		
-		double shipAnewXVel = shipAVelocityX + Jx / shipAmass;
+		double shipAnewXVel = shipAVelocityX + (Jx / shipAmass);
+//		System.out.println("--------shipAnewXvel--------");
+//		System.out.println(shipAVelocityX);
+//		System.out.println(Jx);
+//		System.out.println(shipAmass);
+//		System.out.println(shipAnewXVel);
 		double shipAnewYVel = shipAVelocityY + Jy / shipAmass;
 		
 		double shipBnewXVel = shipBVelocityX - Jx / shipBmass;
 		double shipBnewYVel = shipBVelocityY - Jy / shipBmass;
 		
+//		System.out.println("------------oude info-----------");
+//		System.out.println("ship1");
+//		System.out.println(shipA.getxVelocity());
+//		System.out.println(shipA.getyVelocity());
+//		System.out.println(shipA.getxPosition());
+//		System.out.println(shipA.getyPosition());
+//		System.out.println("ship2");
+//		System.out.println(shipB.getxVelocity());
+//		System.out.println(shipB.getyVelocity());
+//		System.out.println(shipB.getxPosition());
+//		System.out.println(shipB.getyPosition());
+
 		shipA.setVelocity(shipAnewXVel, shipAnewYVel);
 		shipB.setVelocity(shipBnewXVel, shipBnewYVel);
+		
+//		System.out.println("------------nieuwe info-----------");
+//		System.out.println("ship1");
+//		System.out.println(shipA.getxVelocity());
+//		System.out.println(shipA.getyVelocity());
+//		System.out.println(shipA.getxPosition());
+//		System.out.println(shipA.getyPosition());
+//		System.out.println("ship2");
+//		System.out.println(shipB.getxVelocity());
+//		System.out.println(shipB.getyVelocity());
+//		System.out.println(shipB.getxPosition());
+//		System.out.println(shipB.getyPosition());
 	}
 	
 	

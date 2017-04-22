@@ -127,9 +127,19 @@ public class Ship extends Entity {
 	 * 
      */
     public void terminate(){
-    	for (Bullet bullet : bullets){
+    	System.out.println("---------------TERMINATE SHIP----------------");
+    	System.out.println(this.getNbOfBullets());
+    	System.out.println(this.bullets);
+    	if (this.getNbOfBullets() != 0) {
+    		Set<Bullet> toremovebullets = new HashSet<>();
+    		toremovebullets.addAll(bullets);
+    		System.out.println("-------------binnen if voorwaarde----------");
+    	for (Bullet bullet : toremovebullets){
+    		System.out.println("--------------ittereren voor remove))))))))))))))");
     		removeBullet(bullet);
-    	}
+    		System.out.println("na removee))))))))))))))))");
+    	}}
+    	System.out.println("uit for loop L");
     	//We can now safely terminate the empty ship as an entity.
     	super.terminate();
     }
@@ -150,7 +160,7 @@ public class Ship extends Entity {
     @Raw 
 	public void setMass(double mass){
 		if(!isValidMass(mass)){
-	        mass = 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getDensity();
+	        mass = 4.0/3.0 * Math.PI * Math.pow(this.getRadius(), 3.0) * this.getDensity();
 		}
 	    this.mass = mass;
 	}
@@ -165,7 +175,7 @@ public class Ship extends Entity {
 	 */
 	@Raw
 	public boolean isValidMass(double mass){
-        return (mass >= 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getDensity());
+        return (mass >= 4.0/3.0 * Math.PI * Math.pow(this.getRadius(), 3.0) * this.getDensity());
 	}
 	
 	/**
@@ -844,7 +854,7 @@ public class Ship extends Entity {
 	 */
 	@Basic
 	public double getInitialBulletSpeed(){
-		return 250;
+		return 250.0;
 	}
 	
 	/**
@@ -904,12 +914,12 @@ public class Ship extends Entity {
      * Variable registering the minimum allowed density.
      */
     
-    private static final double min_Density = 1.42*(Math.pow(10, 12));
+    private static final double min_Density = 1.42*(Math.pow(10.0, 12.0));
     
     /**
      * Variable registering the Minimum allowed mass.
      */
-    private final double min_Mass = min_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+    private final double min_Mass = min_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3.0));
     
     /**
      * Variable registering the mass of this ship.

@@ -521,6 +521,7 @@ public abstract class Entity {
 	 * 
 	 */
 	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
+//		System.out.println(duration);
 		if (!isValidDuration(duration)){
 			throw new IllegalDurationException(duration);
 		}
@@ -586,8 +587,14 @@ public abstract class Entity {
 	 * 		  
 	 */
 	public Boolean significantOverlap (Entity object2){
-		return (this.getDistanceBetween(object2) < -0.1);
-	}
+			if (this.equals(object2))
+				return true;
+
+			double distance = this.getDistanceBetween(object2);
+
+			return (distance < 0);
+		}
+
 	
 	
 	
@@ -841,7 +848,7 @@ public abstract class Entity {
 	/**
 	 * Variable registering the minimum allowed Radius.
 	 */
-	private static double min_Radius = 10;
+	private static double min_Radius = 10.0;
 
 	/**
 	 * Variable registering the radius of this Entity.

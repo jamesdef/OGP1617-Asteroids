@@ -110,12 +110,12 @@ public class Part2generalTests {
 		
 		facade.addShipToWorld(world, shipA);
 		facade.addShipToWorld(world, shipB);
-		facade.addShipToWorld(world, shipD);
+//		facade.addShipToWorld(world, shipD);
 
 		
 
 		assertFalse(facade.overlap(shipA,shipB));
-		assertTrue(facade.overlap(shipB,shipD));
+//		assertTrue(facade.overlap(shipB,shipD));
 
 	}
 	

@@ -173,7 +173,7 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 		} catch (IllegalPositionException e) {
 			throw new ModelException("Illegal Position");
 		} catch (IllegalRadiusException e) {
-			throw new ModelException("Illegal Radius");		}
+			throw new ModelException("Illegal Radius");	}
 	}
 
 	@Override
