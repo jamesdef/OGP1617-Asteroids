@@ -266,8 +266,22 @@ public class World {
 		System.out.println("--------------------");
 		System.out.println(canHaveAsEntity(entity));
 		System.out.println(entity.getWorld());
-		if (!canHaveAsEntity(entity) || entity.getWorld()!=null)
+		if (!canHaveAsEntity(entity) || entity.getWorld()!=null){
+			//TODO Deze exception zorgt blijkbaar voor problemen bij runnn programma
+				System.out.println("Aan bek liereken trol");
 				throw new IllegalArgumentException();
+		}
+		
+		// TODO DOCUMENTATIE AANPASSEN
+			// als een entiteit overlapt met een andere bij toevoegen
+			// dan wordt ze meteen verwijderd. De andere niet
+		for (Entity Object : this.getAllEntities()) {
+			if (entity.significantOverlap(Object)){
+				System.out.println("overlap SHIPZ");
+			    entity.terminate();
+				return;
+			}
+	    }
 
 		this.entities.put((StringMaker(entity.getPosition())), entity);
 		//This entity has the world as its world.
@@ -341,19 +355,30 @@ public class World {
 	 * 					(otherwise the bullet should belong to the ship, not the world)
 	 * 
 	 */
+	// TODO blijkbaar geeft deze functie soms 'onverwacht false' bij het creeren van een wereld.
 	public Boolean canHaveAsEntity(Entity entity){
-
-		if (entity.isTerminated() || this.isTerminated() || entity == null  || entity.getWorld() != null 
+		System.out.println("We gaan ne keer checken wat er veroorzaakt problemen in canhaveasentity");
+//		System.out.println(entity.isTerminated());
+//		System.out.println(this.isTerminated);
+//		System.out.println(entity == null);
+//		System.out.println(entity.getWorld() != null && this != entity.getWorld());
+		// TODO Het probleem zit hem in worldBoundaries, deze geeft soms waar
+		System.out.println(!this.withinWorldBoundaries(entity));
+//		System.out.println(entity instanceof Bullet && ((Bullet)entity).getShip()!= null);
+		System.out.println("Funk so brada check it out now");
+		
+		if (entity.isTerminated() || this.isTerminated() || entity == null  || (entity.getWorld() != null && this != entity.getWorld())
 				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
 			System.out.println("hierbinnenn");
 			return false;
 		}
-		for (Entity ship : this.getAllShips()) {
-			if (entity.significantOverlap(ship)){
-				System.out.println("overlap SHIPZ");
-				return false;
-			}
-	    }
+		// TODO Documentatie aanpassen Sowieso was dize code fout
+//		for (Entity ship : this.getAllShips()) {
+//			if (entity.significantOverlap(ship)){
+//				System.out.println("overlap SHIPZ");
+//				return false;
+//			}
+//	    }
 	    return true;
 	}
 	
@@ -404,19 +429,49 @@ public class World {
 	 *  coordinaten ligt toch sowieso niet in de wereld?
 	 */
 	public Boolean withinWorldBoundaries(Entity object){
-		
+		System.out.println("-------------------WITHIN BOUNDARIE?");
+	
 		double x = object.getxPosition();
 		double y = object.getyPosition();
 		double width = this.getWidth();
 		double height = this.getHeight();
 		double radius = object.getRadius();
 		
-		return (
-				((width - x) >= 0.99*radius) &&
+		System.out.println("xposition:" + x);
+		System.out.println("yposition:" +y);
+		System.out.println("width:" + width);
+		System.out.println("height:" + height);
+		System.out.println("radius:" + radius);
+		
+		System.out.println(((width - x) >= 0.99*radius) &&
 				(x >= 0.99*radius) &&
 				((height - y) >= 0.99*radius) &&
 				(y >= 0.99*radius)
 				);
+		
+		System.out.println("We gaan em vinden, dieje patj");
+		
+		System.out.println((width + radius - x) >= 0.99*radius);
+		System.out.println((x >= 0.99*radius));
+		System.out.println((height + radius - y) >= 0.99*radius);
+		System.out.println((y >= 0.99*radius));
+		
+		
+		// TODO beetje inefficiente implementatie, maar lijkt mij wel correcter te zijn,
+		// helft van schip mag nu buiten wereld zijn
+		return (
+				((width + radius - x) >= 0.01) &&
+				(x >= 0.99*radius) &&
+				((height +radius - y) >= 0.99*radius) &&
+				(y >= 0.01)
+				);
+		
+//		return (
+//				((width - x) >= 0.99*radius) &&
+//				(x >= 0.99*radius) &&
+//				((height - y) >= 0.99*radius) &&
+//				(y >= 0.99*radius)
+//				);
 	}
 	
 // ---------------------- EVOLVING AND COLLISION ----------------------
@@ -461,10 +516,13 @@ public class World {
 		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
 //		System.out.println("begin evolve");
 //		System.out.println(Dt);
+		
+		if (! isValidDuration(Dt))
+			return;
+			
 		double tNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
 		Entity nextEntityBoundaryCollisionEntity = this.getNextEntityBoundaryCollisionEntity();
-		
-		
+
 		//NEXT ENTITY-ENTITY COLLISSION INFO
 		double tNextEntityEntityPosition = this.getTimeToNextEntityEntityCollision();
 		HashSet<Entity> nextEntityEntityPositionEntities = this.getNextEntityEntityCollisionEntities();
@@ -472,33 +530,78 @@ public class World {
 		double tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
 //		System.out.println("-------------------tC-----");
 //		System.out.println(tC);
+		double counter = 0;
 		if (tC <= Dt){
-			
-			this.moveAllEntities(tC);
+			System.out.print("tC = ");
+			System.out.println(tC);
+			System.out.print("Dt = ");
+			System.out.println(Dt);
+			while ( Dt != 0){
+				System.out.println(Dt);
+				System.out.println("Dt evolve");
+				if (! isValidDuration(tC))
+					System.out.println("not valid tC");
+				else
+					this.moveAllEntities(tC);
+				
+				if (tNextEntityBoundaryCollision<=tNextEntityEntityPosition) {
+					//handle entity boundary collision
+					this.handleEntityBoundaryCollision(nextEntityBoundaryCollisionEntity);
+				}
+				else {
+					//handle entity entity collision
+					List<Entity> ArrayofEntities = new ArrayList<>(nextEntityEntityPositionEntities);
+					Entity entityA = ArrayofEntities.get(0);
+					Entity entityB = ArrayofEntities.get(1);
+					System.out.println("entityentitycoll");
+	
+	
+					this.handleEntityEntityCollision(entityA, entityB);
+				}
+				if (isValidDuration(tC))
+					Dt = Dt - tC;
+				
+				tNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
+				nextEntityBoundaryCollisionEntity = this.getNextEntityBoundaryCollisionEntity();
 
-			if (tNextEntityBoundaryCollision<=tNextEntityEntityPosition) {
-				//handle entity boundary collision
-				this.handleEntityBoundaryCollision(nextEntityBoundaryCollisionEntity);
+				//NEXT ENTITY-ENTITY COLLISSION INFO
+				tNextEntityEntityPosition = this.getTimeToNextEntityEntityCollision();
+				nextEntityEntityPositionEntities = this.getNextEntityEntityCollisionEntities();
+				
+				tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
+				System.out.println("tC new");
+				System.out.println(tC);
+				System.out.println("Dt new");
+				System.out.println(Dt);
+				if (tC <= Dt){
+					counter +=1;
+				} else {
+					this.moveAllEntities(Dt);
+					Dt = 0;
+				}
 			}
-			else {
-				//handle entity entity collision
-				List<Entity> ArrayofEntities = new ArrayList<>(nextEntityEntityPositionEntities);
-				Entity entityA = ArrayofEntities.get(0);
-				Entity entityB = ArrayofEntities.get(1);
-//				System.out.println("entityentitycoll");
-
-
-				this.handleEntityEntityCollision(entityA, entityB);
-			}	
 //			System.out.println("evolve");
-				this.evolve(Dt-tC);
+//				this.evolve(Dt-tC);
 			} 
 		else {
 				this.moveAllEntities(Dt);
 			}
-//		System.out.println("einde evolve");
+		System.out.println(Dt);
+		System.out.println(counter);
+		System.out.println("einde evolve");
 	}
-	
+	/**
+	 *  Check whether the given duration is legal.
+	 * 
+	 * @param duration
+	 * 		  The duration of the specific movement of the entity.
+	 * @return true if the duration is a non-negative number and finite.
+	 * 		   | return (duration >= 0 && !Double.isNaN(duration) && (duration != Double.POSITIVE_INFINITY))
+	 */			
+	@Raw
+	public boolean isValidDuration(double duration){
+		return ((duration >= 0) && (!Double.isNaN(duration)) && (duration != Double.POSITIVE_INFINITY));
+	}
 	
 	/**
 	 * This method returns the time to the next collision between an entity and a boundary.
@@ -675,11 +778,13 @@ public class World {
 	 * @param bullet
 	 * 		  The bullet to handle.
 	 * @effect handles a collision between a bullet and a boundary.
+	 * 		   If a bullet bounces while it only has 1 one bounce left,
+	 * 		   it is terminated.
 	 * 		   | @see implementation
 	 */
 	public void handleBulletBoundaryCollision(Bullet bullet){
 		int nbBouncesLeft = bullet.getBouncesLeft();
-		if(nbBouncesLeft == 0){
+		if(nbBouncesLeft == 1){
 			bullet.terminate();
 		} else {
 			bullet.decrementBouncesLeft(); 

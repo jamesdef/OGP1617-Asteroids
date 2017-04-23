@@ -152,7 +152,7 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 
 	@Override
 	public boolean isShipThrusterActive(Ship ship) throws ModelException {
-		return ship.getthrustState();
+		return ship.getThrustState();
 	}
 
 	@Override

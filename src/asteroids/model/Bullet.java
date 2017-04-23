@@ -42,6 +42,8 @@ public class Bullet extends Entity {
 
 	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius) throws IllegalPositionException, IllegalRadiusException{
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
+		setBulletMass(getRadius());
+		
 	}
 	
 	

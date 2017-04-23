@@ -415,7 +415,7 @@ public class Ship extends Entity {
 	 * 		   True when it is enabled, false otherwise.
 	 */
 	@Basic
-	public Boolean getthrustState(){
+	public Boolean getThrustState(){
 		return this.thrusterActivity;
 	}
 	
@@ -439,11 +439,11 @@ public class Ship extends Entity {
 	 * It is calculated using Newton's second law of motion.
 	 * 
 	 * @return The acceleration of this ship.
-	 * 		   |return (force/getTotalMass())
+	 * 		   |result == (force/getTotalMass())
 	 */
 	@Basic
 	public double getPossibleAcceleration(){
-		return getThrustForce()/getTotalMass();
+		return this.getThrustForce()/this.getTotalMass();
 	}
 	
 	/**
@@ -453,7 +453,7 @@ public class Ship extends Entity {
 	 * 		   |@see implementation
 	 */
 	public double getAcceleration(){
-		if (this.getthrustState()==true){
+		if (this.getThrustState()==true){
 			return this.getPossibleAcceleration();
 		}
 		else{
@@ -505,7 +505,7 @@ public class Ship extends Entity {
 	 * 		  |this.setVelocity(NewxVelocity, NewyVelocity);
 	 */
 	public void accelerate(double duration){
-		if(getthrustState() == true){
+		if(getThrustState() == true){
 			//If the acceleration is negative, then we leave the velocity untouched.
 			double a = Math.max(0, getPossibleAcceleration());
 			double NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()))*duration;

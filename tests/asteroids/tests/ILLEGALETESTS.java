@@ -238,6 +238,9 @@ public class ILLEGALETESTS {
 		facade.evolve(world, 4, null);
 		assertEquals(0,facade.getNbBulletsOnShip(ship1),EPSILON);
 		facade.evolve(world, 96, null);
+		System.out.println("cyka blyat");
+		System.out.println(facade.getBulletVelocity(bullet2)[0]);
+		// geeft positieve velocity, illegaal ventje denk dat positief moet zijn
 		assertEquals(-250,facade.getBulletVelocity(bullet2)[0],EPSILON);
 		facade.evolve(world, 70, null);
 		assertFalse(facade.isTerminatedShip(ship1));
@@ -254,6 +257,7 @@ public class ILLEGALETESTS {
 		facade.addShipToWorld(world, ship2);
 		facade.addShipToWorld(world, ship1);
 		facade.loadBulletOnShip(ship2, bullet);
+		
 		assertEquals(1,facade.getNbBulletsOnShip(ship2),EPSILON);
 		assert(facade.getBulletShip(bullet)== ship2);
 		facade.fireBullet(ship2);

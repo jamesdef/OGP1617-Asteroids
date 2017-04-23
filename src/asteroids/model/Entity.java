@@ -523,6 +523,7 @@ public abstract class Entity {
 	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
 //		System.out.println(duration);
 		if (!isValidDuration(duration)){
+			System.out.println(duration);
 			throw new IllegalDurationException(duration);
 		}
 		double newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
@@ -565,8 +566,8 @@ public abstract class Entity {
 	public double getDistanceBetween(Entity other){
 		double result = 0;
 		if (this != other){
-		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.xPosition), 2.0)+
-									Math.pow((this.getyPosition()-other.yPosition), 2.0));
+		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.getxPosition()), 2.0)+
+									Math.pow((this.getyPosition()-other.getyPosition()), 2.0));
 		result = centerDistance - this.getRadius() - other.radius;
 		}
 		return result;
@@ -577,26 +578,23 @@ public abstract class Entity {
 	 * Returns whether two objects (entities) overlap. 
 	 * A certain boundary is set to account for rounding issues with the double-representation.
 	 * 
-	 * @param object2
+	 * @param Other
 	 * 		  The other of two enitities that might overlap.
 	 * @return True only if they overlap significantly. 
-	 * 		   For now we have defined this with a -0.1 value, to allow the program to run,
-	 * 		   working with the 99% rule triggers to much.
-	 * 			
+	 * 		   We first calculate the distance between the two entities.
+	 * 		   Then we check whether this distance is smaller than 0.99 times the sum of the radii of both.	
 	 * 		 | @see implementation
 	 * 		  
 	 */
-	public Boolean significantOverlap (Entity object2){
-			if (this.equals(object2))
+	public Boolean significantOverlap (Entity other){
+			if (this.equals(other)){
 				return true;
+			}
+			double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.getxPosition()), 2.0)+
+					Math.pow((this.getyPosition()-other.getyPosition()), 2.0));
 
-			double distance = this.getDistanceBetween(object2);
-
-			return (distance < 0);
+			return (centerDistance < 0.99*(this.getRadius() + other.getRadius()));
 		}
-
-	
-	
 	
 	/**
 	 * This method returns the time until an entity will reach a certain boundary of the world it is in.
@@ -728,7 +726,7 @@ public abstract class Entity {
 	 */
 	public double getTimeToEntityCollision(Entity other) throws IllegalCollisionException {
 		if (this.significantOverlap(other)){
-			throw new IllegalCollisionException(this,other);
+			//throw new IllegalCollisionException(this,other);
 		}
 		
 		//Sigma is centerdistance at the moment of collision : sum of two radii.
