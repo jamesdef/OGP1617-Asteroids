@@ -9,8 +9,10 @@ import asteroids.model.Entity;
 import asteroids.model.IllegalBulletException;
 import asteroids.model.IllegalCollisionException;
 import asteroids.model.IllegalDurationException;
+import asteroids.model.IllegalEntityException;
 import asteroids.model.IllegalPositionException;
 import asteroids.model.IllegalRadiusException;
+import asteroids.model.IllegalShipException;
 import asteroids.model.Ship;
 import asteroids.model.World;
 import asteroids.part1.facade.IFacade;
@@ -254,7 +256,11 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 
 	@Override
 	public void addShipToWorld(World world, Ship ship) throws ModelException {
-		world.addEntity(ship);
+		try {
+			world.addEntity(ship);
+		} catch (IllegalEntityException e) {
+			throw new ModelException ("Illegal entity");
+		} 
 	}
 
 	@Override
@@ -264,7 +270,11 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 
 	@Override
 	public void addBulletToWorld(World world, Bullet bullet) throws ModelException {
-		world.addEntity(bullet);
+		try {
+			world.addEntity(bullet);
+		} catch (IllegalEntityException e) {
+			throw new ModelException ("Illegal entity");
+		} 
 	}
 
 	@Override
@@ -313,7 +323,9 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 	public void fireBullet(Ship ship) throws ModelException {
 		try {
 			ship.fireBullet();
-		} catch (IllegalPositionException e) {
+		} catch(IllegalShipException e) {
+			throw new ModelException("Illegal Ship as source");
+		}  catch (IllegalPositionException e) {
 			throw new ModelException("Illegal Position");
 		} catch (IllegalRadiusException e) {
 			throw new ModelException("Illegal Radius");		}
@@ -379,6 +391,8 @@ public class Facade implements IFacade, asteroids.part2.facade.IFacade {
 		} catch (IllegalDurationException e) {
 			throw new ModelException("Illegal Duration");
 
+		} catch (IllegalBulletException e) {
+			throw new ModelException("Illegal Bullet");
 		}
 	}
 

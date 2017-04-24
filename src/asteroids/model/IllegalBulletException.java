@@ -6,10 +6,7 @@ package asteroids.model;
  * @version 2.0
  * @author Michiel
  */
-public class IllegalBulletException extends RuntimeException {
-
-
-
+public class IllegalBulletException extends Exception {
 
 	/**
 	 * Initialize this new bullet exception with given bullet.

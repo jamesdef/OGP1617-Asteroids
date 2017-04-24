@@ -100,24 +100,26 @@ public class Part2generalTests {
 		
 	}
 	//Overlap
-	@Test
-	public void testShipOverlap() throws ModelException {
+	@Test(expected = ModelException.class)
+	public void testShipsThatOverlap() throws ModelException {
 		World world = Worlds()[1];
 
 		Ship shipA = Ships()[0];
 		Ship shipB = Ships()[1];
 		Ship shipD = Ships()[3];
 		
+		
 		facade.addShipToWorld(world, shipA);
 		facade.addShipToWorld(world, shipB);
 		facade.addShipToWorld(world, shipD);
 
-		
 
 		assertFalse(facade.overlap(shipA,shipB));
 		assertTrue(facade.overlap(shipB,shipD));
 
 	}
+	
+
 	
 	
 	//Test getEntityAt

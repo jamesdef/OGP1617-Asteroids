@@ -70,17 +70,6 @@ public class Bullet extends Entity {
     }
 	
 // ---------------- Getters----------------------------------------
-		/**
-		 * Returns the world to which this bullet belongs.
-		 * @return the world to which this bullet belongs.
-		 */
-		/**@Basic
-		public World getWorld(){
-	    	System.out.println("bullet getworld");
-
-			return this.world;
-
-		}*/
 		
 		/**
 		 * Returns the ship to which this bullet belongs.
@@ -232,15 +221,17 @@ public class Bullet extends Entity {
 	 * 			The ship that fired this bullet.
 	 * @post	The source of this bullet is the given ship.
 	 * 			| new.getSource() == source
-	 * @throws 	IllegalArgumentException
+     * @throws IllegalShipException 
 	 * 			If this bullet 
 	 * 				-already belongs to a world
 	 * 				-already is loaded/fired by a ship
 	 * 		    |(this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
 	 */
-	public void setSource(Ship source) throws IllegalArgumentException {
-//		if (this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
-//			throw new IllegalArgumentException();
+	public void setSource(Ship source) throws  IllegalShipException {
+		// TODO : Werkt dit; 
+		// Niet zeker, gooit teveel errors
+		if (this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
+			throw new IllegalShipException(source);
 		if (source==null)
 			this.source=null;
 		else
@@ -260,16 +251,16 @@ public class Bullet extends Entity {
      * @post The new universal lower bound for the radius is equal to the given value.
      * 		 |new.getMinRadius() == Lower_Bound
      * 
-     * @throws IllegalArgumentException
-     * 		   The given argument is not valid.
+     * @throws IllegalRadiusException 
+     * 		   The given l is not valid.
      * 		   | !(Lower_bound > 0)
      */
-    public final void setMin_Radius(double lowerbound){
+    public final void setMin_Radius(double lowerbound) throws IllegalRadiusException{
     	if (isValidMinimumRadius(lowerbound)){
     		Bullet.min_Radius = lowerbound;
     	}
     	else{
-    		throw new IllegalArgumentException(Double.toString(lowerbound));
+    		throw new IllegalRadiusException(lowerbound);
     	}
     }
     

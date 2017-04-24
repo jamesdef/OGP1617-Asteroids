@@ -117,7 +117,7 @@ public class ILLEGALETESTS {
 	
 	
 	/// TEST GETTERS ///
-	
+		
 	@Test
 	public void shipGetters() throws ModelException {
 		Ship ship1 = createShips()[0];
@@ -137,15 +137,19 @@ public class ILLEGALETESTS {
 		
 		try {
 			world.addEntity(ship9);
-		} catch (IllegalArgumentException illegalArgumentException) {
+		} catch (IllegalEntityException illegalEntityException) {
 			// Ship9 will not be added into the world
 		}
 
 		// VELOCITY
+//		Ship ship7 = facade.createShip(10000, 10000, SPEED_OF_LIGHT, SPEED_OF_LIGHT, 100, Math.PI / 4,0);
+
 		double[] velocity = facade.getShipVelocity(ship1);
 		assertEquals(0, velocity[0], EPSILON);
 		assertEquals(0, velocity[1], EPSILON);
 		double[] velocity7 = facade.getShipVelocity(ship7);
+	
+		 
 		assertEquals(SPEED_OF_LIGHT*Math.cos(Math.PI/4), velocity7[0], EPSILON);
 		assertEquals(SPEED_OF_LIGHT*Math.sin(Math.PI/4), velocity7[1], EPSILON);
 
@@ -160,7 +164,8 @@ public class ILLEGALETESTS {
 		assertEquals(5E16,facade.getShipMass(ship2),EPSILON );
 		
 		//ACCELERATION
-		assertEquals((1.1E18)/(5E16),facade.getShipAcceleration(ship1),EPSILON);
+		facade.setThrusterActive(ship1, true);
+		assertEquals((1.1E21)/(5E16),facade.getShipAcceleration(ship1),EPSILON);
 	}
 	
 	
@@ -212,7 +217,7 @@ public class ILLEGALETESTS {
 
 
 	@Test 
-	public void firingBullets2() throws ModelException, IllegalPositionException, IllegalRadiusException{
+	public void firingBullets2() throws ModelException, IllegalPositionException, IllegalRadiusException, IllegalShipException{
 		World world = createWorlds()[0];
 		Ship ship1 = createShips()[0];
 		Ship ship2 = createShips()[1];
@@ -528,11 +533,16 @@ public class ILLEGALETESTS {
 		assertNull(position[0]);
 	}
 
+//	Ship ship1 = facade.createShip(10000, 10000, 0, 0, 10, 0,5E16);
+//	Ship ship7 = facade.createShip(10000, 10000, SPEED_OF_LIGHT, SPEED_OF_LIGHT, 100, Math.PI / 4,0);
+
+	
 	@Test(expected = ModelException.class)
 	public final void noTimeBecauseOverlapping() throws ModelException {
 		Ship ship1 = createShips()[0];
 		Ship ship7 = createShips()[6];
-
+		
+		System.out.println(facade.getTimeToCollision(ship1,ship7));
 		facade.getTimeToCollision(ship1,ship7);
 	}
 

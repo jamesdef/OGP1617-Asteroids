@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-
+//TODO: FIX Illegal ship as source wordt teveel gegooid bij het spelen van het 
+// Programma gooit daarom soms wat rood, dit moet ik nog bekijken. - Michiel
+// ZIE: setsource in bullet.
 /**
  * A class for dealing with ships, which are a kind of entity in space. 
  * These have a certain position, velocity, radius, speed and orientation.
@@ -127,19 +129,13 @@ public class Ship extends Entity {
 	 * 
      */
     public void terminate(){
-    	System.out.println("---------------TERMINATE SHIP----------------");
-    	System.out.println(this.getNbOfBullets());
-    	System.out.println(this.bullets);
+
     	if (this.getNbOfBullets() != 0) {
     		Set<Bullet> toremovebullets = new HashSet<>();
     		toremovebullets.addAll(bullets);
-    		System.out.println("-------------binnen if voorwaarde----------");
     	for (Bullet bullet : toremovebullets){
-    		System.out.println("--------------ittereren voor remove))))))))))))))");
     		removeBullet(bullet);
-    		System.out.println("na removee))))))))))))))))");
     	}}
-    	System.out.println("uit for loop L");
     	//We can now safely terminate the empty ship as an entity.
     	super.terminate();
     }
@@ -232,12 +228,17 @@ public class Ship extends Entity {
      * 		   
      */
     public double getMassOfBullets(){
-    	double bulletMass=0;
+    	double bulletMass = 0;
     	
-		for (Bullet bullet: this.getBullets())
-			bulletMass =+ bullet.getMass();
+    	for (Bullet bullet: this.getBullets()){
+			bulletMass += bullet.getMass();
+		}
+		
 		return bulletMass;
     }
+    
+    
+   		
     
     /**
      * This method returns the total mass of this ship. 
@@ -250,6 +251,7 @@ public class Ship extends Entity {
      * 			|return this.getMass() + GetMassOfAllBulletsOwnedByThisShip;
      */
 	public double getTotalMass(){
+
 		return (this.getMass() + getMassOfBullets());
 	}
 	
@@ -341,22 +343,22 @@ public class Ship extends Entity {
      * This method makes it possible for the user to change the lower bound
      * imposed upon ships, for all ships.
      * 
-     * @param Lower_Bound
+     * @param lowerbound
      * 		  The new minimum radius.
      * 
      * @post The new universal lower bound for the radius is equal to the given value.
      * 		 |new.Min_Radius == Lower_Bound
      * 
-     * @throws IllegalArgumentException
-     * 		   The given argument is not valid.
+     * @throws IllegalRadiusException 
+     * 		   The given lowerbound for the radius is not valid.
      * 		   | !(Lower_bound > 0)
      */
-    public void setMin_Radius(double Lower_Bound){
-    	if (Lower_Bound > 0){
-    		Ship.min_Radius = Lower_Bound;
+    public void setMin_Radius(double lowerbound) throws IllegalRadiusException{
+    	if (lowerbound > 0){
+    		Ship.min_Radius = lowerbound;
     	}
     	else{
-    		throw new IllegalArgumentException(Double.toString(Lower_Bound));
+    		throw new IllegalRadiusException(lowerbound);
     	}
     }
     
@@ -790,8 +792,10 @@ public class Ship extends Entity {
 	 * 		   The position to which the bullet is set must be legal.
 	 * @throws IllegalRadiusException
 	 * 		   The radius of the fired bullet must be legal.
+	 * @throws IllegalShipException 
+	 * 		   The ship must be a valid source to the fired bullet.
 	 */
-	public void fireBullet() throws IllegalPositionException, IllegalRadiusException{
+	public void fireBullet() throws IllegalPositionException, IllegalRadiusException, IllegalShipException{
 		if (this.getNbOfBullets()!= 0 && belongsToWorld()){
 			Bullet bullet = this.getBullets().iterator().next();
 			
@@ -809,7 +813,6 @@ public class Ship extends Entity {
 			
 			
 			//bullet is now set to where it will start its movement, after some checks.
-			
 			
 			
 			// Check whether the bullet is within the worlds' boundaries, if not: terminate it.
@@ -838,8 +841,8 @@ public class Ship extends Entity {
 			
 			
 
-
-		//	bullet.setWorld(this.getWorld());
+			// TODO Moet dit hier staan of niet? denk het wel
+			bullet.setWorld(this.getWorld());
 			// The bullet is in a legal spot and can start moving. It's velocity is now assigned.
 			bullet.setVelocity(xSpeed, ySpeed);	
 			

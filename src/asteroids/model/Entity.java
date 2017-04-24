@@ -372,13 +372,14 @@ public abstract class Entity {
 	 */
 	@Raw
 	public void setVelocity(double xVelocity, double yVelocity){
-		
+			
 		if ((!Double.isNaN(xVelocity)) && (!Double.isNaN(yVelocity))){
-
+	
 				if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
 					this.scaleVelocity(xVelocity, yVelocity);
+					return;
 				}		
-				else{
+				else {
 					this.xVelocity = xVelocity;
 					this.yVelocity = yVelocity;
 				}
@@ -403,7 +404,7 @@ public abstract class Entity {
 	 */
 	@Raw
 	public boolean exceedsMaxVelocity(double xVelocity, double yVelocity){
-		return (Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2)) > getMaxVelocity());
+		return (Math.sqrt(Math.pow(yVelocity,2)+Math.pow(xVelocity,2)) > getMaxVelocity());
 	}
 	
 	/**
@@ -442,9 +443,16 @@ public abstract class Entity {
 	 * 		 of the given parameters exceed the maximum velocity.
 	 */
 	public void scaleVelocity(double xVelocity, double yVelocity ){
+		// The velocities are first changed to their illegal values.
+		// So that getTotalVelocity can be computed
+		// TODO total velocity with lambda expression
+		this.xVelocity = xVelocity;
+		this.yVelocity = yVelocity;
+		
 		double scaledxVelocity = (xVelocity*getMaxVelocity())/this.getTotalVelocity();
 		double scaledyVelocity = (yVelocity*getMaxVelocity())/this.getTotalVelocity();
-
+		
+		
 		this.xVelocity = scaledxVelocity;
 		this.yVelocity = scaledyVelocity;
 	}
@@ -521,9 +529,8 @@ public abstract class Entity {
 	 * 
 	 */
 	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
-//		System.out.println(duration);
+
 		if (!isValidDuration(duration)){
-			System.out.println(duration);
 			throw new IllegalDurationException(duration);
 		}
 		double newxPosition = this.getxPosition() + (duration)*(this.getxVelocity());
@@ -592,7 +599,7 @@ public abstract class Entity {
 			}
 			double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.getxPosition()), 2.0)+
 					Math.pow((this.getyPosition()-other.getyPosition()), 2.0));
-
+			
 			return (centerDistance < 0.99*(this.getRadius() + other.getRadius()));
 		}
 	
@@ -603,7 +610,7 @@ public abstract class Entity {
 	 * @return If this entity will never collide with a boundary, the method will return infinity.
 	 * 		   Otherwise it will return the shortest time until the entity reaches a boundary.
 	 * 		   It simply calculates both the times to reach either the vertical or horizontal boundary.
-	 * 		   And then takes the smallest of both times.
+	 * 		   And then takes the smallest of both times. 
 	 * 		   @see implementation 
 	 *         
 	 *         A use for this method: 
@@ -615,14 +622,14 @@ public abstract class Entity {
 	 * 		   |	!this.getWorld().withinBoundaries(this)
 	 * 	       If we had not increased resulting_time with extra, the entity would have still been within this world.
 	 * 
-	 * @throw IllegalStateException
+	 * @throw IllegalBulletException
 	 * 		  The entity is not within a certain world.
 	 * 		  |this.getWorld() == null
 	 * 		  
 	 */
-	public double getTimeToBoundaryCollision(){
+	public double getTimeToBoundaryCollision() throws IllegalEntityException{
 		if (this.getWorld() == null){
-			throw new IllegalStateException();
+			throw new IllegalEntityException(this);
 			}
 		
 		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(),
@@ -726,7 +733,7 @@ public abstract class Entity {
 	 */
 	public double getTimeToEntityCollision(Entity other) throws IllegalCollisionException {
 		if (this.significantOverlap(other)){
-			//throw new IllegalCollisionException(this,other);
+			throw new IllegalCollisionException(this,other);
 		}
 		
 		//Sigma is centerdistance at the moment of collision : sum of two radii.
@@ -808,7 +815,7 @@ public abstract class Entity {
 	/**
 	 * Variable registering the speed of light; 300000 km/s.
 	 */
-	protected static final double speedoflight = 300000;
+	protected static final double speedoflight = 300000.0;
 
 	/**
 	 * Variable registering the xPosition of this Entity.

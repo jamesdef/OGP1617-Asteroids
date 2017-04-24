@@ -157,7 +157,7 @@ public class World {
 	 */
 	 @Basic
 	 public double getWidth(){
-		 return World.width;
+		 return this.width;
 	 }
 		
 	 /**
@@ -166,7 +166,7 @@ public class World {
 	 */
 	 @Basic
 	 public double getHeight(){
-		return World.height;
+		return this.height;
 	 }
 	 
 	 
@@ -191,10 +191,10 @@ public class World {
 	public void setWidth(double width){
 		double widthpositive = Math.abs(width);
 		if (widthpositive  > Upper_Bound) {
-			World.width = Upper_Bound;
+			this.width = Upper_Bound;
 		}
 		else if (widthpositive  >0){
-			World.width = widthpositive;
+			this.width = widthpositive;
 		}
 	}
 	
@@ -218,10 +218,10 @@ public class World {
 	public void setHeight(double height){
 		double heightpositive = Math.abs(height);
 		if (heightpositive > Upper_Bound) {
-			World.height = Upper_Bound;
+			this.height = Upper_Bound;
 		}
 		else if (heightpositive >0){
-			World.height = heightpositive;
+			this.height = heightpositive;
 		}
 	}
 	
@@ -257,31 +257,16 @@ public class World {
 	 * 		  |  new.hasAsEntity(entity) == true
 	 * 		  |	 entity.getWorld() == this
 	 * 
-	 * @throws IllegalArgumentException()
+	 * @throws IllegalEntityException
 	 * 		   If this world can not have the given entity as one of its entities 
 	 * 			or the given entity already has a world, this exception is thrown.
 	 * 		   |(!canHaveAsEntity(entity) || entity.getWorld()!=null)
 	 */
-	public void addEntity(Entity entity){
-		System.out.println("--------------------");
-		System.out.println(canHaveAsEntity(entity));
-		System.out.println(entity.getWorld());
+	public void addEntity(Entity entity) throws IllegalEntityException{
+
 		if (!canHaveAsEntity(entity) || entity.getWorld()!=null){
-			//TODO Deze exception zorgt blijkbaar voor problemen bij runnn programma
-				System.out.println("Aan bek liereken trol");
-				throw new IllegalArgumentException();
+				throw new IllegalEntityException(entity);
 		}
-		
-		// TODO DOCUMENTATIE AANPASSEN
-			// als een entiteit overlapt met een andere bij toevoegen
-			// dan wordt ze meteen verwijderd. De andere niet
-		for (Entity Object : this.getAllEntities()) {
-			if (entity.significantOverlap(Object)){
-				System.out.println("overlap SHIPZ");
-			    entity.terminate();
-				return;
-			}
-	    }
 
 		this.entities.put((StringMaker(entity.getPosition())), entity);
 		//This entity has the world as its world.
@@ -312,14 +297,14 @@ public class World {
 	 * 			the given entity is no longer attached to any world.
 	 * 			|if (hasAsEntity(entity){
 	 * 			|	((new entity).getWorld == null)}
-	 * @throws IllegalArgumentException 
+	 * @throws IllegalEntityException 
 	 * 		   If the given entity is not active or the given entity does not belong to this
 	 * 		   world, this exception is thrown.
 	 * 		
 	 */
-	public void removeEntity(Entity entity) throws IllegalArgumentException{
+	public void removeEntity(Entity entity) throws IllegalEntityException{
 		if (entity == null || !hasEntity(entity)){
-			throw new IllegalArgumentException();
+			throw new IllegalEntityException(entity);
 		}
 
 		this.entities.values().remove(entity);
@@ -353,32 +338,21 @@ public class World {
 	 * 			- The entity is within the worlds boundaries 
 	 * 			- In the case that the entity is a bullet, it must not have a ship ascribed to it. 
 	 * 					(otherwise the bullet should belong to the ship, not the world)
-	 * 
+	 * 			- The entity does not overlap with any other entity, that is already within this world.
+	 *			| @see implementation
 	 */
-	// TODO blijkbaar geeft deze functie soms 'onverwacht false' bij het creeren van een wereld.
+	
 	public Boolean canHaveAsEntity(Entity entity){
-		System.out.println("We gaan ne keer checken wat er veroorzaakt problemen in canhaveasentity");
-//		System.out.println(entity.isTerminated());
-//		System.out.println(this.isTerminated);
-//		System.out.println(entity == null);
-//		System.out.println(entity.getWorld() != null && this != entity.getWorld());
-		// TODO Het probleem zit hem in worldBoundaries, deze geeft soms waar
-		System.out.println(!this.withinWorldBoundaries(entity));
-//		System.out.println(entity instanceof Bullet && ((Bullet)entity).getShip()!= null);
-		System.out.println("Funk so brada check it out now");
-		
 		if (entity.isTerminated() || this.isTerminated() || entity == null  || (entity.getWorld() != null && this != entity.getWorld())
 				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
-			System.out.println("hierbinnenn");
 			return false;
 		}
-		// TODO Documentatie aanpassen Sowieso was dize code fout
-//		for (Entity ship : this.getAllShips()) {
-//			if (entity.significantOverlap(ship)){
-//				System.out.println("overlap SHIPZ");
-//				return false;
-//			}
-//	    }
+	
+		for (Entity Object : this.getAllEntities()) {
+			if (entity.significantOverlap(Object)){
+				return false ;
+			}
+		}
 	    return true;
 	}
 	
@@ -424,12 +398,8 @@ public class World {
 	 * 		  the centre of the object is bigger than 99% of the objectsradius.
 	 * 		  |@ see implementation
 	 * 
-	 *  Math.abs: In onze beschrijving van ship hebben we niet geï¿½ist
-	 *  dat de position enkel positieve coordinaten kent. Maar: een schip met negatieve 
-	 *  coordinaten ligt toch sowieso niet in de wereld?
 	 */
 	public Boolean withinWorldBoundaries(Entity object){
-		System.out.println("-------------------WITHIN BOUNDARIE?");
 	
 		double x = object.getxPosition();
 		double y = object.getyPosition();
@@ -437,41 +407,12 @@ public class World {
 		double height = this.getHeight();
 		double radius = object.getRadius();
 		
-		System.out.println("xposition:" + x);
-		System.out.println("yposition:" +y);
-		System.out.println("width:" + width);
-		System.out.println("height:" + height);
-		System.out.println("radius:" + radius);
-		
-		System.out.println(((width - x) >= 0.99*radius) &&
+			return (
+				((width - x) >= 0.99*radius) &&
 				(x >= 0.99*radius) &&
 				((height - y) >= 0.99*radius) &&
 				(y >= 0.99*radius)
 				);
-		
-		System.out.println("We gaan em vinden, dieje patj");
-		
-		System.out.println((width + radius - x) >= 0.99*radius);
-		System.out.println((x >= 0.99*radius));
-		System.out.println((height + radius - y) >= 0.99*radius);
-		System.out.println((y >= 0.99*radius));
-		
-		
-		// TODO beetje inefficiente implementatie, maar lijkt mij wel correcter te zijn,
-		// helft van schip mag nu buiten wereld zijn
-		return (
-				((width + radius - x) >= 0.01) &&
-				(x >= 0.99*radius) &&
-				((height +radius - y) >= 0.99*radius) &&
-				(y >= 0.01)
-				);
-		
-//		return (
-//				((width - x) >= 0.99*radius) &&
-//				(x >= 0.99*radius) &&
-//				((height - y) >= 0.99*radius) &&
-//				(y >= 0.99*radius)
-//				);
 	}
 	
 // ---------------------- EVOLVING AND COLLISION ----------------------
@@ -512,7 +453,7 @@ public class World {
 	 * 		  The duration with which we will evolve.
 	 * @effect | @see implementation
 	 */
-	public void evolve(double Dt) throws IllegalCollisionException, IllegalPositionException, IllegalDurationException{
+	public void evolve(double Dt) throws IllegalCollisionException, IllegalPositionException, IllegalDurationException, IllegalBulletException{
 		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
 //		System.out.println("begin evolve");
 //		System.out.println(Dt);
@@ -532,13 +473,13 @@ public class World {
 //		System.out.println(tC);
 		double counter = 0;
 		if (tC <= Dt){
-			System.out.print("tC = ");
-			System.out.println(tC);
-			System.out.print("Dt = ");
-			System.out.println(Dt);
+//			System.out.print("tC = ");
+//			System.out.println(tC);
+//			System.out.print("Dt = ");
+//			System.out.println(Dt);
 			while ( Dt != 0){
-				System.out.println(Dt);
-				System.out.println("Dt evolve");
+//				System.out.println(Dt);
+//				System.out.println("Dt evolve");
 				if (! isValidDuration(tC))
 					System.out.println("not valid tC");
 				else
@@ -553,7 +494,7 @@ public class World {
 					List<Entity> ArrayofEntities = new ArrayList<>(nextEntityEntityPositionEntities);
 					Entity entityA = ArrayofEntities.get(0);
 					Entity entityB = ArrayofEntities.get(1);
-					System.out.println("entityentitycoll");
+//					System.out.println("entityentitycoll");
 	
 	
 					this.handleEntityEntityCollision(entityA, entityB);
@@ -569,10 +510,10 @@ public class World {
 				nextEntityEntityPositionEntities = this.getNextEntityEntityCollisionEntities();
 				
 				tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
-				System.out.println("tC new");
-				System.out.println(tC);
-				System.out.println("Dt new");
-				System.out.println(Dt);
+//				System.out.println("tC new");
+//				System.out.println(tC);
+//				System.out.println("Dt new");
+//				System.out.println(Dt);
 				if (tC <= Dt){
 					counter +=1;
 				} else {
@@ -586,9 +527,9 @@ public class World {
 		else {
 				this.moveAllEntities(Dt);
 			}
-		System.out.println(Dt);
-		System.out.println(counter);
-		System.out.println("einde evolve");
+//		System.out.println(Dt);
+//		System.out.println(counter);
+//		System.out.println("einde evolve");
 	}
 	/**
 	 *  Check whether the given duration is legal.
@@ -980,11 +921,11 @@ public class World {
 	 * Variable registering the width of this world. The default value is set to
 	 * be half of the maximum possible Value.
 	 */
-	private static double width = (1/2)*Upper_Bound;
+	private double width = (1/2)*Upper_Bound;
 
 	/**
 	 * Variable registering the height of this world. The default value is set to
 	 * be half of the maximum possible Value.
 	 */
-	private static double height = (1/2)*Upper_Bound;
+	private double height = (1/2)*Upper_Bound;
 }
