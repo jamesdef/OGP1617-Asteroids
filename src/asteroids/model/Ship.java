@@ -7,9 +7,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-//TODO: FIX Illegal ship as source wordt teveel gegooid bij het spelen van het 
-// Programma gooit daarom soms wat rood, dit moet ik nog bekijken. - Michiel
-// ZIE: setsource in bullet.
 /**
  * A class for dealing with ships, which are a kind of entity in space. 
  * These have a certain position, velocity, radius, speed and orientation.
@@ -690,6 +687,7 @@ public class Ship extends Entity {
 	 * 		   | 									|| bullet.getShip() != null   )
 	 * 		 
 	 */
+	// TODO misschien mag hier wel bij dat Source null is
 	public void loadBullet(Bullet bullet) throws IllegalPositionException, IllegalBulletException{
 		if (((this.getWorld()!=null)&&(bullet.getWorld()!=null)&&(this.getWorld()!=bullet.getWorld())) 
 							|| !canHaveAsBullet(bullet) || bullet.getShip()!= null){

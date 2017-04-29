@@ -878,7 +878,9 @@ public class World {
 	public void handleBulletShipCollision(Bullet bullet, Ship ship) throws IllegalBulletException, IllegalPositionException{
 		
 		if(bullet.getSource() == ship){
+			System.out.println("the source of this bullet is the hitting ship");
 			ship.loadBullet(bullet);
+			
 		} else {
 			ship.terminate();
 			bullet.terminate();

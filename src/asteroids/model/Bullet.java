@@ -224,13 +224,13 @@ public class Bullet extends Entity {
      * @throws IllegalShipException 
 	 * 			If this bullet 
 	 * 				-already belongs to a world
-	 * 				-already is loaded/fired by a ship
-	 * 		    |(this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
+	 * 				-already is loaded/fired by a ship, that is not this ship. 
+	 * 					(It can be this ship if the bullet was loaded upon this ship once again
+	 * 					after previously being fired by it).
+	 * 		    |(this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null && this.getSource() != source)
 	 */
 	public void setSource(Ship source) throws  IllegalShipException {
-		// TODO : Werkt dit; 
-		// Niet zeker, gooit teveel errors
-		if (this.getWorld()!=null||this.getShip()!=null||this.getSource()!=null)
+		if (this.getWorld()!=null||this.getShip()!=null||(this.getSource()!=null && this.getSource() != source))
 			throw new IllegalShipException(source);
 		if (source==null)
 			this.source=null;
