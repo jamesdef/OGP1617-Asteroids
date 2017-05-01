@@ -1,5 +1,5 @@
 package asteroids.model;
-
+import asteroids.model.exceptions.*;
 
 
 import java.util.ArrayList;

@@ -2,6 +2,7 @@ package asteroids.model;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
+import asteroids.model.exceptions.*;
 
 
 /**

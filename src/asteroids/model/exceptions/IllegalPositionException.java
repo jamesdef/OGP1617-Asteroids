@@ -1,4 +1,6 @@
-package asteroids.model;
+package asteroids.model.exceptions;
+
+import asteroids.model.*;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;

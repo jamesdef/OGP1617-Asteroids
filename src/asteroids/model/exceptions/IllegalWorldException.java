@@ -1,5 +1,6 @@
-package asteroids.model;
+package asteroids.model.exceptions;
 
+import asteroids.model.*;
 /** 
  * A class for signaling illegal worlds.
  * 
