@@ -4,12 +4,24 @@ import asteroids.model.exceptions.*;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
+import be.kuleuven.cs.som.annotate.Model;
 import be.kuleuven.cs.som.annotate.Raw;
 
+
+
+// TODO: Basic methoden vereisen geen echte specificatie
+// TODO: oppassen met finals
+// TODO: Throws moeten enkel in de specifactie staan als ze uitermate relevant zijn
+// TODO: Postcondities en classe invarianten niet herhalen bij subklassen en overriding
+// TODO: Constructoren zijn raw als ze niet de laatste subklasse zijn.
+// TODO: De constructor van een abstracte klasse is steeds 'model'
+
 /** 
-*  A class for dealing with entities. We could define these as 'objects that can move through space'.
-*  An example of such an entity can be a ship or a bullet. It can belong to a certain world.
-*  Properties described are: position, velocity,radius.
+*  A class for dealing with entities. 
+*  We could define these as 'objects that can move through space'.
+*  Entities can interact with eachother upon collision.
+*  It can belong to a certain world.
+*  Properties described are: position, velocity,radius, density and mass.
 *  
 * @invar   The highest possible absolute, total velocity is lower than a certain maximum, the entity can never exceed this speed.
 * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
@@ -64,6 +76,7 @@ public abstract class Entity {
 	 *@note    Any new entity initialized with this constructor
 	 * 		   will satisfy all its class invariants. The setters will see to this in their implementation.
 	 */
+	@Raw @Model
 	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius)
 		throws IllegalPositionException, IllegalRadiusException{
 		
@@ -118,7 +131,6 @@ public abstract class Entity {
     
     /**
 	 * Return the x-coordinate of this entity.  
-	 * @return the x-coordinate of this entity.
 	 */
 	@Basic
 	public double getxPosition(){
@@ -128,8 +140,6 @@ public abstract class Entity {
 
 	/**
 	 * Return the y-coordinate of this entity.
-	 * @return the y-coordinate of this entity.
-	 * 
 	 */
 	@Basic
 	public double getyPosition(){
@@ -139,7 +149,6 @@ public abstract class Entity {
 
 	/**
 	 * Returns the velocity of this Entity, in the x-direction.
-	 * @return the horizontal velocity of this Entity.
 	 */
 	@Basic
 	public double getxVelocity(){
@@ -148,7 +157,6 @@ public abstract class Entity {
 
 	/**
 	 * Returns the velocity of this Entity, in the y-direction.
-	 * @return the vertical velocity of this Entity.
 	 */
 	@Basic
 	public double getyVelocity(){
@@ -182,20 +190,15 @@ public abstract class Entity {
 	}
 
 	/**
-	 *  Return the radius of this Entity.
-	 * @return the radius of this Entity.
+	 * Return the radius of this Entity.
 	 */
 	@Basic
-	@Immutable
 	public double getRadius(){
 		return this.radius;
 	}
 
 	/** 
-	 *  Returns the x and y coordinates within an array.
-	 *  
-	 * @return the x and y coordinate as an array.
-	 * 		 
+	 *  Returns the x and y coordinates within an array.	 
 	 */
 	@Basic
 	public double[] getPosition(){
@@ -205,7 +208,6 @@ public abstract class Entity {
 	
 	/**
 	 * Returns the density of this entity.
-	 * @return the density of this entity.
 	 */
 	@Basic
 	public double getDensity(){
@@ -214,7 +216,6 @@ public abstract class Entity {
 	
 	/**
 	 * Return the mass of this entity.
-	 * @return the mass of this entity.
 	 */
 	@Basic
 	public double getMass(){
@@ -411,16 +412,14 @@ public abstract class Entity {
 	
 	/**
 	 * Return the maximum velocity an entity can have.
-	 * @return the maximum velocity an entity can have.
 	 */
-	@Basic
+	@Basic @Immutable
 	public static double getMaxVelocity(){
 		return Entity.max_Velocity;
 	}
 	
 	/**
 	 * Return the minimum velocity an entity can have.
-	 * @return the minimum velocity an entity can have.
 	 */
 	@Basic
 	public static double getMinVelocity(){

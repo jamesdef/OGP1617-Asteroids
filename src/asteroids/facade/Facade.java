@@ -7,13 +7,7 @@ import java.util.Set;
 
 import asteroids.model.Bullet;
 import asteroids.model.Entity;
-import asteroids.model.IllegalBulletException;
-import asteroids.model.IllegalCollisionException;
-import asteroids.model.IllegalDurationException;
-import asteroids.model.IllegalEntityException;
-import asteroids.model.IllegalPositionException;
-import asteroids.model.IllegalRadiusException;
-import asteroids.model.IllegalShipException;
+import asteroids.model.exceptions.*;
 import asteroids.model.Ship;
 import asteroids.model.World;
 import asteroids.part1.facade.IFacade;

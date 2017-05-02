@@ -7,11 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import asteroids.model.Bullet;
-import asteroids.model.IllegalCollisionException;
-import asteroids.model.IllegalDurationException;
-import asteroids.model.IllegalPositionException;
+import asteroids.model.*;
 import asteroids.model.Ship;
 import asteroids.model.World;
+import asteroids.model.exceptions.IllegalCollisionException;
 import asteroids.facade.Facade;
 import asteroids.part2.facade.IFacade;
 import asteroids.util.ModelException;

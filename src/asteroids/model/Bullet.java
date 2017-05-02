@@ -4,19 +4,16 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 import asteroids.model.exceptions.*;
 
+//TODO if a bullet hits it's own ship, it is reloaded but its bounces
+// are not forgotten, where shall we say this?
 
 /**
  * A class for dealing with bullets, which are a kind of entity in space. 
- * These have a certain position, velocity, radius, speed.
- * The bullet also has a mass and a certain density.
- * A bullet can have an owner: a ship or a world. If it has a ship as its owner, it can not have a world as its owner.
+ * These have a certain position, velocity, radius, mass and density.
+ * A bullet can have an owner: a ship or a world. 
+ * If it has a ship as its owner, it can not have a world as its owner.
  * If a bullet is fired, it has a source (a ship that fired it); unless this ship has been destroyed in the meanwhile.
  * A bullet can only bounce of a boundary a given number of times.
- * If a bullet hits it source, it is reloaded upon this ship.
- * If a bullet reenters its owner, its previous bounces are not forgotten.
- * 
- * @invar 	The invariants of the superclass 'Entity' are described there.
- * 			They ofcourse hold for this subclass.
  *
  * @invar 	Each bullet must have a proper owner at all times.
  *		  	|hasProperOwner()
@@ -28,7 +25,7 @@ import asteroids.model.exceptions.*;
  * 			|isValidRadius(getRadius())
  *
  * @invar   The mass of a bullet must be valid.
- * 		    |isValidMass(this.getMass)
+ * 		    |this.getMass() > 0
  * 
  * @invar   The density of a ship must be valid.
  * 		    |isValidDensity(this.getDensity)
@@ -39,8 +36,39 @@ import asteroids.model.exceptions.*;
  */
 public class Bullet extends Entity {
 	
-	//private double radius;
-
+	
+	
+	/**
+	 * Initialize this new bullet with given position,radius, speed.
+	 * 
+	 * 
+	 * @param  xPosition
+	 *         The position of this bullet, according to the x-axis. 
+	 *         Expressed in km.
+	 *         
+	 * @param  yPosition
+	 *         The position of this bullet,according to the y-axis.
+	 *         Expressed in km.
+	 *         
+	 * @param  radius
+	 * 		   The radius of this new bullet.
+	 * 		   Expressed in km.	
+	 * 
+	 * @param  xVelocity 
+	 *         The velocity of this bullet, in the x-direction.
+	 *         Expressed in km/s.
+	 *         
+	 * @param  yVelocity 
+	 * 		   The velocity of the bullet, in the y-direction. 
+	 * 		   Expressed in km/s.
+	 *          
+	 * @effect The given parameters are set as the properties of the new bullet.
+	 * 		   |setPosition(xPosition,yPosition);
+	 *	       |setVelocity(xVelocity,yVelocity);
+	 *	       |setRadius(radius);
+	 *		   |setBulletMass(new.getRadius());
+	 *
+	 */
 	public Bullet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius) throws IllegalPositionException, IllegalRadiusException{
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
 		setBulletMass(getRadius());
@@ -74,7 +102,6 @@ public class Bullet extends Entity {
 		
 		/**
 		 * Returns the ship to which this bullet belongs.
-		 * @return the ship to which this bullet belongs.
 		 */
 		@Basic
 		public Ship getShip(){
@@ -82,17 +109,7 @@ public class Bullet extends Entity {
 		}
 		
 		/**
-		 * Returns the mass of this bullet.
-		 * @return the mass of this bullet.
-		 */
-		@Basic
-		public double getMass(){
-			return this.mass;
-		}
-		
-		/**
 		 * Returns the density of this bullet.
-		 * @return the density of this bullet.
 		 */
 		@Basic
 		public double getDensity(){
@@ -101,7 +118,6 @@ public class Bullet extends Entity {
 		
 		/**
 		 * Returns the minimum radius for bullets.
-		 * @return the minimum radius bullets should have.
 		 */
 		@Basic
 		public static double getMinRadius(){
@@ -206,9 +222,9 @@ public class Bullet extends Entity {
  	 * This method sets the mass of this bullet depending on it's size (=defined by radius)
  	 * 
  	 * @param radius
- 	 * 		  The radius of this ship.
- 	 * @post The new mass of this ship now equals the value calculated using the formula with the given radius.
- 	 * 		 new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+ 	 * 		  The radius of this bullet.
+ 	 * @post The new mass of this bullet now equals the value calculated using the formula with the given radius.
+ 	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
  	 */
  	private void setBulletMass(double radius){
  		this.mass = default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
@@ -256,7 +272,8 @@ public class Bullet extends Entity {
      * 		   The given l is not valid.
      * 		   | !(Lower_bound > 0)
      */
-    public final void setMin_Radius(double lowerbound) throws IllegalRadiusException{
+	@Raw
+    public static void setMin_Radius(double lowerbound) throws IllegalRadiusException{
     	if (isValidMinimumRadius(lowerbound)){
     		Bullet.min_Radius = lowerbound;
     	}
@@ -266,7 +283,7 @@ public class Bullet extends Entity {
     }
     
 	/**
-	 * Check whether the Minimum radius is a valid limit.
+	 * Check whether the given minimum radius is a valid limit.
 	 * 
 	 * @param Min_Radius
 	 * 		  The minimum radius to check.
@@ -362,23 +379,12 @@ public class Bullet extends Entity {
 	 */
 	private static double min_Radius = 1.0;
 	
-//	/**
-//	 * Variable registering the radius of this Ship.
-//	 */
-//	private double radius = 0;
-
-	
 	/**
 	 * Field initialising the existence of ship.
 	 * Initialised to a value of null.
 	 */
 	private Ship ship = null;
 
-//	/**		 
-//	 * Field initialising the existence of World.
-//	 * Initialised to a value of null.
-//	*/
-//	private World world = null;
 
     /**
      * Variable referencing the source ship (that fired the bullet) of the bullet.
@@ -393,15 +399,8 @@ public class Bullet extends Entity {
 	
 	/**
 	 * Variable registering the density of this bullet.
-	 * @Override
 	 */
 	private double density = default_Density;
-	
-	/**
-	 * Variable registering the mass of this bullet.
-	 * @Override
-	 */
-	private double mass = default_Mass;
 	
 	/**
 	 * Variable registering the Default_Mass of a bullet

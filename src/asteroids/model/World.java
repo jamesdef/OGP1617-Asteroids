@@ -75,8 +75,7 @@ public class World {
 	}
 
 	/**
-	 * Check whether this world is terminated.
-	 * @return The state of this world; whether it is terminated or not.
+	 * Returns whether this world is terminated (true) or not (false).
 	 */
 	@Basic
 	public boolean isTerminated(){
@@ -153,7 +152,6 @@ public class World {
 	
 	/**
 	 * Return the width of this world.
-	 * @return the width of this world.
 	 */
 	 @Basic
 	 public double getWidth(){
@@ -162,7 +160,6 @@ public class World {
 		
 	 /**
 	 * Return the height of this world.
-	 * @return the height of this world.
 	 */
 	 @Basic
 	 public double getHeight(){
@@ -452,11 +449,23 @@ public class World {
 	 * @param Dt
 	 * 		  The duration with which we will evolve.
 	 * @effect | @see implementation
+	 * 
+	 * @throws IllegalDurationExcepton 
+	 * 		   The given duration is not a valid duration.
+	 * 		   | Dt < 0
 	 */
 	public void evolve(double Dt) throws IllegalCollisionException, IllegalPositionException, IllegalDurationException, IllegalBulletException{
 		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
 //		System.out.println("begin evolve");
 //		System.out.println(Dt);
+		
+		// TODO: Als je een entity verplaatst moet je er aan denken dat hij in de map zat met zijn oude positie als key.
+		// Verwijder hem daarom misschien best uit die map en plaats hem er opnieuw in na verplaatsing
+//		 for (Entity entity : this.getEntities()) {
+//             this.entities.remove(entity.getPosition());
+//             entity.move(duration);
+//             // Isn't a null operation, because the position of the entity is the key of the hash map.
+//             this.entities.put(entity.getPosition(), entity);
 		
 		if (! isValidDuration(Dt))
 			return;
@@ -516,7 +525,8 @@ public class World {
 //				System.out.println(Dt);
 				if (tC <= Dt){
 					counter +=1;
-				} else {
+				} 
+				else {
 					this.moveAllEntities(Dt);
 					Dt = 0;
 				}
