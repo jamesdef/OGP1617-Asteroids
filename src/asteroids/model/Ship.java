@@ -152,11 +152,11 @@ public class Ship extends Entity {
 	 * 		@ see implementation
 	 */
     @Raw 
-	public void setMass(double mass){
+	public void setShipMass(double mass){
 		if(!isValidMass(mass)){
 	        mass = 4.0/3.0 * Math.PI * Math.pow(this.getRadius(), 3.0) * this.getDensity();
 		}
-	    this.mass = mass;
+	    super.setMass(mass);
 	}
 	
 	/**

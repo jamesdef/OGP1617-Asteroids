@@ -95,7 +95,7 @@ public abstract class Entity {
 	 * @post This entity is now terminated
 	 * 		| new.isTerminated() == true
 	 */
-	public void terminate(){
+	public void terminate() {
 		if(this.getWorld()!= null)
 			this.getWorld().removeEntity(this);
 		this.isTerminated = true;
@@ -474,7 +474,7 @@ public abstract class Entity {
 	 * 		   | ! isValidRadius(radius)
 	 */
 	@Raw
-	public void setRadius(double radius) throws IllegalRadiusException{
+	protected void setRadius(double radius) throws IllegalRadiusException{
 		if (!isValidRadius(radius)){
 			throw new IllegalRadiusException(radius);
 		}
@@ -493,6 +493,7 @@ public abstract class Entity {
 	 * 		   | radius >= getMin_Radius;
 	 */
 	@Raw
+	// TODO getMinradius moet gelden voor alle entitiess
 	public boolean isValidRadius(double radius){
 		return (radius >= getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
 	}
@@ -505,6 +506,22 @@ public abstract class Entity {
 	public static double getMinRadius(){
 		return Entity.min_Radius;
 	}
+	
+// ---------------- Mass -------------------
+	
+	/**
+	 * Sets the mass of this entity to the given value
+	 * @param mass
+	 * 		  The mass to set this entity to.
+	 * @post The new mass of this entity equals the given mass.
+	 * 		 new.getMass() == mass
+	 */		
+	@Raw
+	public void setMass(double mass){
+		this.mass = mass;
+	}
+		
+	
 	
 // ---------------- Moving -------------------
 		
@@ -813,6 +830,8 @@ public abstract class Entity {
 	
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
 	
+	// TODO Variabelen moeten private gedeclareerd worden en dan moet je protected getters maken.
+	
 	/**
 	 * Variable registering the speed of light; 300000 km/s.
 	 */
@@ -849,8 +868,10 @@ public abstract class Entity {
 	/**
 	 * Variable registering the maximum allowed velocity.
 	 */
-	protected static final double max_Velocity = speedoflight;
+	private static final double max_Velocity = speedoflight;
 
+	//TODO verzetten van min radius naar ship.
+	
 	/**
 	 * Variable registering the minimum allowed Radius.
 	 */
@@ -864,18 +885,18 @@ public abstract class Entity {
 	/**
 	 * Variable registering the mass of this entity.
 	 */
-	protected double mass;
+	private double mass;
 
 	/**
 	 * Variable registering the world to which this entity belongs.
 	 * Initialised as null; the entity has no world per default.
 	 */
-	protected World world = null;
+	private World world = null;
 
 	/**
 	 * Variable registering the density of this entity.
 	 */
-	protected double density;
+	private double density;
 
 	
 }

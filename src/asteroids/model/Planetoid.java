@@ -1,9 +1,11 @@
 package asteroids.model;
 
 import asteroids.model.exceptions.IllegalDurationException;
+import asteroids.model.exceptions.IllegalEntityException;
 import asteroids.model.exceptions.IllegalPositionException;
 import asteroids.model.exceptions.IllegalRadiusException;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with planetoids, a specific kind of minor planets.
@@ -49,13 +51,13 @@ public class Planetoid extends MinorPlanet {
 	 *	       |setVelocity(xVelocity,yVelocity);
 	 *	       |setRadius(radius);
 	 *		   |setPlanetoidMass(new.getRadius());
-	 *
 	 */
+	@Raw
 	public Planetoid(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius)
 			throws IllegalPositionException, IllegalRadiusException {
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
-		setPlanetoidMass(this.getRadius());
-		initialRadius = radius;
+		this.setPlanetoidMass(this.getRadius());
+		this.initialRadius = radius;
 	}
 	
 	/**
@@ -67,14 +69,82 @@ public class Planetoid extends MinorPlanet {
  	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
  	 */
  	private void setPlanetoidMass(double radius){
- 		this.mass = default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+ 		this.setMass(default_Density*(4/3)*Math.PI*(Math.pow(radius, 3)));
  	}
 	
  	
  	//TODO when a planetoid is bigger than 30 km and is terminated, it spawns two smaller asteroids.
- 	
+ 	/**
+ 	 * This planetoid is terminated. 
+ 	 * If this planetoid is in a world and 
+ 	 * it has a radius bigger than 30 km's, it spawns two new asteroids.
+ 	 * 
+ 	 * @post This planetoid is terminated.
+ 	 * 	     | new.isTerminated == true
+ 	 * 
+ 	 * @post If this planetoid has a radius larger than 30 and is within a world:
+ 	 * 		 it spawns two new asteroids upon termination. 
+ 	 * 		 These 'children' are placed so that their centres are on one line 
+ 	 * 		 with the centre of their parent on a distance of half the radius of the parent from that centre. 
+ 	 * 		 We choose to place them randomly at the sides of their deceized parent.
+ 	 * 		 Their radius is half of the parents' radius,
+ 	 * 		 the direction of the first child is determined at random,
+ 	 * 		 the direction of the second child is the opposite thereof.
+ 	 * 		 Finally, their speed equals 1.5 times the speed their parent had.
+ 	 * 		 | if (this.getWorld() != null && this.getRadius() >= 30)
+ 	 * 		  | 			then @see implementation
+ 	 * 
+ 	 * @throws IllegalPositionException
+ 	 * 		   If the position of the created asteroid child is not allowed.
+ 	 */
+ 	@Override
  	public void terminate(){
- 		
+ 		super.terminate();
+ 		if (this.getWorld() != null && this.getRadius() >= 30){
+ 			//TODO Kan ik wel deze dingen opvragen? De entiteit is immers getermineerd.
+ 			double xPosition = this.getxPosition();
+ 			double yPosition = this.getyPosition();
+ 			double r = this.getRadius();
+ 			double parentVelocity = this.getTotalVelocity();
+ 			double randomAngle = Math.random() *2.0*Math.PI; 
+ 			// TODO: aan de hand van testen; Misschien moeten we ze wel random plaatsen.
+ 			double randomPlacement = Math.random() * 2.0 * Math.PI;
+ 			
+ 			//TODO: Probleem: Bij het aanmaken van een asteroid kunnen exceptions worden gegooid
+// 			        daardoor moeten die hier meteen opgevangen worden, en dan mogen die entiteiten
+// 			        meteen getermineerd worden maar dat lukt hier niet perfect.
+ 			
+// 			Asteroid firstChild = new Asteroid(xPosition+(r/2*Math.cos(randomPlacement)), yPosition + (r/2*Math.sin(randomPlacement)), 
+//					1.5*parentVelocity*Math.cos(randomAngle),1.5*parentVelocity*Math.sin(randomAngle),
+//					r/2);
+// 			
+// 			Asteroid secondChild = new Asteroid(xPosition-(r/2*Math.cos(randomPlacement)), yPosition - (r/2*Math.sin(randomPlacement)), 
+//					-1.5*parentVelocity*Math.cos(randomAngle),-1.5*parentVelocity*Math.sin(randomAngle),
+//					r/2);
+ 			
+// 			TODO CONSULTATIE: vragen of deze triviale try catch een goede oplossing is voor het throws probleem.
+ 			 // prof: mag maar volgens liskov mag je ook de nodige exceptions gooien in terminate in entity en dan 
+ 			 // die gegooide entities beperken in bijvoorbeeld ship waar die exceptions niet nodig zijn.
+ 			// Maar dit mag dus in principe ook wel.
+ 			
+ 			Asteroid firstChild;
+			try {
+				firstChild = new Asteroid(xPosition+(r/2*Math.cos(randomPlacement)), yPosition + (r/2*Math.sin(randomPlacement)), 
+						1.5*parentVelocity*Math.cos(randomAngle),1.5*parentVelocity*Math.sin(randomAngle),
+						r/2);
+				this.getWorld().addEntity(firstChild);
+			} catch (IllegalPositionException | IllegalRadiusException e) {
+			}
+ 			
+			Asteroid secondChild;
+			try {
+				secondChild = new Asteroid(xPosition-(r/2*Math.cos(randomPlacement)), yPosition - (r/2*Math.sin(randomPlacement)), 
+						-1.5*parentVelocity*Math.cos(randomAngle),-1.5*parentVelocity*Math.sin(randomAngle),
+						r/2);
+				this.getWorld().addEntity(secondChild);
+			} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException e) {
+			}		
+ 		}
  	}
  	
  	/**
@@ -82,6 +152,7 @@ public class Planetoid extends MinorPlanet {
  	 * 
  	 * @param duration
  	 * 		  The time during which this planetoid moves
+ 	 * @throws IllegalRadiusException 
  	 * @post The distanceTravelled is incremented by the amount of kilometers that the planetoid had moved.
  	 * 		 That amount is calculated using the duration and the velocity of this ship.
  	 * 		 | new.getDistanceTravelled() += duration*this.getTotalVelocity()
@@ -91,7 +162,32 @@ public class Planetoid extends MinorPlanet {
  		super.move(duration);
  		// TODO ik denk dat dit een juiste manier is om dit te beschrijven.
  		this.distanceTravelled += duration*this.getTotalVelocity();		
+ 		shrink(distanceTravelled);
  	}
+ 	
+ 	/**
+ 	 * This method shrinks this planetoid based on the distance it has travelled.
+ 	 * If the planetoid no longer has a valid radius, through this shrinking, it 
+ 	 * is terminated.
+ 	 * 
+ 	 * @param distanceTravelled
+ 	 * 		  The amount of kilometres travelled by this planetoid
+ 	 * @effect The radius of this planetoid is shrunken
+ 	 * 		   | new. getRadius() == (getInitialRadius() - (0.0001)*distanceTravelled);
+ 	 * @effect If the radius is not valid, the planetoid is terminated.
+ 	 * 		   | if !isValidRadius()
+ 	 * 				| then this.terminate(); 
+ 	 */
+ 	private void shrink(double distanceTravelled){
+ 		double shrunk_radius = (getInitialRadius() - (0.0001)*distanceTravelled);
+ 		
+ 		try {
+			setRadius(shrunk_radius);
+		} catch (IllegalRadiusException e) {
+			this.terminate();
+		}
+ 	}
+ 	
  	
 	/**
 	 * Variable registering the default density of a planetoid.

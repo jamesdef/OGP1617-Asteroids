@@ -227,7 +227,7 @@ public class Bullet extends Entity {
  	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
  	 */
  	private void setBulletMass(double radius){
- 		this.mass = default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+ 		this.setMass(default_Density*(4/3)*Math.PI*(Math.pow(radius, 3)));
  	}
      
 

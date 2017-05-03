@@ -426,9 +426,13 @@ public class World {
 	 * 		  | @see implementation
 	 */
 	public void moveAllEntities( double Dt) throws IllegalPositionException, IllegalDurationException{
-
+		
+		// TODO: Klopt verwijdering van entity voor verwijdering? 
+		// Denk dat dit enige manier is om key te updaten.
 		for(Entity entity: this.getAllEntities()){
+			this.entities.values().remove(entity);
 			entity.move(Dt);
+			this.entities.put((StringMaker(entity.getPosition())), entity);
 			
 			if(entity instanceof Ship){
 				((Ship) entity).accelerate(Dt);
@@ -458,14 +462,6 @@ public class World {
 		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
 //		System.out.println("begin evolve");
 //		System.out.println(Dt);
-		
-		// TODO: Als je een entity verplaatst moet je er aan denken dat hij in de map zat met zijn oude positie als key.
-		// Verwijder hem daarom misschien best uit die map en plaats hem er opnieuw in na verplaatsing
-//		 for (Entity entity : this.getEntities()) {
-//             this.entities.remove(entity.getPosition());
-//             entity.move(duration);
-//             // Isn't a null operation, because the position of the entity is the key of the hash map.
-//             this.entities.put(entity.getPosition(), entity);
 		
 		if (! isValidDuration(Dt))
 			return;
