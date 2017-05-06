@@ -950,6 +950,10 @@ public class Ship extends Entity {
 					this.terminate();
 				}
 			}
+			
+			if(entity instanceof Asteroid){
+				this.terminate();
+			}
 		}
 		
 		public void teleport(){
