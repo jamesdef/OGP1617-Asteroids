@@ -10,7 +10,7 @@ import be.kuleuven.cs.som.annotate.Raw;
 /**
  * A class for dealing with planetoids, a specific kind of minor planets.
  * They have a certain position, radius, velocity and mass.
- * When a planetoid is terminated, it spawns 
+ * When a planetoid is terminated, it spawns two new asteroid children.
  * 
  * @invar The mass of each planetoid must be valid.
  * 		  |this.getMass() > 0
@@ -45,19 +45,31 @@ public class Planetoid extends MinorPlanet {
 	 * @param  yVelocity 
 	 * 		   The velocity of the planetoid, in the y-direction. 
 	 * 		   Expressed in km/s.
+	 * 
+	 * @param totalDistanceTraveled
+	 * 		  The distance that this planetoid has traveled upon initialisation.
 	 *          
 	 * @effect The given parameters are set as the properties of the new planetoid.
 	 * 		   |setPosition(xPosition,yPosition);
 	 *	       |setVelocity(xVelocity,yVelocity);
 	 *	       |setRadius(radius);
 	 *		   |setPlanetoidMass(new.getRadius());
+	 *@post The initial radius is set to the value with which this planetoid is initialised.
+	 *		new.initialRadius = radius
+	 *
+	 *@post The distance traveled is now equal to the given value.
+	 *		|new.distanceTraveled = totalDistanceTraveled
 	 */
 	@Raw
-	public Planetoid(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius)
+	public Planetoid(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double totalDistanceTraveled)
 			throws IllegalPositionException, IllegalRadiusException {
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
 		this.setPlanetoidMass(this.getRadius());
-		this.initialRadius = radius;
+		this.initialRadius = this.getRadius();
+		this.distanceTraveled = totalDistanceTraveled;
+		//Perhaps the totalDistanceTraveled is not equal to zero
+		//and so the radius has to be shrunk right away.
+		this.shrink(distanceTraveled);	
 	}
 	
 	/**
@@ -161,8 +173,8 @@ public class Planetoid extends MinorPlanet {
  		// TODO misschien hier al krimpen
  		super.move(duration);
  		// TODO ik denk dat dit een juiste manier is om dit te beschrijven.
- 		this.distanceTravelled += duration*this.getTotalVelocity();		
- 		shrink(distanceTravelled);
+ 		this.distanceTraveled += duration*this.getTotalVelocity();		
+ 		shrink(distanceTraveled);
  	}
  	
  	/**
@@ -200,7 +212,7 @@ public class Planetoid extends MinorPlanet {
 	 */
 	@Basic
 	public double getDistanceTravelled(){
-		return this.distanceTravelled;
+		return this.distanceTraveled;
 	}
 	/**
 	 * Returns the radius that this planetoid had upon creation.
@@ -214,7 +226,7 @@ public class Planetoid extends MinorPlanet {
 	 * Variable registering the distance this planetoid has travelled.
 	 * Initialised to a value of zero.
 	 */
-	protected double distanceTravelled = 0;
+	protected double distanceTraveled = 0;
 	
 	/**
      * Variable registering the radius that this planetoid had upon creation.

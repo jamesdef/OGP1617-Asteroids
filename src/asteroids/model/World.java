@@ -107,6 +107,15 @@ public class World {
 		return new HashSet<>(this.entities.values());
 	}
 	
+	//TODO: kan veel generischer. Het is ridiculous om 4 keer 
+	// dezelfde code te schrijven.
+	// je wilt in facade bekomen bij getWorldAsteroids: 
+	// return world.getEntities(Asteroid.class)
+	// Zo ziet getEntities er dan uit: 
+//	public <T extends Entity> Set<T> getEntities(Class<T> c){
+//        return (Set<T>)this.entities.values().stream().filter(entity -> c.isInstance(entity)).collect(Collectors.toSet());
+//    }
+	
 	/**
 	 * Returns a set of all ships that belong to this world.
 	 * @return a set of all ships that belong to this world.
@@ -134,6 +143,35 @@ public class World {
 		}
 		return bullets;
 	}
+	
+	/**
+	 * Returns a set of all asteroids that belong to this world.
+	 * @return a set of all asteroids that belong to this world.
+	 */
+	public Set<Asteroid> getAllAsteroids(){
+		Set<Asteroid> asteroids = new HashSet<>();
+		for(Entity entityToCheck: this.getAllEntities()){
+			if (entityToCheck instanceof Asteroid){
+				asteroids.add((Asteroid)entityToCheck);
+			}
+		}
+		return asteroids;
+	}
+	
+	/**
+	 * Returns a set of all planetoids that belong to this world.
+	 * @return a set of all planetoids that belong to this world.
+	 */
+	public Set<Planetoid> getAllPlanetoids(){
+		Set<Planetoid> planetoids = new HashSet<>();
+		for(Entity entityToCheck: this.getAllEntities()){
+			if (entityToCheck instanceof Planetoid){
+				planetoids.add((Planetoid)entityToCheck);
+			}
+		}
+		return planetoids;
+	}
+	
 	
 	
 	/**

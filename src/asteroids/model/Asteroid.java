@@ -66,7 +66,7 @@ public class Asteroid extends MinorPlanet{
  	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
  	 */
  	private void setAsteroidMass(double radius){
- 		this.mass = default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+ 		this.setMass(default_Density*(4/3)*Math.PI*(Math.pow(radius, 3)));
  	}
 	
 	/**
