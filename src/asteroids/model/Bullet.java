@@ -407,5 +407,36 @@ public class Bullet extends Entity {
 	 */
 	protected final static double default_Mass = default_Density*(4.0/3.0)*Math.PI*(Math.pow(min_Radius, 3.0));
 	
+	//@Override
+	public void handleOtherEntityCollision(Entity entity){
+		if(entity instanceof Ship){
+			if(this.getSource() == entity){
+				//this.setShip((Ship) entity);
+			} else {
+				this.terminate();
+			}
+		}
+		this.terminate();
+
+				
+	}
+	
+	//@Override
+	public void handleBoundaryCollision(){
+	 this.handbleBoundaryCollisionsCount();
+	 if(!this.isTerminated()){
+		 super.handleBoundaryCollision();
+	 }
+		
+	}
+	
+	public void handbleBoundaryCollisionsCount(){
+		int nbBouncesLeft = this.getBouncesLeft();
+		if(nbBouncesLeft == 1){
+			this.terminate();
+		} else {
+			this.decrementBouncesLeft(); 
+		}
+	}
 	
 }

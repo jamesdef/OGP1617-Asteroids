@@ -74,5 +74,17 @@ public class Asteroid extends MinorPlanet{
 	 */
 	protected static double default_Density = 2.65*(Math.pow(10.0, 12.0));
 	
+	//@Override
+	public void handleOtherEntityCollision(Entity entity){
+		if(entity instanceof MinorPlanet){
+			//casual collision
+			this.handleCasualCollision(entity);
+		}
+		if(entity instanceof Bullet){
+			//this dies
+			this.terminate();
+		}
+	}
+	
 }
 

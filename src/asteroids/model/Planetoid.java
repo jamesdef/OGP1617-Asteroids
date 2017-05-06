@@ -220,5 +220,23 @@ public class Planetoid extends MinorPlanet {
      * Variable registering the radius that this planetoid had upon creation.
      */
     protected final double initialRadius;
+    
+  //@Override
+  	public void handleOtherEntityCollision(Entity entity){
+  		if(entity instanceof MinorPlanet){
+  			//casual collision
+  			this.handleCasualCollision(entity);
+  		}
+  	
+  		if(entity instanceof Bullet){
+  			//this dies
+  			this.terminate();
+  		}
+  		
+  		if(entity instanceof Ship){
+  			//ONLY ACTIVE HANDLER, THIS WILL HANDLE THE SHIP'S TELEPORTATION AS THE SHIP CLASS CAN'T BE UPDATED FROM PART 2
+  			((Ship) entity).teleport();
+  		}
+  	}
 	
 }

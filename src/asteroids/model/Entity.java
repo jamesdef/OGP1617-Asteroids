@@ -897,6 +897,63 @@ public abstract class Entity {
 	 * Variable registering the density of this entity.
 	 */
 	private double density;
+	
+	public void handleBoundaryCollision(){
+		boolean horizontally = 
+				(this.getxPosition()< 1.01 * this.getRadius()) || 
+				(this.getxPosition() > (this.getWorld().getWidth() - 1.01 * this.getRadius()));
+		
+		if(horizontally){
+			this.setVelocity(-this.getxVelocity(), this.getyVelocity());
+		} else {
+			this.setVelocity(this.getxVelocity(), -this.getyVelocity());
+		}
+		
+	}
 
+	public abstract void handleOtherEntityCollision(Entity entityB) throws IllegalPositionException, IllegalBulletException;
+
+	
+	public void handleCasualCollision(Entity entity){
+			
+			double thisShipPositionX = this.getxPosition();
+			double thisShipPositionY = this.getyPosition();
+			
+			double thisShipVelocityX = this.getxVelocity();
+			double thisShipVelocityY = this.getyVelocity();
+			
+			double thisShipRadius = this.getRadius();
+			double thisShipmass = this.getMass();
+			
+			
+			double entityPositionX = entity.getxPosition();
+			double entityPositionY = entity.getyPosition();
+			
+			double entityVelocityX = entity.getxVelocity();
+			double entityVelocityY = entity.getyVelocity();
+			
+			double entityRadius = entity.getRadius();
+			double entitymass = entity.getMass();
+			
+			double deltaPosX = entityPositionX - thisShipPositionX;
+			double deltaPosY = entityPositionY - thisShipPositionY;
+			double deltaVelX = entityVelocityX - thisShipVelocityX;
+			double deltaVelY = entityVelocityY - thisShipVelocityY;
+			
+			double delta = deltaPosX * deltaVelX + deltaPosY * deltaVelY;
+	
+			double sumRadius = thisShipRadius + entityRadius;
+			
+			double jValue = 
+					(2 * thisShipmass * entitymass * delta) / 
+					(sumRadius * (thisShipmass + entitymass));
+			double Jx = (jValue * deltaPosX) / sumRadius;
+			double Jy = (jValue * deltaPosY) / sumRadius;
+			
+			double thisShipnewXVel = thisShipVelocityX + (Jx / thisShipmass);
+			double thisShipnewYVel = thisShipVelocityY + Jy / thisShipmass;	
+			this.setVelocity(thisShipnewXVel, thisShipnewYVel);
+		}
+	
 	
 }

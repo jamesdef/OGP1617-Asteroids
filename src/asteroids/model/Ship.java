@@ -935,7 +935,36 @@ public class Ship extends Entity {
 	 */
 	private double thrustforce = 1.1E18;
 	
-	public void teleport(){
+	//@Override
+		public void handleOtherEntityCollision(Entity entity) throws IllegalPositionException, IllegalBulletException{
+			
+			if(entity instanceof Ship){
+				// doe casual collision
+				this.handleCasualCollision(entity);	
+			}
+			
+			if(entity instanceof Bullet){
+				if(((Bullet) entity).getSource() == this){
+					this.loadBullet((Bullet) entity);
+				} else {
+					this.terminate();
+				}
+			}
+		}
 		
-	}
+		public void teleport(){
+			
+			double radius = this.getRadius();
+			double randomXcord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
+			double rancomYcord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
+			
+			try{
+				this.setPosition(randomXcord, rancomYcord);
+				//TODO check overlap
+				
+			} catch (Exception exception) {
+	            this.terminate();
+	        }
+			
+		}
 }
