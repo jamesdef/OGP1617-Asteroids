@@ -492,7 +492,9 @@ public class World {
 				
 				if (tNextEntityBoundaryCollision<=tNextEntityEntityPosition) {
 					//handle entity boundary collision
-					this.handleEntityBoundaryCollision(nextEntityBoundaryCollisionEntity);
+					
+					nextEntityBoundaryCollisionEntity.handleBoundaryCollision();
+					//this.handleEntityBoundaryCollision(nextEntityBoundaryCollisionEntity);
 				}
 				else {
 					//handle entity entity collision
@@ -502,7 +504,12 @@ public class World {
 //					System.out.println("entityentitycoll");
 	
 	
-					this.handleEntityEntityCollision(entityA, entityB);
+					//this.handleEntityEntityCollision(entityA, entityB);
+					
+					
+					//NEW HOEC
+					entityA.handleOtherEntityCollision(entityB);
+					entityB.handleOtherEntityCollision(entityA);
 				}
 				if (isValidDuration(tC))
 					Dt = Dt - tC;
