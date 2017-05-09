@@ -229,7 +229,7 @@ public class Ship extends Entity {
     	double bulletMass = 0;
     	
     	for (Bullet bullet: this.getBullets()){
-			bulletMass += bullet.getMass();
+			bulletMass =+ bullet.getMass();
 		}
 		
 		return bulletMass;
@@ -249,7 +249,8 @@ public class Ship extends Entity {
      * 			|return this.getMass() + GetMassOfAllBulletsOwnedByThisShip;
      */
 	public double getTotalMass(){
-
+		
+		System.out.println(this.getMass());
 		return (this.getMass() + getMassOfBullets());
 	}
 	
@@ -956,6 +957,17 @@ public class Ship extends Entity {
 			}
 		}
 		
+		
+		public boolean overlapsWithOther(){
+			for(Entity entity: this.getWorld().getAllEntities()){
+				if(this.significantOverlap(entity)){
+					System.out.println("overlap terminate");
+					//return true;
+				}
+			}
+			return false;
+		}
+		
 		public void teleport(){
 			
 			double radius = this.getRadius();
@@ -964,6 +976,11 @@ public class Ship extends Entity {
 			
 			try{
 				this.setPosition(randomXcord, rancomYcord);
+				
+				if(this.overlapsWithOther()){
+					this.terminate();
+				}
+				
 				//TODO check overlap
 				
 			} catch (Exception exception) {

@@ -250,5 +250,9 @@ public class Planetoid extends MinorPlanet {
   			((Ship) entity).teleport();
   		}
   	}
+  	
+  	public boolean isValidDistanceTraveled(double distance){
+  		return true;
+  	}
 	
 }
