@@ -252,7 +252,11 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public void removeShipFromWorld(World world, Ship ship) throws ModelException {
-		world.removeEntity(ship);
+		try {
+			world.removeEntity(ship);
+		} catch (IllegalEntityException e) {
+			throw new ModelException ("Illegal entity");
+		} 
 	}
 
 	@Override

@@ -326,8 +326,13 @@ public abstract class Entity {
 	@Raw
 	public static boolean isValidPosition(double xPosition, double yPosition){
 	
+	
 		return (isValidCoordinate(xPosition) && isValidCoordinate(yPosition));
+		
+		
+		
 	}
+	
 	
 	/**
 	 * Returns whether this coordinate is valid
@@ -518,7 +523,15 @@ public abstract class Entity {
 	 */		
 	@Raw
 	public void setMass(double mass){
-		this.mass = mass;
+		if(isValidMass(mass)){
+			this.mass = mass;
+		} else {
+			//this.mass=this.
+		}
+	}
+	
+	public boolean isValidMass(double mass){
+		return true;
 	}
 		
 	
@@ -754,6 +767,12 @@ public abstract class Entity {
 			throw new IllegalCollisionException(this,other);
 		}
 		
+		if(other instanceof Bullet){
+			if(((Bullet) other).getShip() != null){
+				return Double.POSITIVE_INFINITY;
+			}
+		}
+		
 		//Sigma is centerdistance at the moment of collision : sum of two radii.
 		double sigma = other.getRadius() + this.getRadius();
 		double[] Dv= {other.getxVelocity() - this.getxVelocity(), other.getyVelocity() - this.getyVelocity()};
@@ -769,6 +788,8 @@ public abstract class Entity {
 		if ((d <= 0) || (DvDr >= 0)){
 			return Double.POSITIVE_INFINITY;
 		}
+		
+		
 		
 		else{
 			return -(DvDr + Math.sqrt(d))/(DvDv);}
