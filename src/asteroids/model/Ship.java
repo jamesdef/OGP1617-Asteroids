@@ -618,11 +618,11 @@ public class Ship extends Entity {
      * 		   -The given bullet is effective
      *         -This ship is not terminated or the bullet is terminated.
      *         -This ship does not already have the bullet as one of it's bullets
-     *         -This ships' radius is bigger than that of the bullet.
+     *         -The bullet is compeletly within this ship. 
      *         | result == ( (bullet != null) 
      *         |       && ((!this.isTerminated()) || (bullet.isTerminated()))
      *         |			 && (!this.hasBullet(bullet)) 
-     *         |					&& (bullet.getRadius()<this.getRadius())  )
+     *         |					&& (bullet.isFullyWithinEntity(this))  )
     }
      */
 	@Raw
@@ -630,8 +630,9 @@ public class Ship extends Entity {
     	  return ( (bullet != null) 
     			       && ((!this.isTerminated()) || (bullet.isTerminated()))
     			     		 && (!this.hasBullet(bullet)) 
-    			     				&& (bullet.getRadius()<this.getRadius())  );		  
+    			     				&& (bullet.isFullyWithinEntity(this))  );		  
     }
+	
 	
     /**
      * Check whether all the bullets attached to this ship are 'legal'.
@@ -697,6 +698,11 @@ public class Ship extends Entity {
 	 */
 	// TODO misschien mag hier wel bij dat Source null is
 	public void loadBullet(Bullet bullet) throws IllegalPositionException, IllegalBulletException{
+//		if (!this.significantOverlap(bullet)){
+//			System.out.println("in not overlap");
+//			throw new IllegalBulletException(bullet);
+//		}
+		
 		if (((this.getWorld()!=null)&&(bullet.getWorld()!=null)&&(this.getWorld()!=bullet.getWorld())) 
 							|| !canHaveAsBullet(bullet) || bullet.getShip()!= null){
 			throw new IllegalBulletException(bullet);
@@ -761,10 +767,13 @@ public class Ship extends Entity {
 	 * 		  | if (hasBullet(bullet){
 	 * 		  |       (bullet.getShip() == null)
 	 */
-	public void removeBullet(Bullet bullet){
-		if (hasBullet(bullet)){
+	public void removeBullet(Bullet bullet) throws IllegalEntityException{
+		if (this.hasBullet(bullet)){
 			bullets.remove(bullet);
 			bullet.setShip(null);
+		}
+		else{
+			throw new IllegalEntityException(this);
 		}
 	}
 	
@@ -886,10 +895,12 @@ public class Ship extends Entity {
 		if (entity.isDeadly() == true){
 			if(entity instanceof Bullet){
 				if(((Bullet) entity).getSource() == this){
+					// The Bullet is first placed to the centre of this ship,
+					// so that it is fully within this ship and can be loaded.	
+					((Bullet) entity).setPosition(this.getxPosition(),this.getyPosition());
+					
 					this.loadBullet((Bullet) entity);
-					// De bullet is geladen, vermijden dat iets nog verwijdert wordt.
-					// TODO probleem is dat in de volgende handler, diezelfde bullet getermineerd wordt.
-					return;
+						return;
 				}
 				else {
 					this.terminate();
@@ -986,12 +997,6 @@ public class Ship extends Entity {
      * Variable registering the Minimum allowed mass.
      */
     private final double min_Mass = min_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3.0));
-    
-    /**
-     * Variable registering the mass of this ship.
-     *
-     */
-    private double mass = min_Mass;
     
 	/**
 	 * A variable defining the force that an active thruster can exert on a ship.

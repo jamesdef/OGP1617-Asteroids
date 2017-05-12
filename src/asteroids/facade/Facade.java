@@ -275,7 +275,11 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public void removeBulletFromWorld(World world, Bullet bullet) throws ModelException {
-		world.removeEntity(bullet);
+		try {
+			world.removeEntity(bullet);
+		} catch (IllegalEntityException e) {
+			throw new ModelException ("Illegal entity");
+		} 
 	}
 
 	@Override
@@ -312,7 +316,11 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public void removeBulletFromShip(Ship ship, Bullet bullet) throws ModelException {
-		ship.removeBullet(bullet);
+		try {
+			ship.removeBullet(bullet);
+		} catch (IllegalEntityException e)  {
+			throw new ModelException ("Illegal Ship");
+		}
 	}
 
 	@Override
@@ -436,6 +444,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public void addPlanetoidToWorld(World world, Planetoid planetoid) throws ModelException {
 		try {
+			System.out.println("binnen in add planetoid to world");
 			world.addEntity(planetoid);
 		} catch (IllegalEntityException e) {
 			throw new ModelException ("Illegal entity");

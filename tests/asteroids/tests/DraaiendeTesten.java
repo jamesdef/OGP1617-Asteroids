@@ -67,21 +67,21 @@ public class DraaiendeTesten {
     facade.addBulletToWorld(filledWorld, bullet1);
   }
   
-//  @Test
-//  public void testEvolveShipDoubleBoundaryCollision() throws ModelException {
-//    max_score += 8;
-//    World world = facade.createWorld(1000, 1000);
-//    Ship ship1 = facade.createShip(100, 100, -10, -10, 50, 0, 1.0E20);
-//    facade.addShipToWorld(world, ship1);
-//    // Probleem: blijft steken in evolve!
-//    // collision after 15 seconds
-//    facade.evolve(world, 15, null);
-//    assertEquals(1, facade.getWorldShips(world).size());
-//    assertEquals(150, facade.getShipPosition(ship1)[0], EPSILON);
-//    assertEquals(150, facade.getShipPosition(ship1)[1], EPSILON);
-//    assertEquals(10, facade.getShipVelocity(ship1)[0], EPSILON);
-//    assertEquals(10, facade.getShipVelocity(ship1)[1], EPSILON);
-//    score += 8;
-//  }
+  @Test
+  public void testEvolveDtNan() throws ModelException {
+    try {
+      max_score += 2;
+      World world = facade.createWorld(1000, 1000);
+      Ship ship1 = facade.createShip(100, 120, 10, 5, 50, 0, 1.0E20);
+      Ship ship2 = facade.createShip(400, 120, 0, -5, 50, 0, 1.0E20);
+      facade.addShipToWorld(world, ship1);
+      facade.addShipToWorld(world, ship2);
+      facade.evolve(world, Double.NaN, null);
+    } catch (ModelException exc) {
+    	System.out.println("10.score verbeterd");
+
+      score += 2;
+    }
+  }
   
 }

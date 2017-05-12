@@ -141,7 +141,8 @@ public class Part3TestFull {
     score += 3;
   }
   
-  // TODO NIET JUIST
+  
+  @Test
   public void testCreateShipRadiusNan() throws ModelException {
     try {
       max_score += 1;
@@ -655,7 +656,6 @@ public class Part3TestFull {
     score += 8;
   }
 
-  // TODO NIET JUIST
   @Test
   public void testLoadBulletOnShipOutOfShip() throws ModelException {
     try {
@@ -761,7 +761,6 @@ public class Part3TestFull {
     score += 8;
   }
 
-  // TODO NIET JUIST WANT catch niet geprint
   @Test
   public void testRemoveBulletFromShipBulletOnOtherShip() throws ModelException {
     try {
@@ -1042,7 +1041,6 @@ public class Part3TestFull {
     score += 2;
   }
 
-  // TODO NIET JUIST 
   @Test
   public void testEvolveDtNan() throws ModelException {
     try {
@@ -1060,7 +1058,6 @@ public class Part3TestFull {
     }
   }
   
-  //TODO NIET JUIST
   @Test
   public void testEvolveDtNegative() throws ModelException {
     try {

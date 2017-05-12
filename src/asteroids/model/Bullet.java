@@ -4,9 +4,6 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 import asteroids.model.exceptions.*;
 
-//TODO if a bullet hits it's own ship, it is reloaded but its bounces
-// are not forgotten, where shall we say this?
-
 /**
  * A class for dealing with bullets, which are a kind of entity in space. 
  * These have a certain position, velocity, radius, mass and density.
@@ -358,9 +355,12 @@ public class Bullet extends Entity {
 	}
 	
 	
-	//TODO documentatie en waarom override in comment?
+	//TODO documentatie
 	
-	//@Override
+	
+	//TODO if a bullet hits it's own ship, it is reloaded but its bounces
+	// are not forgotten, where shall we say this?
+	@Override
 	public void handleOtherEntityCollision(Entity entity){
 		if(entity instanceof Ship){
 			if(this.getSource() == entity){

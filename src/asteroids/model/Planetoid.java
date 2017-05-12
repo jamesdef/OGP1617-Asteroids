@@ -66,6 +66,7 @@ public class Planetoid extends MinorPlanet {
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
 		this.setPlanetoidMass(this.getRadius());
 		this.initialRadius = this.getRadius();
+		System.out.println("initialradius =" + initialRadius);
 		this.setDistanceTraveled(totalDistanceTraveled);
 		//Perhaps the totalDistanceTraveled is not equal to zero
 		//and so the radius has to be shrunk right away.
@@ -125,7 +126,6 @@ public class Planetoid extends MinorPlanet {
   	}
 	
  	
- 	//TODO when a planetoid is bigger than 30 km and is terminated, it spawns two smaller asteroids.
  	/**
  	 * This planetoid is terminated. 
  	 * If this planetoid is in a world and 
@@ -151,41 +151,27 @@ public class Planetoid extends MinorPlanet {
  	 */
  	@Override
  	public void terminate(){
- 		super.terminate();
+ 		// TODO grens verlaagd voor test
  		if (this.getWorld() != null && this.getRadius() >= 30){
- 			//TODO Kan ik wel deze dingen opvragen? De entiteit is immers getermineerd.
+ 			// We save the world of this, soon to be terminated, planetoid, 
+ 			// so that we can use it to add it's children. Thus avoiding the null pointer.
+ 			World worldToAddTo = this.getWorld();
+ 			super.terminate();	
+ 			
  			double xPosition = this.getxPosition();
  			double yPosition = this.getyPosition();
  			double r = this.getRadius();
  			double parentVelocity = this.getTotalVelocity();
  			double randomAngle = Math.random() *2.0*Math.PI; 
- 			// TODO: aan de hand van testen; Misschien moeten we ze wel random plaatsen.
  			double randomPlacement = Math.random() * 2.0 * Math.PI;
- 			
- 			//TODO: Probleem: Bij het aanmaken van een asteroid kunnen exceptions worden gegooid
-// 			        daardoor moeten die hier meteen opgevangen worden, en dan mogen die entiteiten
-// 			        meteen getermineerd worden maar dat lukt hier niet perfect.
- 			
-// 			Asteroid firstChild = new Asteroid(xPosition+(r/2*Math.cos(randomPlacement)), yPosition + (r/2*Math.sin(randomPlacement)), 
-//					1.5*parentVelocity*Math.cos(randomAngle),1.5*parentVelocity*Math.sin(randomAngle),
-//					r/2);
-// 			
-// 			Asteroid secondChild = new Asteroid(xPosition-(r/2*Math.cos(randomPlacement)), yPosition - (r/2*Math.sin(randomPlacement)), 
-//					-1.5*parentVelocity*Math.cos(randomAngle),-1.5*parentVelocity*Math.sin(randomAngle),
-//					r/2);
- 			
-// 			TODO CONSULTATIE: vragen of deze triviale try catch een goede oplossing is voor het throws probleem.
- 			 // prof: mag maar volgens liskov mag je ook de nodige exceptions gooien in terminate in entity en dan 
- 			 // die gegooide entities beperken in bijvoorbeeld ship waar die exceptions niet nodig zijn.
- 			// Maar dit mag dus in principe ook wel.
  			
  			Asteroid firstChild;
 			try {
 				firstChild = new Asteroid(xPosition+(r/2*Math.cos(randomPlacement)), yPosition + (r/2*Math.sin(randomPlacement)), 
 						1.5*parentVelocity*Math.cos(randomAngle),1.5*parentVelocity*Math.sin(randomAngle),
 						r/2);
-				this.getWorld().addEntity(firstChild);
-			} catch (IllegalPositionException | IllegalRadiusException e) {
+				worldToAddTo.addEntity(firstChild);
+			} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException e) {
 			}
  			
 			Asteroid secondChild;
@@ -193,10 +179,14 @@ public class Planetoid extends MinorPlanet {
 				secondChild = new Asteroid(xPosition-(r/2*Math.cos(randomPlacement)), yPosition - (r/2*Math.sin(randomPlacement)), 
 						-1.5*parentVelocity*Math.cos(randomAngle),-1.5*parentVelocity*Math.sin(randomAngle),
 						r/2);
-				this.getWorld().addEntity(secondChild);
+				worldToAddTo.addEntity(secondChild);
 			} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException e) {
-			}		
+			}
+			// When we come out of this creation, the planetoid is already terminated
+			// So we return out of this function immediatly.
+			return;
  		}
+ 		super.terminate();
  	}
  	
  	/**
@@ -204,17 +194,19 @@ public class Planetoid extends MinorPlanet {
  	 * 
  	 * @param duration
  	 * 		  The time during which this planetoid moves
- 	 * @throws IllegalRadiusException 
  	 * @post The distanceTravelled is incremented by the amount of kilometers that the planetoid had moved.
  	 * 		 That amount is calculated using the duration and the velocity of this ship.
  	 * 		 | new.getDistanceTravelled() += duration*this.getTotalVelocity()
+ 	 *@effect Every time the planetoid is moved, it is shrunken based on the distance it
+ 	 *		  has traveled in total.
+ 	 *		  |shrink(distanceTraveled);
  	 */
+ 	@Override
  	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
- 		// TODO misschien hier al krimpen
  		super.move(duration);
- 		// TODO ik denk dat dit een juiste manier is om dit te beschrijven.
  		this.distanceTraveled += duration*this.getTotalVelocity();		
  		shrink(distanceTraveled);
+// 		System.out.println("radius after moving =" + this.getRadius());
  	}
  	
  	/**
@@ -258,7 +250,6 @@ public class Planetoid extends MinorPlanet {
     
     //TODO DOCUMENTATIE
     
-    //WAAROM STAAT DEZE OVERRIDE GECOMMENTED?
     @Override
   	public void handleOtherEntityCollision(Entity entity){
   		if(entity instanceof MinorPlanet){

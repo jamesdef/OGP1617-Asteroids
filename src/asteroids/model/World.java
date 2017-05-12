@@ -301,13 +301,15 @@ public class World {
 	public void addEntity(Entity entity) throws IllegalEntityException{
 
 		if (entity == null || !canHaveAsEntity(entity) || entity.getWorld()!=null){
-				
 				throw new IllegalEntityException(entity);
 		}
 
 		this.entities.put((StringMaker(entity.getPosition())), entity);
 		//This entity has the world as its world.
+		
+		
 		entity.setWorld(this);
+		
 	}
 	
 	/** HELPER FUNCTION 
@@ -520,8 +522,9 @@ public class World {
 //		System.out.println("begin evolve");
 //		System.out.println("Duration equals:" + Dt);
 		
-		if (! isValidDuration(Dt))
-			return;
+		if (! isValidDuration(Dt)){
+			throw new IllegalDurationException(Dt);
+		}
 
 //		ENTITY-BOUNDARY INFO
 		// The time until the first boundary collision is calculated.
@@ -549,7 +552,6 @@ public class World {
 			if (! isValidDuration(tC))
 //				System.out.println("not valid tC");
 				throw new IllegalDurationException(tC);
-			//				    Misschien TODO throw illegal duration exception hier
 			else
 				// All entities are moved until the time of collision
 				this.moveAllEntities(tC);
@@ -558,7 +560,6 @@ public class World {
 
 			if (tNextEntityBoundaryCollision<=tNextEntityEntityCollision) {
 				//handle entity boundary collision
-				//TODO collision int hoeksken
 				nextEntityBoundaryCollisionEntity.handleBoundaryCollision();
 			}
 
