@@ -66,18 +66,13 @@ public class Asteroid extends MinorPlanet{
  	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
  	 */
  	private void setAsteroidMass(double radius){
- 		this.setMass(default_Density*(4/3)*Math.PI*(Math.pow(radius, 3)));
+ 		this.setMass(default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3)));
  	}
 	
-	/**
-	 * Variable registering the default density of an asteroid.
-	 */
-	protected static double default_Density = 2.65*(Math.pow(10.0, 12.0));
-	
-	//@Override
+
+	@Override
 	public void handleOtherEntityCollision(Entity entity){
 		if(entity instanceof MinorPlanet){
-			//casual collision
 			this.handleCasualCollision(entity);
 		}
 		if(entity instanceof Bullet){
@@ -85,6 +80,23 @@ public class Asteroid extends MinorPlanet{
 			this.terminate();
 		}
 	}
+	
+	/**
+	 * Method registering if this entity is deadly.
+	 */
+	@Override
+	public Boolean isDeadly(){
+		return true;
+	}
+	
+	
+// --------------- INITIALISATION ----------------
+	
+	/**
+	 * Variable registering the default density of an asteroid.
+	 */
+	private static double default_Density = 2.65*(Math.pow(10.0, 12.0));
+	
 	
 }
 

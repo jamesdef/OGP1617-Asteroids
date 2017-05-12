@@ -32,7 +32,10 @@ public class Facade implements asteroids.part3.facade.IFacade {
 			throw new ModelException("ILLEGAL RADIUS");
 		}
 	}
-
+	
+	
+	// TODO blijkbaar moeten assertion errors ook gecatchet worden. 
+	
 	@Override
 	public Ship createShip(double x, double y, double xVelocity, double yVelocity, double radius, double direction,
 			double mass) throws ModelException {
@@ -42,6 +45,8 @@ public class Facade implements asteroids.part3.facade.IFacade {
 			throw new ModelException("Illegal Position");
 		} catch (IllegalRadiusException e) {
 			throw new ModelException("Illegal Radius");
+		} catch (AssertionError e) {
+			throw new ModelException("Illegal Direction");
 		}
 	}
 

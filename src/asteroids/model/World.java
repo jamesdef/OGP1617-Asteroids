@@ -293,13 +293,15 @@ public class World {
 	 * 		  |	 entity.getWorld() == this
 	 * 
 	 * @throws IllegalEntityException
+	 * 		   If the entity is null, an exception is thrown.
 	 * 		   If this world can not have the given entity as one of its entities 
 	 * 			or the given entity already has a world, this exception is thrown.
-	 * 		   |(!canHaveAsEntity(entity) || entity.getWorld()!=null)
+	 * 		   | entity == null || (!canHaveAsEntity(entity) || entity.getWorld()!=null)
 	 */
 	public void addEntity(Entity entity) throws IllegalEntityException{
 
-		if (!canHaveAsEntity(entity) || entity.getWorld()!=null){
+		if (entity == null || !canHaveAsEntity(entity) || entity.getWorld()!=null){
+				
 				throw new IllegalEntityException(entity);
 		}
 
@@ -378,11 +380,21 @@ public class World {
 	 */
 	
 	public Boolean canHaveAsEntity(Entity entity){
+		
+		// 1 is het probleem!
+//		System.out.println("1:" + entity.isTerminated() );
+//		System.out.println("2:" + this.isTerminated() );
+//		System.out.println("3:" + entity == null );
+//		System.out.println("4:" + (entity.getWorld() != null && this != entity.getWorld()));
+//		System.out.println("5:" + !this.withinWorldBoundaries(entity) );
+//		System.out.println("6:" + (entity instanceof Bullet && ((Bullet)entity).getShip()!= null));
+
+
 		if (entity.isTerminated() || this.isTerminated() || entity == null  || (entity.getWorld() != null && this != entity.getWorld())
 				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
 			return false;
 		}
-	
+		
 		for (Entity Object : this.getAllEntities()) {
 			if (entity.significantOverlap(Object)){
 				return false ;
@@ -459,17 +471,23 @@ public class World {
 	 * 		  The given duration
 	 * @throws IllegalDurationException
 	 * 		   |!isValidDuration()
+	 * @post  Each entity is moved and so it's key in getEntities()
+	 * 		  must change to the new location of that entity.
+	 * 		|for(Entity entity: this.getAllEntities())
+	 * 		  | entity == new.entities.get(new.getPosition)
 	 * @effect All entities within this world are moved.
 	 * 		   A ship can be accelerated if its thruster is on.
 	 * 		  | @see implementation
 	 */
 	public void moveAllEntities( double Dt) throws IllegalPositionException, IllegalDurationException{
 		
-		// TODO: Klopt verwijdering van entity voor verwijdering? 
-		// Denk dat dit enige manier is om key te updaten.
 		for(Entity entity: this.getAllEntities()){
-			this.entities.values().remove(entity);
+			// The values are first removed from the map of entities, 
+			// before the entities are moved.
+			this.getEntities().values().remove(entity);
 			entity.move(Dt);
+			// After moving an entity, its key changes. 
+			// And thus we must update this.
 			this.entities.put((StringMaker(entity.getPosition())), entity);
 			
 			if(entity instanceof Ship){
@@ -486,7 +504,8 @@ public class World {
 	 * This method evolves the world to a next state, a given duration later.
 	 * 
 	 * If something important will happen within this world before the given duration,
-	 * this event will first be handled.
+	 * this event will first be handled. If after that, another event happens before the remaining
+	 * duration is completed, that event is handled also.
 	 * 
 	 * @param Dt
 	 * 		  The duration with which we will evolve.
@@ -499,89 +518,110 @@ public class World {
 	public void evolve(double Dt) throws IllegalCollisionException, IllegalPositionException, IllegalDurationException, IllegalBulletException{
 		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
 //		System.out.println("begin evolve");
-//		System.out.println(Dt);
+//		System.out.println("Duration equals:" + Dt);
 		
 		if (! isValidDuration(Dt))
 			return;
-			
+
+//		ENTITY-BOUNDARY INFO
+		// The time until the first boundary collision is calculated.
 		double tNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
+//		System.out.println("Time till next boundary coll:" + tNextEntityBoundaryCollision);
 		Entity nextEntityBoundaryCollisionEntity = this.getNextEntityBoundaryCollisionEntity();
 
-		//NEXT ENTITY-ENTITY COLLISSION INFO
-		double tNextEntityEntityPosition = this.getTimeToNextEntityEntityCollision();
-		HashSet<Entity> nextEntityEntityPositionEntities = this.getNextEntityEntityCollisionEntities();
+//      ENTITY - ENTITY INFO
+		// The time until the first collision between two entities is calculated.
+		double tNextEntityEntityCollision = this.getTimeToNextEntityEntityCollision();
+		HashSet<Entity> nextEntityEntityCollisionEntities = this.getNextEntityEntityCollisionEntities();
 		
-		double tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
+		double tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityCollision);
 //		System.out.println("-------------------tC-----");
 //		System.out.println(tC);
-		double counter = 0;
 		if (tC <= Dt){
+//			 Time to first collision is smaller than given evolve time Dt.
 //			System.out.print("tC = ");
 //			System.out.println(tC);
 //			System.out.print("Dt = ");
 //			System.out.println(Dt);
-			while ( Dt != 0){
-//				System.out.println(Dt);
-//				System.out.println("Dt evolve");
-				if (! isValidDuration(tC))
-					System.out.println("not valid tC");
-				else
-					this.moveAllEntities(tC);
-				
-				if (tNextEntityBoundaryCollision<=tNextEntityEntityPosition) {
-					//handle entity boundary collision
-					
-					nextEntityBoundaryCollisionEntity.handleBoundaryCollision();
-					//this.handleEntityBoundaryCollision(nextEntityBoundaryCollisionEntity);
-				}
-				else {
-					//handle entity entity collision
-					List<Entity> ArrayofEntities = new ArrayList<>(nextEntityEntityPositionEntities);
-					Entity entityA = ArrayofEntities.get(0);
-					Entity entityB = ArrayofEntities.get(1);
-//					System.out.println("entityentitycoll");
-	
-	
-					//this.handleEntityEntityCollision(entityA, entityB);
-					
-					
-					//NEW HOEC
-					entityA.handleOtherEntityCollision(entityB);
-					entityB.handleOtherEntityCollision(entityA);
-				}
-				if (isValidDuration(tC))
-					Dt = Dt - tC;
-				
-				tNextEntityBoundaryCollision = this.getTimeToNextEntityBoundaryCollision();
-				nextEntityBoundaryCollisionEntity = this.getNextEntityBoundaryCollisionEntity();
+			
+//			System.out.println(Dt);
+//			System.out.println("Dt evolve");
+			if (! isValidDuration(tC))
+//				System.out.println("not valid tC");
+				throw new IllegalDurationException(tC);
+			//				    Misschien TODO throw illegal duration exception hier
+			else
+				// All entities are moved until the time of collision
+				this.moveAllEntities(tC);
 
-				//NEXT ENTITY-ENTITY COLLISSION INFO
-				tNextEntityEntityPosition = this.getTimeToNextEntityEntityCollision();
-				nextEntityEntityPositionEntities = this.getNextEntityEntityCollisionEntities();
-				
-				tC = Math.min(tNextEntityBoundaryCollision, tNextEntityEntityPosition);
-//				System.out.println("tC new");
-//				System.out.println(tC);
-//				System.out.println("Dt new");
-//				System.out.println(Dt);
-				if (tC <= Dt){
-					counter +=1;
-				} 
-				else {
-					this.moveAllEntities(Dt);
-					Dt = 0;
-				}
+			//-------------- COLLISIONS ARE HANDLED, entities are at point of collision.
+
+			if (tNextEntityBoundaryCollision<=tNextEntityEntityCollision) {
+				//handle entity boundary collision
+				//TODO collision int hoeksken
+				nextEntityBoundaryCollisionEntity.handleBoundaryCollision();
 			}
-//			System.out.println("evolve");
-//				this.evolve(Dt-tC);
-			} 
-		else {
-				this.moveAllEntities(Dt);
+
+
+			else {
+				//handle entity entity collision
+				List<Entity> ArrayofEntities = new ArrayList<>(nextEntityEntityCollisionEntities);
+				Entity entityA = ArrayofEntities.get(0);
+				Entity entityB = ArrayofEntities.get(1);
+
+				// TWO-SIDED solving of collision.
+				entityA.handleOtherEntityCollision(entityB);
+				//Flag for collision handled is raised in case
+				// this is a casual collision.
+				setCasualCollisionHandled(true);
+				entityB.handleOtherEntityCollision(entityA);
+				// Flag is now put to false again:
+				setCasualCollisionHandled(false);
 			}
+
+			// If tC was valid, it is now substracted from Dt.
+			// This to calculate the remaining time until evolve is complete.		
+			if (isValidDuration(tC))
+				Dt = Dt - tC;
+			// Recursive: a new Dt has been computed and we now 
+			// call upon evolve with the smaller value for Dt.
+			this.evolve(Dt);
+		}
+		
+		else{ 
+			// ! tC < Dt
+			// Dt is smaller than the time until the first collision.
+			this.moveAllEntities(Dt);
+		}
+		
 //		System.out.println(Dt);
 //		System.out.println(counter);
 //		System.out.println("einde evolve");
 	}
+	
+	/**
+	 * Method returning whether the casual collision is already handled.
+	 */
+	@Basic
+	public boolean isCasualCollisionHandled(){
+		return casualCollisionHandled;
+	}
+	
+	/**
+	 * Method that sets whether the casual collision has already been handled.
+	 */
+	@Basic
+	public void setCasualCollisionHandled(Boolean given){
+		casualCollisionHandled = given;
+	}
+	
+	/*
+	 * Variable registering whether this casual collision is handled.
+	 * Initialised as false.
+	 */
+	private boolean casualCollisionHandled = false;
+	
+	
 	/**
 	 *  Check whether the given duration is legal.
 	 * 
@@ -929,7 +969,7 @@ public class World {
 	public void handleBulletShipCollision(Bullet bullet, Ship ship) throws IllegalBulletException, IllegalPositionException{
 		
 		if(bullet.getSource() == ship){
-			System.out.println("the source of this bullet is the hitting ship");
+//			System.out.println("the source of this bullet is the hitting ship");
 			ship.loadBullet(bullet);
 			
 		} else {

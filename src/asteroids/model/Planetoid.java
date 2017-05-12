@@ -66,7 +66,7 @@ public class Planetoid extends MinorPlanet {
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
 		this.setPlanetoidMass(this.getRadius());
 		this.initialRadius = this.getRadius();
-		this.distanceTraveled = totalDistanceTraveled;
+		this.setDistanceTraveled(totalDistanceTraveled);
 		//Perhaps the totalDistanceTraveled is not equal to zero
 		//and so the radius has to be shrunk right away.
 		this.shrink(distanceTraveled);	
@@ -81,8 +81,48 @@ public class Planetoid extends MinorPlanet {
  	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
  	 */
  	private void setPlanetoidMass(double radius){
- 		this.setMass(default_Density*(4/3)*Math.PI*(Math.pow(radius, 3)));
+ 		this.setMass(default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3)));
  	}
+ 	
+ 	
+ 	/**
+ 	 * This method sets the total distance traveled to the
+ 	 * given value. 
+ 	 * 
+ 	 * @param totalDistanceTraveled
+ 	 * 		  The amount of distance traveled to set.
+ 	 * @post If the given value is not valid, this entity is terminated.
+ 	 * 		 |if !isValidDistanceTraveled(totalDistanceTraveled)
+ 	 * 		 | 		this.terminate()
+ 	 * @post If the given value is valid, the new distance traveled is equal
+ 	 * 		 to the given value.
+ 	 * 	     |if isValidDistanceTraveled(totalDistanceTraveled)
+ 	 * 		 | 	new.distanceTraveled == totalDistanceTraveled
+ 	 */
+ 	private void setDistanceTraveled(double totalDistanceTraveled){
+ 		if (!isValidDistanceTraveled(totalDistanceTraveled)){
+ 			this.terminate();
+ 		}
+ 		else{
+ 			this.distanceTraveled = totalDistanceTraveled;
+ 		}
+ 	}
+ 	
+ 	
+ 	//TODO DOCUMENTATIE
+ 	/**
+ 	 * This method checks whether the given distance is a valid value for 
+ 	 * the distance traveled. The distance is valid if it is not so big as to make
+ 	 * decline the radius beneath a size of 5 right away.
+ 	 * 
+ 	 * @param distance
+ 	 * 	      The distance to check
+ 	 * @return Whether this total traveled distance is valid.
+ 	 * 		   | result = 0.000001*distance < (this.getRadius()-5.0)
+ 	 */
+  	public boolean isValidDistanceTraveled(double distance){
+  		return 0.000001*distance < (this.getRadius()-5.0);
+  	}
 	
  	
  	//TODO when a planetoid is bigger than 30 km and is terminated, it spawns two smaller asteroids.
@@ -185,13 +225,13 @@ public class Planetoid extends MinorPlanet {
  	 * @param distanceTravelled
  	 * 		  The amount of kilometres travelled by this planetoid
  	 * @effect The radius of this planetoid is shrunken
- 	 * 		   | new. getRadius() == (getInitialRadius() - (0.0001)*distanceTravelled);
+ 	 * 		   | new. getRadius() == (getInitialRadius() - (0.000001)*distanceTravelled);
  	 * @effect If the radius is not valid, the planetoid is terminated.
  	 * 		   | if !isValidRadius()
  	 * 				| then this.terminate(); 
  	 */
  	private void shrink(double distanceTravelled){
- 		double shrunk_radius = (getInitialRadius() - (0.0001)*distanceTravelled);
+ 		double shrunk_radius = (getInitialRadius() - (0.000001)*distanceTravelled);
  		
  		try {
 			setRadius(shrunk_radius);
@@ -199,13 +239,6 @@ public class Planetoid extends MinorPlanet {
 			this.terminate();
 		}
  	}
- 	
- 	
-	/**
-	 * Variable registering the default density of a planetoid.
-	 */
-	protected final static double default_Density = 0.917*(Math.pow(10.0, 12.0));
-	
 	
 	/**
 	 * Returns the distance this planetoid has travelled.
@@ -221,19 +254,12 @@ public class Planetoid extends MinorPlanet {
 	public double getInitialRadius(){
 		return this.initialRadius;
 	}
-	
-	/**
-	 * Variable registering the distance this planetoid has travelled.
-	 * Initialised to a value of zero.
-	 */
-	protected double distanceTraveled = 0;
-	
-	/**
-     * Variable registering the radius that this planetoid had upon creation.
-     */
-    protected final double initialRadius;
+
     
-  //@Override
+    //TODO DOCUMENTATIE
+    
+    //WAAROM STAAT DEZE OVERRIDE GECOMMENTED?
+    @Override
   	public void handleOtherEntityCollision(Entity entity){
   		if(entity instanceof MinorPlanet){
   			//casual collision
@@ -251,8 +277,26 @@ public class Planetoid extends MinorPlanet {
   		}
   	}
   	
-  	public boolean isValidDistanceTraveled(double distance){
-  		return true;
-  	}
+  	
+  	
+//-------------VARIABLES - INITIALISING-----------
+	
+	/**
+	 * Variable registering the default density of a planetoid.
+	 */
+	private final static double default_Density = 0.917*(Math.pow(10.0, 12.0));
+	
+  	
+	/**
+	 * Variable registering the distance this planetoid has travelled.
+	 * Initialised to a value of zero.
+	 */
+	private double distanceTraveled = 0;
+	
+	/**
+     * Variable registering the radius that this planetoid had upon creation.
+     */
+    private final double initialRadius;
+  	
 	
 }

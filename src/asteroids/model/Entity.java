@@ -334,20 +334,20 @@ public abstract class Entity {
 	}
 	
 	
+	// TODO BLIJKBAAR MAG INFINITY WEL ALS POSITIE BUITEN EEN WERELD
+	
 	/**
 	 * Returns whether this coordinate is valid
 	 * 
 	 * @param coordinate
 	 * 		   The coordinate that we wish to inspect
 	 * 
-	 * @return True if and only if this coordinate is not infinity or not a number.
-	 * 		   |result == (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
-				&& (coordinate != Double.NEGATIVE_INFINITY));
+	 * @return True if and only if this coordinate is not a number.
+	 * 		   |result == (!Double.isNaN(coordinate));
 	 */
 	@Raw
 	public static boolean isValidCoordinate(double coordinate){
-		return (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
-				&& (coordinate != Double.NEGATIVE_INFINITY));
+		return (!Double.isNaN(coordinate));
 	}
 	
 	
@@ -500,17 +500,20 @@ public abstract class Entity {
 	@Raw
 	// TODO getMinradius moet gelden voor alle entitiess
 	public boolean isValidRadius(double radius){
-		return (radius >= getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+		return ((!Double.isNaN(radius)) && (radius != Double.POSITIVE_INFINITY));
 	}
 	
-	/**
-	 * Return the minimum radius an entity can have.
-	 * @return the minimum radius an entity can have.
-	 */
-	@Basic
-	public static double getMinRadius(){
-		return Entity.min_Radius;
-	}
+	
+	// TODO je kan ook deze functie wel gebruiken en enkel dit overschrijven in andere klassen.
+//	
+//	/**
+//	 * Return the minimum radius an entity can have.
+//	 * @return the minimum radius an entity can have.
+//	 */
+//	@Basic
+//	public abstract double getMinRadius();
+	
+
 	
 // ---------------- Mass -------------------
 	
@@ -523,17 +526,24 @@ public abstract class Entity {
 	 */		
 	@Raw
 	public void setMass(double mass){
-		if(isValidMass(mass)){
-			this.mass = mass;
-		} else {
-			//this.mass=this.
-		}
+		this.mass = mass;
 	}
 	
-	public boolean isValidMass(double mass){
-		return true;
-	}
-		
+	
+	
+//	public void setMass(double mass){
+//		if(isValidMass(mass)){
+//			this.mass = mass;
+//		} else {
+//			//this.mass=this.
+//		}
+//	}
+//	
+//	//TODO KAN NIET KLOPPEN
+//	public boolean isValidMass(double mass){
+//		return true;
+//	}
+//		
 	
 	
 // ---------------- Moving -------------------
@@ -652,15 +662,11 @@ public abstract class Entity {
 	 * 		   | 	this.move(resulting_time + extra)
 	 * 		   |	!this.getWorld().withinBoundaries(this)
 	 * 	       If we had not increased resulting_time with extra, the entity would have still been within this world.
-	 * 
-	 * @throw IllegalBulletException
-	 * 		  The entity is not within a certain world.
-	 * 		  |this.getWorld() == null
 	 * 		  
 	 */
-	public double getTimeToBoundaryCollision() throws IllegalEntityException{
+	public double getTimeToBoundaryCollision(){
 		if (this.getWorld() == null){
-			throw new IllegalEntityException(this);
+			return Double.POSITIVE_INFINITY;
 			}
 		
 		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(),
@@ -672,10 +678,11 @@ public abstract class Entity {
 	}
 	
 	
+	//TODO DOCUMENTATION  
 	
 	public double[] getBoundaryCollisionPosition(){
 		if (this.getWorld() == null){
-			throw new IllegalStateException();
+			return null;
 			}
 		
 		double T = this.getTimeToBoundaryCollision();
@@ -849,6 +856,194 @@ public abstract class Entity {
 		return CollisionCoordinates;
 	}	
 	
+	
+	// TODO DOCUMENTATIE COLLISIONS
+	
+	public void handleBoundaryCollision(){
+		// TODO Using two bouleans, it is now possible to have a "corner" collision: 
+		// => double velocity change.
+		
+		// A horizontal collision occurs when the x-position is around the
+		// distance of the radius of this ship. Or same thing but on the other side.
+		boolean horizontally = 
+				(this.getxPosition()< 1.01 * this.getRadius()) || 
+				(this.getxPosition() > (this.getWorld().getWidth() - 1.01 * this.getRadius()));
+		// A vertical collision occurs when the y-position is around the
+		// distance of the radius of this ship. Or same thing but on the other side.		
+		boolean vertically = 
+				(this.getyPosition()< 1.01 * this.getRadius()) || 
+				(this.getyPosition() > (this.getWorld().getHeight() - 1.01 * this.getRadius()));
+		
+		
+		if(horizontally){
+			this.setVelocity(-this.getxVelocity(), this.getyVelocity());
+		} 
+		
+		if (vertically) {
+			this.setVelocity(this.getxVelocity(), -this.getyVelocity());
+		}
+		
+	}
+
+	public abstract void handleOtherEntityCollision(Entity entityB) throws IllegalPositionException, IllegalBulletException;
+
+	
+	public void handleCasualCollision(Entity other){
+		
+		// Only do this if the casual collision has not been handled already.
+		if (!this.getWorld().isCasualCollisionHandled()){
+			// DEZE ENTITEIT 
+
+			double thisEntityPositionX = this.getxPosition();
+			double thisEntityPositionY = this.getyPosition();
+
+			double thisEntityVelocityX = this.getxVelocity();
+			double thisEntityVelocityY = this.getyVelocity();
+
+			double thisEntityRadius = this.getRadius();
+			double thisEntitymass = this.getMass();
+
+			// DE ANDERE ENTITEIT
+
+			double otherEntityPositionX = other.getxPosition();
+			double otherEntityPositionY = other.getyPosition();
+
+			double otherEntityVelocityX = other.getxVelocity();
+			double otherEntityVelocityY = other.getyVelocity();
+
+			double otherEntityRadius = other.getRadius();
+			double otherEntitymass = other.getMass();
+
+			double deltaPosX = otherEntityPositionX - thisEntityPositionX;
+			double deltaPosY = otherEntityPositionY - thisEntityPositionY;
+			double deltaVelX = otherEntityVelocityX - thisEntityVelocityX;
+			double deltaVelY = otherEntityVelocityY - thisEntityVelocityY;
+
+			double delta = deltaPosX * deltaVelX + deltaPosY * deltaVelY;
+			double sumRadius = thisEntityRadius + otherEntityRadius;
+
+			double jValue = 
+					(2 * thisEntitymass * otherEntitymass * delta) / 
+					(sumRadius * (thisEntitymass + otherEntitymass));
+
+			double Jx = (jValue * deltaPosX) / sumRadius;
+			double Jy = (jValue * deltaPosY) / sumRadius;
+
+			double thisEntitynewXVel = thisEntityVelocityX + (Jx / thisEntitymass);
+			double thisEntitynewYVel = thisEntityVelocityY + (Jy / thisEntitymass);	
+
+			this.setVelocity(thisEntitynewXVel, thisEntitynewYVel);
+
+			double otherEntitynewXVel = otherEntityVelocityX - (Jx / otherEntitymass);
+			double otherEntitynewYVel = otherEntityVelocityY - (Jy / otherEntitymass);	
+
+			other.setVelocity(otherEntitynewXVel,otherEntitynewYVel);
+		}
+		
+		
+//			if (first){
+//
+//				System.out.println("First is true ");	
+//				double delta = deltaPosX * deltaVelX + deltaPosY * deltaVelY;
+//				double sumRadius = thisEntityRadius + entityRadius;
+//				
+//				double jValue = 
+//						(2 * thisEntitymass * entitymass * delta) / 
+//						(sumRadius * (thisEntitymass + entitymass));
+//				System.out.println("First J-Value:" + jValue);
+//				
+//				double Jx = (jValue * deltaPosX) / sumRadius;
+//				double Jy = (jValue * deltaPosY) / sumRadius;
+//				
+//				System.out.println("First Jx-Value:" + Jx);
+//				System.out.println("First Jy-Value:" + Jy);
+//				
+//				double thisEntitynewXVel = thisEntityVelocityX + (Jx / thisEntitymass);
+//				double thisEntitynewYVel = thisEntityVelocityY + (Jy / thisEntitymass);	
+//				
+//				System.out.println("First is true en new xvel:" + thisEntitynewXVel);
+//				this.setVelocity(thisEntitynewXVel, thisEntitynewYVel);
+//
+//			}
+//			
+//			else {
+//				// de delta's moeten net dezelfde zijn zodat de jvalue dezelfde is
+//				double secondDeltaPosX = -deltaPosX;
+//				double secondDeltaPosY = -deltaPosY;
+//				double secondDeltaVelX = -deltaVelX;
+//				double secondDeltaVelY = -deltaVelY;
+//				System.out.println("First is false ");	
+//				double delta = secondDeltaPosX * secondDeltaVelX + secondDeltaPosY * secondDeltaVelY;
+//				
+//				double sumRadius = thisEntityRadius + entityRadius;
+//				
+//				double jValue = 
+//						(2 * thisEntitymass * entitymass * delta) / 
+//						(sumRadius * (thisEntitymass + entitymass));
+//				
+//				System.out.println("Second J-Value:" + jValue);
+//				
+//				double Jx = (jValue * deltaPosX) / sumRadius;
+//				double Jy = (jValue * deltaPosY) / sumRadius;
+//				
+//				System.out.println("Second Jx-Value:" + Jx);
+//				System.out.println("Second Jy-Value:" + Jy);
+//				
+//				double thisEntitynewXVel = thisEntityVelocityX - (Jx / thisEntitymass);
+//				double thisEntitynewYVel = thisEntityVelocityY - (Jy / thisEntitymass);	
+//				
+//				System.out.println("First is false en new xvel:" + thisEntitynewXVel);
+//				this.setVelocity(thisEntitynewXVel, thisEntitynewYVel);
+//
+//			}
+			
+//			double delta = deltaPosX * deltaVelX + deltaPosY * deltaVelY;
+	
+//			double sumRadius = thisEntityRadius + entityRadius;
+//			
+//			double jValue = 
+//					(2 * thisEntitymass * entitymass * delta) / 
+//					(sumRadius * (thisEntitymass + entitymass));
+//			double Jx = (jValue * deltaPosX) / sumRadius;
+//			double Jy = (jValue * deltaPosY) / sumRadius;
+			
+//			System.out.println("huidige/oude snelheid" + thisEntityVelocityX);
+			
+			
+//			double thisEntitynewXVel = thisEntityVelocityX + (Jx / thisEntitymass);
+//			double thisEntitynewYVel = thisEntityVelocityY + (Jy / thisEntitymass);	
+//			this.setVelocity(thisEntitynewXVel, thisEntitynewYVel);
+
+			
+//			if (first){
+//				double thisEntitynewXVel = thisEntityVelocityX + (Jx / thisEntitymass);
+//				double thisEntitynewYVel = thisEntityVelocityY + (Jy / thisEntitymass);	
+//				System.out.println("First is true en new xvel:" + thisEntitynewXVel);
+//				this.setVelocity(thisEntitynewXVel, thisEntitynewYVel);
+//			}
+			
+//			else{
+//				//TODO BLIJKBAAR IS DIT OOK MET - NOG STEEDS NIET JUIST
+//				double thisEntitynewXVel = thisEntityVelocityX + (Jx / thisEntitymass);
+//				double thisEntitynewYVel = thisEntityVelocityY + (Jy / thisEntitymass);	
+//				System.out.println("First is false en new xvel:" + thisEntitynewXVel);
+//				this.setVelocity(thisEntitynewXVel, thisEntitynewYVel);	
+//			}
+			
+		}
+	
+	
+	// TODO juiste manier? 
+	
+	/**
+	 * Method registering if this entity is deadly.
+	 */
+	public Boolean isDeadly(){
+		return false;
+	}
+	
+	
+	
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
 	
 	// TODO Variabelen moeten private gedeclareerd worden en dan moet je protected getters maken.
@@ -856,53 +1051,46 @@ public abstract class Entity {
 	/**
 	 * Variable registering the speed of light; 300000 km/s.
 	 */
-	protected static final double speedoflight = 300000.0;
+	private static final double speedoflight = 300000.0;
 
 	/**
 	 * Variable registering the xPosition of this Entity.
 	 */
-	protected double xPosition = 0.0;
+	private double xPosition = 0.0;
 
 	/**
 	 * Variable registering the yPosition of this Entity.
 	 */
-	protected double yPosition = 0.0;
+	private double yPosition = 0.0;
 
 
 	/**
 	 * Variable registering the xVelocity of this Entity.
 	 */
-	protected double xVelocity = min_Velocity;
+	private double xVelocity = min_Velocity;
 
 
 	/**
 	 * Variable registering the yVelocity of this Entity.
 	 */
-	protected double yVelocity = min_Velocity;
+	private double yVelocity = min_Velocity;
 
 
 	/**
 	 * Variable registering the minimum allowed velocity.
 	 */
-	protected static final double min_Velocity = 0;
+	private static final double min_Velocity = 0;
 
 	/**
 	 * Variable registering the maximum allowed velocity.
 	 */
 	private static final double max_Velocity = speedoflight;
-
-	//TODO verzetten van min radius naar ship.
 	
-	/**
-	 * Variable registering the minimum allowed Radius.
-	 */
-	private static double min_Radius = 10.0;
-
 	/**
 	 * Variable registering the radius of this Entity.
 	 */
-	private double radius = min_Radius;
-
+	private double radius;
+	
 	/**
 	 * Variable registering the mass of this entity.
 	 */
@@ -918,63 +1106,5 @@ public abstract class Entity {
 	 * Variable registering the density of this entity.
 	 */
 	private double density;
-	
-	public void handleBoundaryCollision(){
-		boolean horizontally = 
-				(this.getxPosition()< 1.01 * this.getRadius()) || 
-				(this.getxPosition() > (this.getWorld().getWidth() - 1.01 * this.getRadius()));
-		
-		if(horizontally){
-			this.setVelocity(-this.getxVelocity(), this.getyVelocity());
-		} else {
-			this.setVelocity(this.getxVelocity(), -this.getyVelocity());
-		}
-		
-	}
-
-	public abstract void handleOtherEntityCollision(Entity entityB) throws IllegalPositionException, IllegalBulletException;
-
-	
-	public void handleCasualCollision(Entity entity){
-			
-			double thisShipPositionX = this.getxPosition();
-			double thisShipPositionY = this.getyPosition();
-			
-			double thisShipVelocityX = this.getxVelocity();
-			double thisShipVelocityY = this.getyVelocity();
-			
-			double thisShipRadius = this.getRadius();
-			double thisShipmass = this.getMass();
-			
-			
-			double entityPositionX = entity.getxPosition();
-			double entityPositionY = entity.getyPosition();
-			
-			double entityVelocityX = entity.getxVelocity();
-			double entityVelocityY = entity.getyVelocity();
-			
-			double entityRadius = entity.getRadius();
-			double entitymass = entity.getMass();
-			
-			double deltaPosX = entityPositionX - thisShipPositionX;
-			double deltaPosY = entityPositionY - thisShipPositionY;
-			double deltaVelX = entityVelocityX - thisShipVelocityX;
-			double deltaVelY = entityVelocityY - thisShipVelocityY;
-			
-			double delta = deltaPosX * deltaVelX + deltaPosY * deltaVelY;
-	
-			double sumRadius = thisShipRadius + entityRadius;
-			
-			double jValue = 
-					(2 * thisShipmass * entitymass * delta) / 
-					(sumRadius * (thisShipmass + entitymass));
-			double Jx = (jValue * deltaPosX) / sumRadius;
-			double Jy = (jValue * deltaPosY) / sumRadius;
-			
-			double thisShipnewXVel = thisShipVelocityX + (Jx / thisShipmass);
-			double thisShipnewYVel = thisShipVelocityY + Jy / thisShipmass;	
-			this.setVelocity(thisShipnewXVel, thisShipnewYVel);
-		}
-	
 	
 }
