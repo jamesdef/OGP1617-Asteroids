@@ -1,12 +1,17 @@
 package asteroids.model;
-import asteroids.model.exceptions.*;
-import be.kuleuven.cs.som.annotate.Basic;
-import be.kuleuven.cs.som.annotate.Immutable;
-import be.kuleuven.cs.som.annotate.Raw;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import asteroids.model.exceptions.IllegalBulletException;
+import asteroids.model.exceptions.IllegalDurationException;
+import asteroids.model.exceptions.IllegalEntityException;
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
+import asteroids.model.exceptions.IllegalShipException;
+import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with ships, which are a kind of entity in space. 
@@ -696,12 +701,7 @@ public class Ship extends Entity {
 	 * 		   | 									|| bullet.getShip() != null   )
 	 * 		 
 	 */
-	// TODO misschien mag hier wel bij dat Source null is
 	public void loadBullet(Bullet bullet) throws IllegalPositionException, IllegalBulletException{
-//		if (!this.significantOverlap(bullet)){
-//			System.out.println("in not overlap");
-//			throw new IllegalBulletException(bullet);
-//		}
 		
 		if (((this.getWorld()!=null)&&(bullet.getWorld()!=null)&&(this.getWorld()!=bullet.getWorld())) 
 							|| !canHaveAsBullet(bullet) || bullet.getShip()!= null){
@@ -851,12 +851,9 @@ public class Ship extends Entity {
 				}
 			}
 	
-			//TODO er zit hier nog ergens een fout in, add entity lukt niet altijd.
 			this.getWorld().addEntity(bullet);
-			
-
-			// TODO Moet dit hier staan of niet? denk het wel
 			bullet.setWorld(this.getWorld());
+			
 			// The bullet is in a legal spot and can start moving. It's velocity is now assigned.
 			bullet.setVelocity(xSpeed, ySpeed);	
 			
@@ -913,17 +910,18 @@ public class Ship extends Entity {
 	}
 	
 	
-	//TODO HOE KAN DAT NU KLOPPEN, TRUE STAAT GECOMMENT
+	//TODO Documentatie 
 	public boolean overlapsWithOther(){
 		for(Entity entity: this.getWorld().getAllEntities()){
 			if(this.significantOverlap(entity)){
-//				System.out.println("overlap terminate");
-				//return true;
+				System.out.println("overlap terminate");
+				return true;
 			}
 		}
 		return false;
 	}
 	
+	//TODO Documentatie 
 	public void teleport(){
 		
 		double radius = this.getRadius();
@@ -936,8 +934,6 @@ public class Ship extends Entity {
 			if(this.overlapsWithOther()){
 				this.terminate();
 			}
-			
-			//TODO check overlap
 			
 		} catch (Exception exception) {
             this.terminate();

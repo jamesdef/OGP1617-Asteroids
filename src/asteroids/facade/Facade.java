@@ -5,18 +5,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import asteroids.model.Asteroid;
 import asteroids.model.Bullet;
 import asteroids.model.Entity;
-import asteroids.model.exceptions.*;
+import asteroids.model.Planetoid;
 import asteroids.model.Ship;
 import asteroids.model.World;
-import asteroids.model.Planetoid;
-import asteroids.model.Asteroid;
-
-import asteroids.part1.facade.IFacade;
+import asteroids.model.exceptions.IllegalBulletException;
+import asteroids.model.exceptions.IllegalCollisionException;
+import asteroids.model.exceptions.IllegalDurationException;
+import asteroids.model.exceptions.IllegalEntityException;
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
+import asteroids.model.exceptions.IllegalShipException;
 import asteroids.part2.CollisionListener;
-//import asteroids.part3.facade.Program;
-import asteroids.part3.programs.IProgramFactory;
 import asteroids.util.ModelException;
 
 public class Facade implements asteroids.part3.facade.IFacade {
@@ -444,7 +446,6 @@ public class Facade implements asteroids.part3.facade.IFacade {
 	@Override
 	public void addPlanetoidToWorld(World world, Planetoid planetoid) throws ModelException {
 		try {
-			System.out.println("binnen in add planetoid to world");
 			world.addEntity(planetoid);
 		} catch (IllegalEntityException e) {
 			throw new ModelException ("Illegal entity");

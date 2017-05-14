@@ -1,7 +1,10 @@
 package asteroids.model;
 
-import asteroids.model.exceptions.*;
-
+import asteroids.model.exceptions.IllegalBulletException;
+import asteroids.model.exceptions.IllegalCollisionException;
+import asteroids.model.exceptions.IllegalDurationException;
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Model;
@@ -88,7 +91,7 @@ public abstract class Entity {
 	}
 
 
-	// ----------------Termination-------------------
+// ----------------Termination-------------------
 
 	/**
 	 * This method terminates this entity.
@@ -334,9 +337,6 @@ public abstract class Entity {
 
 	}
 
-
-	// TODO BLIJKBAAR MAG INFINITY WEL ALS POSITIE BUITEN EEN WERELD
-
 	/**
 	 * Returns whether this coordinate is valid
 	 * 
@@ -580,6 +580,7 @@ public abstract class Entity {
 
 
 	// ---------------------  COLLISION and Relative Postioning ----------------------
+	
 	/**
 	 *  Return the distance betwheen two entities.
 	 * 
@@ -607,7 +608,7 @@ public abstract class Entity {
 	}
 
 
-	// TODO dit lijkt niet goed te werken
+	// TODO dit lijkt niet goed te werken: marge inwerken
 
 	/** 
 	 * Returns whether two objects (entities) overlap. 
@@ -787,7 +788,9 @@ public abstract class Entity {
 		if (this.significantOverlap(other)){
 			throw new IllegalCollisionException(this,other);
 		}
-
+		
+		//Check to see whether the bullet with which this might collide is within
+		// a ship, then it can not collide.
 		if(other instanceof Bullet){
 			if(((Bullet) other).getShip() != null){
 				return Double.POSITIVE_INFINITY;
@@ -897,16 +900,31 @@ public abstract class Entity {
 		}
 
 	}
-
+	
+	// TODO: hebben abstracte methoden documentatie?
 	public abstract void handleOtherEntityCollision(Entity entityB) throws IllegalPositionException, IllegalBulletException;
 
-
+	/**
+	 * This method handles a casual collision between two entities.
+	 * This means a collision in which two entities merely bounce off of eachother.
+	 * 
+	 * @param other
+	 * 		  The other entity in this collision
+	 *
+	 * @post The collision is only resolved if it hasn't been resolved already.
+	 * 		 | if (!this.getWorld().isCasualCollisionHandled())
+	 *       |		then old. getxVelocity == new. getyVelocity;
+	 *       ---
+	 * @effect The collision is resolved by 
+	 * 		   changing the entities' directions and velocity;
+	 *         the mathematical way of doing this was provided to us.
+	 *         | @see implementation
+	 */
 	public void handleCasualCollision(Entity other){
 
 		// Only do this if the casual collision has not been handled already.
 		if (!this.getWorld().isCasualCollisionHandled()){
-			// DEZE ENTITEIT 
-
+			// This entity
 			double thisEntityPositionX = this.getxPosition();
 			double thisEntityPositionY = this.getyPosition();
 
@@ -916,8 +934,7 @@ public abstract class Entity {
 			double thisEntityRadius = this.getRadius();
 			double thisEntitymass = this.getMass();
 
-			// DE ANDERE ENTITEIT
-
+			// The other entity
 			double otherEntityPositionX = other.getxPosition();
 			double otherEntityPositionY = other.getyPosition();
 
@@ -926,7 +943,8 @@ public abstract class Entity {
 
 			double otherEntityRadius = other.getRadius();
 			double otherEntitymass = other.getMass();
-
+			
+			// The computations
 			double deltaPosX = otherEntityPositionX - thisEntityPositionX;
 			double deltaPosY = otherEntityPositionY - thisEntityPositionY;
 			double deltaVelX = otherEntityVelocityX - thisEntityVelocityX;
@@ -953,12 +971,11 @@ public abstract class Entity {
 			other.setVelocity(otherEntitynewXVel,otherEntitynewYVel);
 		}			
 	}
-
-
-
+	
 	/**
 	 * Method registering if this entity is deadly.
 	 * Meaning that if it hits another entity, that other entity is terminated.
+	 * The default is set to false and is changed within deadly entities.
 	 */
 	public Boolean isDeadly(){
 		return false;

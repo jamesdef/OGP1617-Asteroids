@@ -66,13 +66,110 @@ public class Planetoid extends MinorPlanet {
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
 		this.setPlanetoidMass(this.getRadius());
 		this.initialRadius = this.getRadius();
-		System.out.println("initialradius =" + initialRadius);
 		this.setDistanceTraveled(totalDistanceTraveled);
 		//Perhaps the totalDistanceTraveled is not equal to zero
 		//and so the radius has to be shrunk right away.
 		this.shrink(distanceTraveled);	
 	}
 	
+	
+// ----------------Termination-------------------	
+	/**
+ 	 * This planetoid is terminated. 
+ 	 * If this planetoid is in a world and 
+ 	 * it has a radius bigger than 30 km's, it spawns two new asteroids.
+ 	 * 
+ 	 * @post This planetoid is terminated.
+ 	 * 	     | new.isTerminated == true
+ 	 * 
+ 	 * @post If this planetoid has a radius larger than 30 and is within a world:
+ 	 * 		 it spawns two new asteroids upon termination. 
+ 	 * 		 These 'children' are placed so that their centres are on one line 
+ 	 * 		 with the centre of their parent on a distance of half the radius of the parent from that centre. 
+ 	 * 		 We choose to place them randomly at the sides of their deceized parent.
+ 	 * 		 Their radius is half of the parents' radius,
+ 	 * 		 the direction of the first child is dependant on the placement of the children,
+ 	 * 		 the direction of the second child is the opposite thereof.
+ 	 * 		 Finally, their speed equals 1.5 times the speed their parent had.
+ 	 * 		 | if (this.getWorld() != null && this.getRadius() >= 30)
+ 	 * 		  | 			then @see implementation
+ 	 * 
+ 	 * @throws IllegalPositionException
+ 	 * 		   If the position of the created asteroid child is not allowed.
+ 	 */
+ 	@Override
+ 	public void terminate(){
+ 		if (this.getWorld() != null && this.getRadius() >= 30){
+ 			// We save the world of this, soon to be terminated, planetoid, 
+ 			// so that we can use it to add it's children. Thus avoiding the null pointer.
+ 			World worldToAddTo = this.getWorld();
+ 			super.terminate();	
+ 			
+ 			double xPosition = this.getxPosition();
+ 			double yPosition = this.getyPosition();
+ 			double r = this.getRadius();
+ 			double parentVelocity = this.getTotalVelocity();
+ 			double randomAngle = Math.random() *2.0*Math.PI; 
+ 				
+ 			Asteroid firstChild;
+			try {
+				firstChild = new Asteroid(xPosition+(r/2*Math.cos(randomAngle)), yPosition + (r/2*Math.sin(randomAngle)), 
+						1.5*parentVelocity*Math.cos(randomAngle),1.5*parentVelocity*Math.sin(randomAngle),
+						r/2);
+				worldToAddTo.addEntity(firstChild);
+			} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException  e) {
+			}
+ 			
+			Asteroid secondChild;
+			try {
+				secondChild = new Asteroid(xPosition-(r/2*Math.cos(randomAngle)), yPosition - (r/2*Math.sin(randomAngle)), 
+						-1.5*parentVelocity*Math.cos(randomAngle),-1.5*parentVelocity*Math.sin(randomAngle),
+						r/2);
+				worldToAddTo.addEntity(secondChild);
+				} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException e) {
+			}
+			// When we come out of this creation, the planetoid is already terminated
+			// So we return out of this function immediatly.
+			return;
+ 		}
+ 		super.terminate();
+ 	}
+ 	
+ // ---------------- Getters -------------------
+ 	
+	/**
+	 * Returns the distance this planetoid has travelled.
+	 */
+	@Basic
+	public double getDistanceTravelled(){
+		return this.distanceTraveled;
+	}
+	/**
+	 * Returns the radius that this planetoid had upon creation.
+	 */
+	@Basic
+	public double getInitialRadius(){
+		return this.initialRadius;
+	}	
+ 	
+ 	/**
+ 	 * This method checks whether the given distance is a valid value for 
+ 	 * the distance traveled. The distance is valid if it is not so big as to make
+ 	 * decline the radius beneath a size of 5 right away.
+ 	 * 
+ 	 * @param distance
+ 	 * 	      The distance to check
+ 	 * @return Whether this total traveled distance is valid.
+ 	 * 		   | result = 0.000001*distance < (this.getRadius()-5.0)
+ 	 */
+  	public boolean isValidDistanceTraveled(double distance){
+  		return 0.000001*distance < (this.getRadius()-5.0);
+  	}
+	
+ 	
+ // ---------------- Setters -------------------
+ 	
+ 	// TODO kan sowieso ook door hogerliggende functie worden overgenomen
 	/**
  	 * This method sets the mass of this planetoid depending on it's size (=defined by radius)
  	 * 
@@ -108,86 +205,8 @@ public class Planetoid extends MinorPlanet {
  			this.distanceTraveled = totalDistanceTraveled;
  		}
  	}
- 	
- 	
- 	//TODO DOCUMENTATIE
- 	/**
- 	 * This method checks whether the given distance is a valid value for 
- 	 * the distance traveled. The distance is valid if it is not so big as to make
- 	 * decline the radius beneath a size of 5 right away.
- 	 * 
- 	 * @param distance
- 	 * 	      The distance to check
- 	 * @return Whether this total traveled distance is valid.
- 	 * 		   | result = 0.000001*distance < (this.getRadius()-5.0)
- 	 */
-  	public boolean isValidDistanceTraveled(double distance){
-  		return 0.000001*distance < (this.getRadius()-5.0);
-  	}
-	
- 	
- 	/**
- 	 * This planetoid is terminated. 
- 	 * If this planetoid is in a world and 
- 	 * it has a radius bigger than 30 km's, it spawns two new asteroids.
- 	 * 
- 	 * @post This planetoid is terminated.
- 	 * 	     | new.isTerminated == true
- 	 * 
- 	 * @post If this planetoid has a radius larger than 30 and is within a world:
- 	 * 		 it spawns two new asteroids upon termination. 
- 	 * 		 These 'children' are placed so that their centres are on one line 
- 	 * 		 with the centre of their parent on a distance of half the radius of the parent from that centre. 
- 	 * 		 We choose to place them randomly at the sides of their deceized parent.
- 	 * 		 Their radius is half of the parents' radius,
- 	 * 		 the direction of the first child is determined at random,
- 	 * 		 the direction of the second child is the opposite thereof.
- 	 * 		 Finally, their speed equals 1.5 times the speed their parent had.
- 	 * 		 | if (this.getWorld() != null && this.getRadius() >= 30)
- 	 * 		  | 			then @see implementation
- 	 * 
- 	 * @throws IllegalPositionException
- 	 * 		   If the position of the created asteroid child is not allowed.
- 	 */
- 	@Override
- 	public void terminate(){
- 		// TODO grens verlaagd voor test
- 		if (this.getWorld() != null && this.getRadius() >= 30){
- 			// We save the world of this, soon to be terminated, planetoid, 
- 			// so that we can use it to add it's children. Thus avoiding the null pointer.
- 			World worldToAddTo = this.getWorld();
- 			super.terminate();	
- 			
- 			double xPosition = this.getxPosition();
- 			double yPosition = this.getyPosition();
- 			double r = this.getRadius();
- 			double parentVelocity = this.getTotalVelocity();
- 			double randomAngle = Math.random() *2.0*Math.PI; 
- 			double randomPlacement = Math.random() * 2.0 * Math.PI;
- 			
- 			Asteroid firstChild;
-			try {
-				firstChild = new Asteroid(xPosition+(r/2*Math.cos(randomPlacement)), yPosition + (r/2*Math.sin(randomPlacement)), 
-						1.5*parentVelocity*Math.cos(randomAngle),1.5*parentVelocity*Math.sin(randomAngle),
-						r/2);
-				worldToAddTo.addEntity(firstChild);
-			} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException e) {
-			}
- 			
-			Asteroid secondChild;
-			try {
-				secondChild = new Asteroid(xPosition-(r/2*Math.cos(randomPlacement)), yPosition - (r/2*Math.sin(randomPlacement)), 
-						-1.5*parentVelocity*Math.cos(randomAngle),-1.5*parentVelocity*Math.sin(randomAngle),
-						r/2);
-				worldToAddTo.addEntity(secondChild);
-			} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException e) {
-			}
-			// When we come out of this creation, the planetoid is already terminated
-			// So we return out of this function immediatly.
-			return;
- 		}
- 		super.terminate();
- 	}
+
+// ----------------------- MOVING AND SHRINKING -----------------
  	
  	/**
  	 * Moves this planetoid during a certain duration, depending on their velocity.
@@ -206,7 +225,6 @@ public class Planetoid extends MinorPlanet {
  		super.move(duration);
  		this.distanceTraveled += duration*this.getTotalVelocity();		
  		shrink(distanceTraveled);
-// 		System.out.println("radius after moving =" + this.getRadius());
  	}
  	
  	/**
@@ -231,25 +249,10 @@ public class Planetoid extends MinorPlanet {
 			this.terminate();
 		}
  	}
-	
-	/**
-	 * Returns the distance this planetoid has travelled.
-	 */
-	@Basic
-	public double getDistanceTravelled(){
-		return this.distanceTraveled;
-	}
-	/**
-	 * Returns the radius that this planetoid had upon creation.
-	 */
-	@Basic
-	public double getInitialRadius(){
-		return this.initialRadius;
-	}
 
-    
+// -------------- COLLISION CASES --------------------
+	
     //TODO DOCUMENTATIE
-    
     @Override
   	public void handleOtherEntityCollision(Entity entity){
   		if(entity instanceof MinorPlanet){
