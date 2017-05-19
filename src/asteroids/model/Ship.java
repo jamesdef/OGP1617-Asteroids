@@ -988,4 +988,30 @@ public class Ship extends Entity {
 	        }
 			
 		}
+		
+		
+		
+		
+		//-----------------------------------
+		// PROGRAMS
+		//------------------------------------
+		
+		
+		
+		private Program program = null;
+		
+		public void setProgram(Program program){
+			this.program = program;
+		}
+		
+		public Program getProgram(){
+			return this.program;
+		}
+		
+		public void executeProgram(double dt){
+			
+		}
+		
+		
+		
 }
