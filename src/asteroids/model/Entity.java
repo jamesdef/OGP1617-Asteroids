@@ -1,7 +1,10 @@
 package asteroids.model;
 
-import asteroids.model.exceptions.*;
-
+import asteroids.model.exceptions.IllegalBulletException;
+import asteroids.model.exceptions.IllegalCollisionException;
+import asteroids.model.exceptions.IllegalDurationException;
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Model;
@@ -15,35 +18,36 @@ import be.kuleuven.cs.som.annotate.Raw;
 // TODO: Postcondities en classe invarianten niet herhalen bij subklassen en overriding
 // TODO: Constructoren zijn raw als ze niet de laatste subklasse zijn.
 // TODO: De constructor van een abstracte klasse is steeds 'model'
+// TODO: Value klasse voor vector operaties
 
 /** 
-*  A class for dealing with entities. 
-*  We could define these as 'objects that can move through space'.
-*  Entities can interact with eachother upon collision.
-*  It can belong to a certain world.
-*  Properties described are: position, velocity,radius, density and mass.
-*  
-* @invar   The highest possible absolute, total velocity is lower than a certain maximum, the entity can never exceed this speed.
-* 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
-* 
-* @invar 	The radius of each entity must be a valid value.
-* 			|isValidRadius(getRadius())
-* 
-* @invar   The coordinates of an entity must be valid.
-* 			|isValidPosition(getxPosition,getyPosition);
-* 
-* @invar  	The entity has to belong to a proper world at all times.
-* 			|hasProperWorld()
-* 
-* 
-* @version 2.0
-* @author Michiel De Koninck & James Defauw
-*
-*/
+ *  A class for dealing with entities. 
+ *  We could define these as 'objects that can move through space'.
+ *  Entities can interact with eachother upon collision.
+ *  It can belong to a certain world.
+ *  Properties described are: position, velocity,radius, density and mass.
+ *  
+ * @invar   The highest possible absolute, total velocity is lower than a certain maximum, the entity can never exceed this speed.
+ * 	      	|!exceedsMaxVelocity(getxVelocity(), getyVelocity())
+ * 
+ * @invar 	The radius of each entity must be a valid value.
+ * 			|isValidRadius(getRadius())
+ * 
+ * @invar   The coordinates of an entity must be valid.
+ * 			|isValidPosition(getxPosition,getyPosition);
+ * 
+ * @invar  	The entity has to belong to a proper world at all times.
+ * 			|hasProperWorld()
+ * 
+ * 
+ * @version 2.0
+ * @author Michiel De Koninck & James Defauw
+ *
+ */
 public abstract class Entity {
-	
+
 	//-------------------------------- CONSTRUCTOR -------------------------------- 
-	
+
 	/**
 	 * Initialize this new entity with given position,radius, speed.
 	 * 
@@ -78,17 +82,17 @@ public abstract class Entity {
 	 */
 	@Raw @Model
 	public Entity(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius)
-		throws IllegalPositionException, IllegalRadiusException{
-		
+			throws IllegalPositionException, IllegalRadiusException{
+
 		// At this point we can invoke our mutators. They will see to it that the class invariants hold at all times.
 		setPosition(xPosition,yPosition);
 		setVelocity(xVelocity,yVelocity);
 		setRadius(radius);
 	}
 
-	
+
 // ----------------Termination-------------------
-	
+
 	/**
 	 * This method terminates this entity.
 	 * 
@@ -100,7 +104,7 @@ public abstract class Entity {
 			this.getWorld().removeEntity(this);
 		this.isTerminated = true;
 	}
-	
+
 	/**
 	 * Checks whether this entity is terminated.
 	 * @return The state of this entity; whether it is terminated or not.
@@ -109,27 +113,27 @@ public abstract class Entity {
 	public boolean isTerminated(){
 		return this.isTerminated;
 	}
-	
+
 	/**
 	 * A variable registering whether or not this enity is terminated.
 	 * Initialised as false.
 	 */
 	private boolean isTerminated = false;
-	
 
-//----------------------------------------- Standard Inspectors--------------
-        
-    /**
-     * Return the world to which this entity belongs.
-     * @return The world to which this entity belongs.
-     * 		   null is returned if this entity does not belong to any world.
-     */
+
+	//----------------------------------------- Standard Inspectors--------------
+
+	/**
+	 * Return the world to which this entity belongs.
+	 * @return The world to which this entity belongs.
+	 * 		   null is returned if this entity does not belong to any world.
+	 */
 	@Basic
-    public World getWorld() {
-    	return this.world;
-    }
-    
-    /**
+	public World getWorld() {
+		return this.world;
+	}
+
+	/**
 	 * Return the x-coordinate of this entity.  
 	 */
 	@Basic
@@ -162,7 +166,7 @@ public abstract class Entity {
 	public double getyVelocity(){
 		return this.yVelocity;
 	}
-	
+
 	/**
 	 * Returns the velocity in an array: (Vx,Vy).
 	 * 
@@ -205,7 +209,7 @@ public abstract class Entity {
 		double[] position = {this.getxPosition(),this.getyPosition()};	
 		return position;			
 	}
-	
+
 	/**
 	 * Returns the density of this entity.
 	 */
@@ -213,7 +217,7 @@ public abstract class Entity {
 	public double getDensity(){
 		return this.density;
 	}
-	
+
 	/**
 	 * Return the mass of this entity.
 	 */
@@ -221,13 +225,13 @@ public abstract class Entity {
 	public double getMass(){
 		return this.mass;
 	}
-	
 
-    
-// ------------SETTERS--------------
-	
-//---------------WORLD; associations--------------
-    
+
+
+	// ------------SETTERS--------------
+
+	//---------------WORLD; associations--------------
+
 	/**
 	 * Sets the given world as the world of this entity.
 	 * 
@@ -252,12 +256,12 @@ public abstract class Entity {
 		// If the world is not effective, and this entity belongs to an effective world, 
 		// then that world can not reference this entity as one of its entities.
 		assert((world != null) || (this.getWorld() == null) || (!this.getWorld().hasEntity(this)));
-		
+
 		this.world = world;
-		
+
 	}
-	
-	
+
+
 	/**
 	 * Check whether this entity can belong to the given world.
 	 * 
@@ -270,7 +274,7 @@ public abstract class Entity {
 	public boolean canHaveAsWorld(World world){
 		return (world != null && world.canHaveAsEntity(this));
 	}
-	
+
 	/**
 	 * Check whether this entity belongs to a proper world.
 	 * 
@@ -283,9 +287,9 @@ public abstract class Entity {
 	public boolean hasProperWorld(){
 		return (canHaveAsWorld(getWorld()) && ((getWorld() == null) || getWorld().hasEntity(this)));
 	}
-	
-//--------------POSITION-----------------------
-	
+
+	//--------------POSITION-----------------------
+
 	/** 
 	 * Sets the position to the given coordinates, if these make for a valid position.
 	 * 
@@ -308,11 +312,11 @@ public abstract class Entity {
 		if (!isValidPosition(xPosition,yPosition)){
 			throw new IllegalPositionException(xPosition,yPosition);
 		}
-		
+
 		this.xPosition = xPosition;
 		this.yPosition = yPosition;
 	}
-	
+
 	/**
 	 * Returns whether the given Position is valid.
 	 * 
@@ -325,34 +329,31 @@ public abstract class Entity {
 	 */
 	@Raw
 	public static boolean isValidPosition(double xPosition, double yPosition){
-	
-	
+
+
 		return (isValidCoordinate(xPosition) && isValidCoordinate(yPosition));
-		
-		
-		
+
+
+
 	}
-	
-	
+
 	/**
 	 * Returns whether this coordinate is valid
 	 * 
 	 * @param coordinate
 	 * 		   The coordinate that we wish to inspect
 	 * 
-	 * @return True if and only if this coordinate is not infinity or not a number.
-	 * 		   |result == (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
-				&& (coordinate != Double.NEGATIVE_INFINITY));
+	 * @return True if and only if this coordinate is not a number.
+	 * 		   |result == (!Double.isNaN(coordinate));
 	 */
 	@Raw
 	public static boolean isValidCoordinate(double coordinate){
-		return (!Double.isNaN(coordinate) && (coordinate != Double.POSITIVE_INFINITY) 
-				&& (coordinate != Double.NEGATIVE_INFINITY));
+		return (!Double.isNaN(coordinate));
 	}
-	
-	
-//--------------------------VELOCITY-----------------
-	
+
+
+	//--------------------------VELOCITY-----------------
+
 	/** 
 	 * This method sets the Velocity to the given value.  
 	 * 
@@ -380,17 +381,17 @@ public abstract class Entity {
 	 */
 	@Raw
 	public void setVelocity(double xVelocity, double yVelocity){
-			
+
 		if ((!Double.isNaN(xVelocity)) && (!Double.isNaN(yVelocity))){
-	
-				if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
-					this.scaleVelocity(xVelocity, yVelocity);
-					return;
-				}		
-				else {
-					this.xVelocity = xVelocity;
-					this.yVelocity = yVelocity;
-				}
+
+			if(this.exceedsMaxVelocity(xVelocity, yVelocity)){
+				this.scaleVelocity(xVelocity, yVelocity);
+				return;
+			}		
+			else {
+				this.xVelocity = xVelocity;
+				this.yVelocity = yVelocity;
+			}
 		}
 	}
 
@@ -414,7 +415,7 @@ public abstract class Entity {
 	public boolean exceedsMaxVelocity(double xVelocity, double yVelocity){
 		return (Math.sqrt(Math.pow(yVelocity,2)+Math.pow(xVelocity,2)) > getMaxVelocity());
 	}
-	
+
 	/**
 	 * Return the maximum velocity an entity can have.
 	 */
@@ -422,7 +423,7 @@ public abstract class Entity {
 	public static double getMaxVelocity(){
 		return Entity.max_Velocity;
 	}
-	
+
 	/**
 	 * Return the minimum velocity an entity can have.
 	 */
@@ -430,7 +431,7 @@ public abstract class Entity {
 	public static double getMinVelocity(){
 		return Entity.min_Velocity;
 	}
-	
+
 	/** 
 	 * Changes the velocity to it's scaled value (so that the class invariants hold)
 	 *  .
@@ -454,17 +455,17 @@ public abstract class Entity {
 		// TODO total velocity with lambda expression
 		this.xVelocity = xVelocity;
 		this.yVelocity = yVelocity;
-		
+
 		double scaledxVelocity = (xVelocity*getMaxVelocity())/this.getTotalVelocity();
 		double scaledyVelocity = (yVelocity*getMaxVelocity())/this.getTotalVelocity();
-		
-		
+
+
 		this.xVelocity = scaledxVelocity;
 		this.yVelocity = scaledyVelocity;
 	}
-	
-    
-// ---------------------------- RADIUS ----------------------------	
+
+
+	// ---------------------------- RADIUS ----------------------------	
 	/** 
 	 * Sets the radius to the given Value, if it is valid.
 	 * 
@@ -500,20 +501,23 @@ public abstract class Entity {
 	@Raw
 	// TODO getMinradius moet gelden voor alle entitiess
 	public boolean isValidRadius(double radius){
-		return (radius >= getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
+		return ((!Double.isNaN(radius)) && (radius != Double.POSITIVE_INFINITY));
 	}
-	
-	/**
-	 * Return the minimum radius an entity can have.
-	 * @return the minimum radius an entity can have.
-	 */
-	@Basic
-	public static double getMinRadius(){
-		return Entity.min_Radius;
-	}
-	
-// ---------------- Mass -------------------
-	
+
+
+	// TODO je kan ook deze functie wel gebruiken en enkel dit overschrijven in andere klassen.
+	//	
+	//	/**
+	//	 * Return the minimum radius an entity can have.
+	//	 * @return the minimum radius an entity can have.
+	//	 */
+	//	@Basic
+	//	public abstract double getMinRadius();
+
+
+
+	// ---------------- Mass -------------------
+
 	/**
 	 * Sets the mass of this entity to the given value
 	 * @param mass
@@ -523,21 +527,11 @@ public abstract class Entity {
 	 */		
 	@Raw
 	public void setMass(double mass){
-		if(isValidMass(mass)){
-			this.mass = mass;
-		} else {
-			//this.mass=this.
-		}
+		this.mass = mass;
 	}
-	
-	public boolean isValidMass(double mass){
-		return true;
-	}
-		
-	
-	
-// ---------------- Moving -------------------
-		
+
+	// ---------------- Moving -------------------
+
 	/**
 	 *  Move the entity, given a certain duration.
 	 * 
@@ -569,8 +563,8 @@ public abstract class Entity {
 
 		this.setPosition(newxPosition, newyPosition);
 	}
-	
-	
+
+
 	/**
 	 *  Check whether the given duration is legal.
 	 * 
@@ -583,9 +577,10 @@ public abstract class Entity {
 	public boolean isValidDuration(double duration){
 		return ((duration >= 0) && (!Double.isNaN(duration)) && (duration != Double.POSITIVE_INFINITY));
 	}
+
+
+	// ---------------------  COLLISION and Relative Postioning ----------------------
 	
-	
-// ---------------------  COLLISION and Relative Postioning ----------------------
 	/**
 	 *  Return the distance betwheen two entities.
 	 * 
@@ -604,13 +599,16 @@ public abstract class Entity {
 	public double getDistanceBetween(Entity other){
 		double result = 0;
 		if (this != other){
-		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.getxPosition()), 2.0)+
-									Math.pow((this.getyPosition()-other.getyPosition()), 2.0));
-		result = centerDistance - this.getRadius() - other.radius;
+			// TODO VECTOR OPERATIE: value klasse maken
+			double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.getxPosition()), 2.0)+
+					Math.pow((this.getyPosition()-other.getyPosition()), 2.0));
+			result = centerDistance - this.getRadius() - other.radius;
 		}
 		return result;
 	}
 
+
+	// TODO dit lijkt niet goed te werken: marge inwerken
 
 	/** 
 	 * Returns whether two objects (entities) overlap. 
@@ -625,15 +623,42 @@ public abstract class Entity {
 	 * 		  
 	 */
 	public Boolean significantOverlap (Entity other){
-			if (this.equals(other)){
-				return true;
-			}
-			double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.getxPosition()), 2.0)+
-					Math.pow((this.getyPosition()-other.getyPosition()), 2.0));
-			
-			return (centerDistance < 0.99*(this.getRadius() + other.getRadius()));
+		if (this.equals(other)){
+			return true;
 		}
-	
+		// TODO VECTOR OPERATIE: value klasse maken
+
+		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.getxPosition()), 2.0)+
+				Math.pow((this.getyPosition()-other.getyPosition()), 2.0));
+
+		return (centerDistance < 0.99*(this.getRadius() + other.getRadius()));
+	}
+
+	/**
+	 * Returns whether this entity is fully within another entity.
+	 * That means the space that this entity occupies, is also completely
+	 * occupied by the other entity.
+	 * 
+	 * @param other
+	 * 		  The other entity that might surround this entity.
+	 * 
+	 * @return True if the sum of distance between the two centres and 
+	 * 		   the radius of this entity is smaller than the radius of the other entity.
+	 * 		   | @see implementation 
+	 * 
+	 */
+	public Boolean isFullyWithinEntity (Entity other){
+		double thisRadius = this.getRadius();
+		double otherRadius = other.getRadius();
+
+		//TODO vector operatie: value klasse
+		double centerDistance = Math.sqrt(Math.pow((this.getxPosition()-other.getxPosition()), 2.0)+
+				Math.pow((this.getyPosition()-other.getyPosition()), 2.0));
+
+		return ((centerDistance + thisRadius) < otherRadius);
+
+	}
+
 	/**
 	 * This method returns the time until an entity will reach a certain boundary of the world it is in.
 	 * 
@@ -652,17 +677,13 @@ public abstract class Entity {
 	 * 		   | 	this.move(resulting_time + extra)
 	 * 		   |	!this.getWorld().withinBoundaries(this)
 	 * 	       If we had not increased resulting_time with extra, the entity would have still been within this world.
-	 * 
-	 * @throw IllegalBulletException
-	 * 		  The entity is not within a certain world.
-	 * 		  |this.getWorld() == null
 	 * 		  
 	 */
-	public double getTimeToBoundaryCollision() throws IllegalEntityException{
+	public double getTimeToBoundaryCollision(){
 		if (this.getWorld() == null){
-			throw new IllegalEntityException(this);
-			}
-		
+			return Double.POSITIVE_INFINITY;
+		}
+
 		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(),
 				this.getWorld().getWidth());
 		double yTime = getTimeToBoundaryAxisCollsion(this.getyVelocity(), this.getyPosition(),
@@ -670,14 +691,15 @@ public abstract class Entity {
 
 		return Math.min(xTime, yTime);		
 	}
-	
-	
-	
+
+
+	//TODO DOCUMENTATION  
+
 	public double[] getBoundaryCollisionPosition(){
 		if (this.getWorld() == null){
-			throw new IllegalStateException();
-			}
-		
+			return null;
+		}
+
 		double T = this.getTimeToBoundaryCollision();
 
 		if (T == Double.POSITIVE_INFINITY){
@@ -688,10 +710,10 @@ public abstract class Entity {
 
 		double[] entityPosition = { this.getxPosition() + this.getxVelocity() * T,
 				this.getyPosition() + this.getyVelocity() * T };
-		
+
 		double xTime = getTimeToBoundaryAxisCollsion(this.getxVelocity(), this.getxPosition(),
 				this.getWorld().getWidth());
-		
+
 
 		if(T == xTime){
 			if(this.getxVelocity() >0){
@@ -700,7 +722,7 @@ public abstract class Entity {
 				entityPosition[0]-= this.getRadius();
 
 			}
-			
+
 		} else {
 			if(this.getyVelocity() >0){
 				entityPosition[1]+= this.getRadius();
@@ -708,12 +730,12 @@ public abstract class Entity {
 				entityPosition[1]-= this.getRadius();
 
 			}
-			
+
 		}
 		return entityPosition;
 	}
-	
-	
+
+
 	/**
 	 * This method calculaties the time until this entity collides with a boundary.
 	 * This either in the x- or y- direction. 
@@ -731,17 +753,17 @@ public abstract class Entity {
 	 * 		  @see implementation
 	 */
 	public double getTimeToBoundaryAxisCollsion(double axisVelocity, double axisPosition, double worldAxisLength){
-		
+
 		double time = Double.POSITIVE_INFINITY;
 		if(axisVelocity != 0){
 			double timeToLongBorder = (worldAxisLength-axisPosition-this.getRadius())/axisVelocity;
 			double timeToZeroBorder = -(axisPosition -this.getRadius())/axisVelocity;
-			
+
 			time = Math.max(timeToZeroBorder,timeToLongBorder);
 		}	
 		return time;
 	}
-	
+
 	/**
 	 *  Calculates the time to the point where the two given entities collide.
 	 * 	If they never collide, it returns positive infinity.
@@ -767,12 +789,14 @@ public abstract class Entity {
 			throw new IllegalCollisionException(this,other);
 		}
 		
+		//Check to see whether the bullet with which this might collide is within
+		// a ship, then it can not collide.
 		if(other instanceof Bullet){
 			if(((Bullet) other).getShip() != null){
 				return Double.POSITIVE_INFINITY;
 			}
 		}
-		
+
 		//Sigma is centerdistance at the moment of collision : sum of two radii.
 		double sigma = other.getRadius() + this.getRadius();
 		double[] Dv= {other.getxVelocity() - this.getxVelocity(), other.getyVelocity() - this.getyVelocity()};
@@ -788,13 +812,13 @@ public abstract class Entity {
 		if ((d <= 0) || (DvDr >= 0)){
 			return Double.POSITIVE_INFINITY;
 		}
-		
-		
-		
+
+
+
 		else{
 			return -(DvDr + Math.sqrt(d))/(DvDv);}
 	}
-	
+
 	/** 
 	 * Returns the position on which two entities collide, if they ever collide. Otherwise it returns null.
 	 * 
@@ -848,60 +872,161 @@ public abstract class Entity {
 
 		return CollisionCoordinates;
 	}	
+
+
+	// TODO DOCUMENTATIE COLLISIONS
+
+	public void handleBoundaryCollision(){
 	
+		// A horizontal collision occurs when the x-position is around the
+		// distance of the radius of this ship. Or same thing but on the other side.
+		boolean horizontally = 
+				(this.getxPosition()< 1.01 * this.getRadius()) || 
+				(this.getxPosition() > (this.getWorld().getWidth() - 1.01 * this.getRadius()));
+		
+		// A vertical collision occurs when the y-position is around the
+		// distance of the radius of this ship. Or same thing but on the other side.		
+		boolean vertically = 
+				(this.getyPosition()< 1.01 * this.getRadius()) || 
+				(this.getyPosition() > (this.getWorld().getHeight() - 1.01 * this.getRadius()));
+
+
+		if(horizontally){
+			this.setVelocity(-this.getxVelocity(), this.getyVelocity());
+		} 
+
+		if (vertically) {
+			this.setVelocity(this.getxVelocity(), -this.getyVelocity());
+		}
+
+	}
+	
+	// TODO: hebben abstracte methoden documentatie?
+	public abstract void handleOtherEntityCollision(Entity entityB) throws IllegalPositionException, IllegalBulletException;
+
+	/**
+	 * This method handles a casual collision between two entities.
+	 * This means a collision in which two entities merely bounce off of eachother.
+	 * 
+	 * @param other
+	 * 		  The other entity in this collision
+	 *
+	 * @post The collision is only resolved if it hasn't been resolved already.
+	 * 		 | if (!this.getWorld().isCasualCollisionHandled())
+	 *       |		then old. getxVelocity == new. getyVelocity;
+	 *       ---
+	 * @effect The collision is resolved by 
+	 * 		   changing the entities' directions and velocity;
+	 *         the mathematical way of doing this was provided to us.
+	 *         | @see implementation
+	 */
+	public void handleCasualCollision(Entity other){
+
+		// Only do this if the casual collision has not been handled already.
+		if (!this.getWorld().isCasualCollisionHandled()){
+			// This entity
+			double thisEntityPositionX = this.getxPosition();
+			double thisEntityPositionY = this.getyPosition();
+
+			double thisEntityVelocityX = this.getxVelocity();
+			double thisEntityVelocityY = this.getyVelocity();
+
+			double thisEntityRadius = this.getRadius();
+			double thisEntitymass = this.getMass();
+
+			// The other entity
+			double otherEntityPositionX = other.getxPosition();
+			double otherEntityPositionY = other.getyPosition();
+
+			double otherEntityVelocityX = other.getxVelocity();
+			double otherEntityVelocityY = other.getyVelocity();
+
+			double otherEntityRadius = other.getRadius();
+			double otherEntitymass = other.getMass();
+			
+			// The computations
+			double deltaPosX = otherEntityPositionX - thisEntityPositionX;
+			double deltaPosY = otherEntityPositionY - thisEntityPositionY;
+			double deltaVelX = otherEntityVelocityX - thisEntityVelocityX;
+			double deltaVelY = otherEntityVelocityY - thisEntityVelocityY;
+
+			double delta = deltaPosX * deltaVelX + deltaPosY * deltaVelY;
+			double sumRadius = thisEntityRadius + otherEntityRadius;
+
+			double jValue = 
+					(2 * thisEntitymass * otherEntitymass * delta) / 
+					(sumRadius * (thisEntitymass + otherEntitymass));
+
+			double Jx = (jValue * deltaPosX) / sumRadius;
+			double Jy = (jValue * deltaPosY) / sumRadius;
+
+			double thisEntitynewXVel = thisEntityVelocityX + (Jx / thisEntitymass);
+			double thisEntitynewYVel = thisEntityVelocityY + (Jy / thisEntitymass);	
+
+			this.setVelocity(thisEntitynewXVel, thisEntitynewYVel);
+
+			double otherEntitynewXVel = otherEntityVelocityX - (Jx / otherEntitymass);
+			double otherEntitynewYVel = otherEntityVelocityY - (Jy / otherEntitymass);	
+
+			other.setVelocity(otherEntitynewXVel,otherEntitynewYVel);
+		}			
+	}
+	
+	/**
+	 * Method registering if this entity is deadly.
+	 * Meaning that if it hits another entity, that other entity is terminated.
+	 * The default is set to false and is changed within deadly entities.
+	 */
+	public Boolean isDeadly(){
+		return false;
+	}
+
+
+
 	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
-	
-	// TODO Variabelen moeten private gedeclareerd worden en dan moet je protected getters maken.
-	
+
 	/**
 	 * Variable registering the speed of light; 300000 km/s.
 	 */
-	protected static final double speedoflight = 300000.0;
+	private static final double speedoflight = 300000.0;
 
 	/**
 	 * Variable registering the xPosition of this Entity.
 	 */
-	protected double xPosition = 0.0;
+	private double xPosition = 0.0;
 
 	/**
 	 * Variable registering the yPosition of this Entity.
 	 */
-	protected double yPosition = 0.0;
+	private double yPosition = 0.0;
 
 
 	/**
 	 * Variable registering the xVelocity of this Entity.
 	 */
-	protected double xVelocity = min_Velocity;
+	private double xVelocity = min_Velocity;
 
 
 	/**
 	 * Variable registering the yVelocity of this Entity.
 	 */
-	protected double yVelocity = min_Velocity;
+	private double yVelocity = min_Velocity;
 
 
 	/**
 	 * Variable registering the minimum allowed velocity.
 	 */
-	protected static final double min_Velocity = 0;
+	private static final double min_Velocity = 0;
 
 	/**
 	 * Variable registering the maximum allowed velocity.
 	 */
 	private static final double max_Velocity = speedoflight;
 
-	//TODO verzetten van min radius naar ship.
-	
-	/**
-	 * Variable registering the minimum allowed Radius.
-	 */
-	private static double min_Radius = 10.0;
-
 	/**
 	 * Variable registering the radius of this Entity.
 	 */
-	private double radius = min_Radius;
+	private double radius;
 
 	/**
 	 * Variable registering the mass of this entity.
@@ -918,63 +1043,5 @@ public abstract class Entity {
 	 * Variable registering the density of this entity.
 	 */
 	private double density;
-	
-	public void handleBoundaryCollision(){
-		boolean horizontally = 
-				(this.getxPosition()< 1.01 * this.getRadius()) || 
-				(this.getxPosition() > (this.getWorld().getWidth() - 1.01 * this.getRadius()));
-		
-		if(horizontally){
-			this.setVelocity(-this.getxVelocity(), this.getyVelocity());
-		} else {
-			this.setVelocity(this.getxVelocity(), -this.getyVelocity());
-		}
-		
-	}
 
-	public abstract void handleOtherEntityCollision(Entity entityB) throws IllegalPositionException, IllegalBulletException;
-
-	
-	public void handleCasualCollision(Entity entity){
-			
-			double thisShipPositionX = this.getxPosition();
-			double thisShipPositionY = this.getyPosition();
-			
-			double thisShipVelocityX = this.getxVelocity();
-			double thisShipVelocityY = this.getyVelocity();
-			
-			double thisShipRadius = this.getRadius();
-			double thisShipmass = this.getMass();
-			
-			
-			double entityPositionX = entity.getxPosition();
-			double entityPositionY = entity.getyPosition();
-			
-			double entityVelocityX = entity.getxVelocity();
-			double entityVelocityY = entity.getyVelocity();
-			
-			double entityRadius = entity.getRadius();
-			double entitymass = entity.getMass();
-			
-			double deltaPosX = entityPositionX - thisShipPositionX;
-			double deltaPosY = entityPositionY - thisShipPositionY;
-			double deltaVelX = entityVelocityX - thisShipVelocityX;
-			double deltaVelY = entityVelocityY - thisShipVelocityY;
-			
-			double delta = deltaPosX * deltaVelX + deltaPosY * deltaVelY;
-	
-			double sumRadius = thisShipRadius + entityRadius;
-			
-			double jValue = 
-					(2 * thisShipmass * entitymass * delta) / 
-					(sumRadius * (thisShipmass + entitymass));
-			double Jx = (jValue * deltaPosX) / sumRadius;
-			double Jy = (jValue * deltaPosY) / sumRadius;
-			
-			double thisShipnewXVel = thisShipVelocityX + (Jx / thisShipmass);
-			double thisShipnewYVel = thisShipVelocityY + Jy / thisShipmass;	
-			this.setVelocity(thisShipnewXVel, thisShipnewYVel);
-		}
-	
-	
 }

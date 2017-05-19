@@ -95,6 +95,8 @@ public class Part3TestFull {
       max_score += 2;
       facade.createShip(Double.NaN, 120, 10, 5, 50, 0, 1.0E20);
     } catch (ModelException exc) {
+//    	System.out.println("12.score verbeterd");
+
       score += 2;
     }
   }
@@ -138,12 +140,16 @@ public class Part3TestFull {
     assertTrue(velocity <= 300000 + EPSILON);
     score += 3;
   }
-
+  
+  
+  @Test
   public void testCreateShipRadiusNan() throws ModelException {
     try {
       max_score += 1;
       facade.createShip(100, 120, 10, 5, Double.NaN, 0, 1.0E20);
     } catch (ModelException exc) {
+//    	System.out.println("13.score verbeterd");
+
       score += 1;
     }
   }
@@ -154,6 +160,8 @@ public class Part3TestFull {
       max_score += 2;
       facade.createShip(100, 120, 10, 5, 0, 0, 1.0E20);
     } catch (ModelException exc) {
+//    	System.out.println("19.score verbeterd");
+
       score += 2;
     }
   }
@@ -164,6 +172,8 @@ public class Part3TestFull {
       max_score += 1;
       facade.createShip(100, 120, 10, 5, 50, -Math.PI, 1.0E20);
     } catch (ModelException exc) {
+//    	System.out.println("14.score verbeterd");
+
       score += 1;
     }
   }
@@ -174,6 +184,8 @@ public class Part3TestFull {
       max_score += 1;
       facade.createShip(100, 120, 10, 5, 50, 3 * Math.PI, 1.0E20);
     } catch (ModelException exc) {
+//    	System.out.println("15.score verbeterd");
+
       score += 1;
     }
   }
@@ -219,6 +231,7 @@ public class Part3TestFull {
     score += 2;
   }
 
+  // TODO PROGRAM
 //  @Test
 //  public void testLoadProgram() throws ModelException {
 //    max_score += 2;
@@ -372,6 +385,8 @@ public class Part3TestFull {
       World world = facade.createWorld(1000, 1000);
       facade.addShipToWorld(world, null);
     } catch (ModelException exc) {
+//    	System.out.println("16.score verbeterd");
+
       score += 1;
     }
   }
@@ -384,6 +399,8 @@ public class Part3TestFull {
       Ship ship = facade.createShip(100000, 1200000, 10, 5, 50, 0, 1.0E20);
       facade.addShipToWorld(world, ship);
     } catch (ModelException exc) {
+//    	System.out.println("17.score verbeterd");
+
       score += 4;
     }
   }
@@ -398,6 +415,7 @@ public class Part3TestFull {
       facade.addShipToWorld(world, ship1);
       facade.addShipToWorld(world, ship2);
     } catch (ModelException exc) {
+//    	System.out.println("1.score verbeterd");
       score += 3;
     }
   }
@@ -411,6 +429,7 @@ public class Part3TestFull {
       facade.addShipToWorld(world, ship);
       facade.addShipToWorld(world, ship);
     } catch (ModelException exc) {
+//    	System.out.println("2.score verbeterd");
       score += 1;
     }
   }
@@ -428,6 +447,7 @@ public class Part3TestFull {
       assertTrue(facade.getWorldShips(world).size() + facade.getWorldShips(otherWorld).size() == 1);
       score += 3;
     } catch (ModelException exc) {
+//    	System.out.println("3.score verbeterd");
       score += 3;
     }
   }
@@ -454,6 +474,7 @@ public class Part3TestFull {
       facade.addShipToWorld(world, ship);
       facade.addBulletToWorld(world, bullet);
     } catch (ModelException exc) {
+//    	System.out.println("4.score verbeterd");
       score += 4;
     }
   }
@@ -485,6 +506,7 @@ public class Part3TestFull {
       facade.addShipToWorld(world, ship2);
       facade.removeShipFromWorld(world, null);
     } catch (ModelException exc) {
+//    	System.out.println("5.score verbeterd");
       score += 1;
     }
   }
@@ -499,6 +521,7 @@ public class Part3TestFull {
       facade.addShipToWorld(world, ship1);
       facade.removeShipFromWorld(world, ship2);
     } catch (ModelException exc) {
+//    	System.out.println("6.score verbeterd");
       score += 2;
     }
   }
@@ -515,6 +538,7 @@ public class Part3TestFull {
       facade.addShipToWorld(otherWorld, ship2);
       facade.removeShipFromWorld(world, ship2);
     } catch (ModelException exc) {
+//    	System.out.println("7.score verbeterd");
       score += 3;
     }
   }
@@ -640,6 +664,7 @@ public class Part3TestFull {
       Bullet bullet = facade.createBullet(560, 120, 10, 5, 50);
       facade.loadBulletOnShip(ship, bullet);
     } catch (ModelException exc) {
+//    	System.out.println("18.score verbeterd");
       score += 5;
     }
   }
@@ -666,6 +691,7 @@ public class Part3TestFull {
       facade.addBulletToWorld(world, bullet);
       facade.loadBulletOnShip(ship, bullet);
     } catch (ModelException exc) {
+//    	System.out.println("8.score verbeterd");
       score += 5;
     }
   }
@@ -751,6 +777,8 @@ public class Part3TestFull {
         throw new ModelException("Needed for a succesfull test.");
       }
     } catch (ModelException exc) {
+//    	System.out.println("9.score verbeterd");
+
       score += 6;
     }
   }
@@ -1024,10 +1052,12 @@ public class Part3TestFull {
       facade.addShipToWorld(world, ship2);
       facade.evolve(world, Double.NaN, null);
     } catch (ModelException exc) {
+//    	System.out.println("10.score verbeterd");
+
       score += 2;
     }
   }
-
+  
   @Test
   public void testEvolveDtNegative() throws ModelException {
     try {
@@ -1039,6 +1069,8 @@ public class Part3TestFull {
       facade.addShipToWorld(world, ship2);
       facade.evolve(world, -1, null);
     } catch (ModelException exc) {
+//    	System.out.println("11.score verbeterd");
+
       score += 2;
     }
   }
@@ -1328,7 +1360,8 @@ public class Part3TestFull {
     assertNull(facade.getBulletWorld(bullet1));
     score += 7;
   }
-
+  
+  //TODO PROGRAMS
   // Assignment Statement
 
   

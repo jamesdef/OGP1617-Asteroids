@@ -24,25 +24,22 @@ public abstract class ActionStatement extends Statement {
 	public void run(List<Expression> arguments){
 		
 		if(enoughTimeLeft()){
-			this.getProgram().subtractTimeLeft(actionTime);
+			this.getProgram().subtractTimeLeft(getActionTime());
 		//	executeActionStatement(getProgram());
 			this.getProgram().getBookmark().addPerformedAction();
 		}
 		else {
-			this.getProgram().setRunning(false);
-			
+			this.getProgram().setRunning(false);	
 		}
-		
 	}
 	
 	public boolean enoughTimeLeft(){
 		double timeLeft = this.getProgram().getTimeLeft();
-		return (timeLeft >= actionTime);
-		
+		return (timeLeft >= getActionTime());
 	}
 	
 	
-	public double geactionTime(){
+	public double getActionTime(){
 		return actionTime;
 	}
 	

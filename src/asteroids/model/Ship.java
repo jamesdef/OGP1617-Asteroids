@@ -1,12 +1,17 @@
 package asteroids.model;
-import asteroids.model.exceptions.*;
-import be.kuleuven.cs.som.annotate.Basic;
-import be.kuleuven.cs.som.annotate.Immutable;
-import be.kuleuven.cs.som.annotate.Raw;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import asteroids.model.exceptions.IllegalBulletException;
+import asteroids.model.exceptions.IllegalDurationException;
+import asteroids.model.exceptions.IllegalEntityException;
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
+import asteroids.model.exceptions.IllegalShipException;
+import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with ships, which are a kind of entity in space. 
@@ -87,7 +92,7 @@ public class Ship extends Entity {
 							throws IllegalPositionException, IllegalRadiusException{
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
 		setOrientation( orientation);
-		setMass(mass);
+		setShipMass(mass);
 	}
 	/**
 	 * Initialize this new ship with the parameters set to their default values.
@@ -154,7 +159,7 @@ public class Ship extends Entity {
     @Raw 
 	public void setShipMass(double mass){
 		if(!isValidMass(mass)){
-	        mass = 4.0/3.0 * Math.PI * Math.pow(this.getRadius(), 3.0) * this.getDensity();
+			mass = 4.0/3.0 * Math.PI * Math.pow(this.getRadius(), 3.0) * this.getDensity();
 		}
 	    super.setMass(mass);
 	}
@@ -165,16 +170,18 @@ public class Ship extends Entity {
 	 * @param mass
 	 * 		  The mass to check
 	 * @return Whether the mass is valid for a ship to have.
-	 * 		   |result == (mass >= 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getMassDensity())
+	 * 		   For this it has to be bigger than the minimum and has to be a number.
+	 * 		   |result == ((mass >= 4/3 * Math.PI * Math.pow(this.getRadius(), 3) * this.getMassDensity())
+	 		   |  && !Double.isNaN(mass) )
 	 */
 	@Raw
 	public boolean isValidMass(double mass){
-        return (mass >= 4.0/3.0 * Math.PI * Math.pow(this.getRadius(), 3.0) * this.getDensity());
+        return ((mass >= 4.0/3.0 * Math.PI * Math.pow(this.getRadius(), 3.0) * this.getDensity()) 
+        		&& !Double.isNaN(mass) );
 	}
 	
 	/**
 	 * Returns the density of this ship.
-	 * @return the density of this ship.
 	 */
 	@Basic
 	public double getDensity(){
@@ -211,11 +218,7 @@ public class Ship extends Entity {
 		return (density >= min_Density);
 	}
         
-    //MASS - Total programming
-    
-	public double getMass(){
-		return this.mass;
-	}
+    //MASS - Total programming<
 	
     /** 
      * This method returns the sum of all the masses of the bullets on this ship.
@@ -250,14 +253,13 @@ public class Ship extends Entity {
      */
 	public double getTotalMass(){
 		
-		System.out.println(this.getMass());
 		return (this.getMass() + getMassOfBullets());
 	}
 	
 	/**
 	 * Return the minimum mass a ship can have.
-	 * @return the minimum mass a ship can have.
 	 */
+	@Basic
 	public double getMinMass(){
 		return this.min_Mass;
 	}
@@ -271,14 +273,22 @@ public class Ship extends Entity {
 	 */
 	@Immutable 
 	private static double getDefaultMass() {
-		return (4.0 / 3.0) * Math.PI * Math.pow(getMinRadius(), 3) * min_Density;
+		return (4.0 / 3.0) * Math.PI * Math.pow(getMinRadius(), 3) * Ship.getMinDensity();
 	}
+	
+	/**
+	 * Returns the minimum density for this ship.
+	 */
+	@Basic @Immutable
+	public static double getMinDensity(){
+		return min_Density;
+	}
+
 	
 //--------------------------------------Orientation-----------------------
 	
 	/**
 	 *  Return the orientation of this ship.
-	 * @return the orientation of this ship.
 	 */
 	@Basic
 	public double getOrientation(){
@@ -365,11 +375,13 @@ public class Ship extends Entity {
 	 * Return the minimum radius a ship can have.
 	 * @return the minimum radius a ship can have.
 	 */
-	@Basic
+	@Basic 
 	public static double getMinRadius(){
 		return Ship.min_Radius;
 	}
 
+	// TODO dit is liskov, documentatie kan enkel verstrengen
+			// moet dus niet gekopieerd zijn
 	/** 
 	 * Checks whether the given radius has a valid value.
 	 * 
@@ -378,13 +390,12 @@ public class Ship extends Entity {
 	 * 
 	 * @return True if the radius exceeds the minimal radius
 	 * 		   false if the radius is less than the minimal_radius. 
-	 * 		   Or if the radius is Infinity or not a number.
-	 * 		   | radius >= getMin_Radius;
+	 * 		   | radius >= Ship.getMin_Radius;
 	 */
     @Override
 	public boolean isValidRadius(double radius){
-		return (radius >= Ship.getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
-	}
+		return (super.isValidRadius(radius) && radius >= Ship.getMinRadius());
+    }
 
 	
 	
@@ -612,11 +623,11 @@ public class Ship extends Entity {
      * 		   -The given bullet is effective
      *         -This ship is not terminated or the bullet is terminated.
      *         -This ship does not already have the bullet as one of it's bullets
-     *         -This ships' radius is bigger than that of the bullet.
+     *         -The bullet is compeletly within this ship. 
      *         | result == ( (bullet != null) 
      *         |       && ((!this.isTerminated()) || (bullet.isTerminated()))
      *         |			 && (!this.hasBullet(bullet)) 
-     *         |					&& (bullet.getRadius()<this.getRadius())  )
+     *         |					&& (bullet.isFullyWithinEntity(this))  )
     }
      */
 	@Raw
@@ -624,8 +635,9 @@ public class Ship extends Entity {
     	  return ( (bullet != null) 
     			       && ((!this.isTerminated()) || (bullet.isTerminated()))
     			     		 && (!this.hasBullet(bullet)) 
-    			     				&& (bullet.getRadius()<this.getRadius())  );		  
+    			     				&& (bullet.isFullyWithinEntity(this))  );		  
     }
+	
 	
     /**
      * Check whether all the bullets attached to this ship are 'legal'.
@@ -689,8 +701,8 @@ public class Ship extends Entity {
 	 * 		   | 									|| bullet.getShip() != null   )
 	 * 		 
 	 */
-	// TODO misschien mag hier wel bij dat Source null is
 	public void loadBullet(Bullet bullet) throws IllegalPositionException, IllegalBulletException{
+		
 		if (((this.getWorld()!=null)&&(bullet.getWorld()!=null)&&(this.getWorld()!=bullet.getWorld())) 
 							|| !canHaveAsBullet(bullet) || bullet.getShip()!= null){
 			throw new IllegalBulletException(bullet);
@@ -755,10 +767,13 @@ public class Ship extends Entity {
 	 * 		  | if (hasBullet(bullet){
 	 * 		  |       (bullet.getShip() == null)
 	 */
-	public void removeBullet(Bullet bullet){
-		if (hasBullet(bullet)){
+	public void removeBullet(Bullet bullet) throws IllegalEntityException{
+		if (this.hasBullet(bullet)){
 			bullets.remove(bullet);
 			bullet.setShip(null);
+		}
+		else{
+			throw new IllegalEntityException(this);
 		}
 	}
 	
@@ -810,7 +825,8 @@ public class Ship extends Entity {
 			
 			this.removeBullet(bullet);
 			bullet.setPosition(bulletXPos, bulletYPos);
-			
+			bullet.setSource(this);
+//			bullet.setShip(null);
 			
 			//bullet is now set to where it will start its movement, after some checks.
 			
@@ -834,20 +850,13 @@ public class Ship extends Entity {
 					return;
 				}
 			}
-			
-			bullet.setSource(this);
+	
 			this.getWorld().addEntity(bullet);
-			//1
-			
-			
-
-			// TODO Moet dit hier staan of niet? denk het wel
 			bullet.setWorld(this.getWorld());
+			
 			// The bullet is in a legal spot and can start moving. It's velocity is now assigned.
 			bullet.setVelocity(xSpeed, ySpeed);	
 			
-
-
 		}
 	}
 	
@@ -869,6 +878,67 @@ public class Ship extends Entity {
 			 return true;
 		 }
 		 return false;	
+	}
+	
+	
+	// TODO DOCUMENTATION EN WAAROM GEEN OVERRIDE?
+	
+	@Override
+	public void handleOtherEntityCollision(Entity entity) throws IllegalPositionException, IllegalBulletException{
+		
+		if(entity instanceof Ship){
+			this.handleCasualCollision(entity);
+		}
+		if (entity.isDeadly() == true){
+			if(entity instanceof Bullet){
+				if(((Bullet) entity).getSource() == this){
+					// The Bullet is first placed to the centre of this ship,
+					// so that it is fully within this ship and can be loaded.	
+					((Bullet) entity).setPosition(this.getxPosition(),this.getyPosition());
+					
+					this.loadBullet((Bullet) entity);
+						return;
+				}
+				else {
+					this.terminate();
+					// Termination is reeds gebeurd.
+					return;
+				}
+			}
+			this.terminate();
+		}		
+	}
+	
+	
+	//TODO Documentatie 
+	public boolean overlapsWithOther(){
+		for(Entity entity: this.getWorld().getAllEntities()){
+			if(this.significantOverlap(entity)){
+				System.out.println("overlap terminate");
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	//TODO Documentatie 
+	public void teleport(){
+		
+		double radius = this.getRadius();
+		double randomXcord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
+		double rancomYcord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
+		
+		try{
+			this.setPosition(randomXcord, rancomYcord);
+			
+			if(this.overlapsWithOther()){
+				this.terminate();
+			}
+			
+		} catch (Exception exception) {
+            this.terminate();
+        }
+		
 	}
 	
     
@@ -895,18 +965,18 @@ public class Ship extends Entity {
 	/**
 	 * Variable registering the orientation of this ship.
 	 */
-	protected double orientation = min_Orientation;
+	private double orientation = min_Orientation;
 	
 	/**
 	 * Variable registering the minimum allowed orientation.
 	 */
-	protected static final double min_Orientation = 0.0;
+	private static final double min_Orientation = 0.0;
 
 
 	/**
 	 * Variable registering the maximum allowed orientation.
 	 */
-	protected static final double max_Orientation = 2.0*Math.PI;
+	private static final double max_Orientation = 2.0*Math.PI;
 	
     /**
      * Variable registering the density of this ship.
@@ -924,71 +994,11 @@ public class Ship extends Entity {
      */
     private final double min_Mass = min_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3.0));
     
-    /**
-     * Variable registering the mass of this ship.
-     *
-     */
-    protected double mass = min_Mass;
-    
-	
 	/**
 	 * A variable defining the force that an active thruster can exert on a ship.
 	 */
 	private double thrustforce = 1.1E18;
 	
-	//@Override
-		public void handleOtherEntityCollision(Entity entity) throws IllegalPositionException, IllegalBulletException{
-			
-			if(entity instanceof Ship){
-				// doe casual collision
-				this.handleCasualCollision(entity);	
-			}
-			
-			if(entity instanceof Bullet){
-				if(((Bullet) entity).getSource() == this){
-					this.loadBullet((Bullet) entity);
-				} else {
-					this.terminate();
-				}
-			}
-			
-			if(entity instanceof Asteroid){
-				this.terminate();
-			}
-		}
-		
-		
-		public boolean overlapsWithOther(){
-			for(Entity entity: this.getWorld().getAllEntities()){
-				if(this.significantOverlap(entity)){
-					System.out.println("overlap terminate");
-					//return true;
-				}
-			}
-			return false;
-		}
-		
-		public void teleport(){
-			
-			double radius = this.getRadius();
-			double randomXcord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
-			double rancomYcord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
-			
-			try{
-				this.setPosition(randomXcord, rancomYcord);
-				
-				if(this.overlapsWithOther()){
-					this.terminate();
-				}
-				
-				//TODO check overlap
-				
-			} catch (Exception exception) {
-	            this.terminate();
-	        }
-			
-		}
-		
 		
 		
 		
@@ -1012,6 +1022,5 @@ public class Ship extends Entity {
 			
 		}
 		
-		
-		
+
 }

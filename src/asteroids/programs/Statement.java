@@ -15,13 +15,12 @@ public abstract class Statement {
 			this.navigateToAction(bookmark);
 			
 			//INDIEN 1 -> MOET NU DE TWEEDE ACTION UITVOEREN
-			
-			
-			
-			
 		}
 	}
 	
+	public void navigateToAction(Bookmark bookmark){
+		
+	}
 	
 
 	//RUN

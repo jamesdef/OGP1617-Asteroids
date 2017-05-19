@@ -66,27 +66,15 @@ public class Planetoid extends MinorPlanet {
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
 		this.setPlanetoidMass(this.getRadius());
 		this.initialRadius = this.getRadius();
-		this.distanceTraveled = totalDistanceTraveled;
+		this.setDistanceTraveled(totalDistanceTraveled);
 		//Perhaps the totalDistanceTraveled is not equal to zero
 		//and so the radius has to be shrunk right away.
 		this.shrink(distanceTraveled);	
 	}
 	
-	/**
- 	 * This method sets the mass of this planetoid depending on it's size (=defined by radius)
- 	 * 
- 	 * @param radius
- 	 * 		  The radius of this planetoid.
- 	 * @post The new mass of this planetoid now equals the value calculated using the formula with the given radius.
- 	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
- 	 */
- 	private void setPlanetoidMass(double radius){
- 		this.setMass(default_Density*(4/3)*Math.PI*(Math.pow(radius, 3)));
- 	}
 	
- 	
- 	//TODO when a planetoid is bigger than 30 km and is terminated, it spawns two smaller asteroids.
- 	/**
+// ----------------Termination-------------------	
+	/**
  	 * This planetoid is terminated. 
  	 * If this planetoid is in a world and 
  	 * it has a radius bigger than 30 km's, it spawns two new asteroids.
@@ -100,7 +88,7 @@ public class Planetoid extends MinorPlanet {
  	 * 		 with the centre of their parent on a distance of half the radius of the parent from that centre. 
  	 * 		 We choose to place them randomly at the sides of their deceized parent.
  	 * 		 Their radius is half of the parents' radius,
- 	 * 		 the direction of the first child is determined at random,
+ 	 * 		 the direction of the first child is dependant on the placement of the children,
  	 * 		 the direction of the second child is the opposite thereof.
  	 * 		 Finally, their speed equals 1.5 times the speed their parent had.
  	 * 		 | if (this.getWorld() != null && this.getRadius() >= 30)
@@ -111,102 +99,44 @@ public class Planetoid extends MinorPlanet {
  	 */
  	@Override
  	public void terminate(){
- 		super.terminate();
  		if (this.getWorld() != null && this.getRadius() >= 30){
- 			//TODO Kan ik wel deze dingen opvragen? De entiteit is immers getermineerd.
+ 			// We save the world of this, soon to be terminated, planetoid, 
+ 			// so that we can use it to add it's children. Thus avoiding the null pointer.
+ 			World worldToAddTo = this.getWorld();
+ 			super.terminate();	
+ 			
  			double xPosition = this.getxPosition();
  			double yPosition = this.getyPosition();
  			double r = this.getRadius();
  			double parentVelocity = this.getTotalVelocity();
  			double randomAngle = Math.random() *2.0*Math.PI; 
- 			// TODO: aan de hand van testen; Misschien moeten we ze wel random plaatsen.
- 			double randomPlacement = Math.random() * 2.0 * Math.PI;
- 			
- 			//TODO: Probleem: Bij het aanmaken van een asteroid kunnen exceptions worden gegooid
-// 			        daardoor moeten die hier meteen opgevangen worden, en dan mogen die entiteiten
-// 			        meteen getermineerd worden maar dat lukt hier niet perfect.
- 			
-// 			Asteroid firstChild = new Asteroid(xPosition+(r/2*Math.cos(randomPlacement)), yPosition + (r/2*Math.sin(randomPlacement)), 
-//					1.5*parentVelocity*Math.cos(randomAngle),1.5*parentVelocity*Math.sin(randomAngle),
-//					r/2);
-// 			
-// 			Asteroid secondChild = new Asteroid(xPosition-(r/2*Math.cos(randomPlacement)), yPosition - (r/2*Math.sin(randomPlacement)), 
-//					-1.5*parentVelocity*Math.cos(randomAngle),-1.5*parentVelocity*Math.sin(randomAngle),
-//					r/2);
- 			
-// 			TODO CONSULTATIE: vragen of deze triviale try catch een goede oplossing is voor het throws probleem.
- 			 // prof: mag maar volgens liskov mag je ook de nodige exceptions gooien in terminate in entity en dan 
- 			 // die gegooide entities beperken in bijvoorbeeld ship waar die exceptions niet nodig zijn.
- 			// Maar dit mag dus in principe ook wel.
- 			
+ 				
  			Asteroid firstChild;
 			try {
-				firstChild = new Asteroid(xPosition+(r/2*Math.cos(randomPlacement)), yPosition + (r/2*Math.sin(randomPlacement)), 
+				firstChild = new Asteroid(xPosition+(r/2*Math.cos(randomAngle)), yPosition + (r/2*Math.sin(randomAngle)), 
 						1.5*parentVelocity*Math.cos(randomAngle),1.5*parentVelocity*Math.sin(randomAngle),
 						r/2);
-				this.getWorld().addEntity(firstChild);
-			} catch (IllegalPositionException | IllegalRadiusException e) {
+				worldToAddTo.addEntity(firstChild);
+			} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException  e) {
 			}
  			
 			Asteroid secondChild;
 			try {
-				secondChild = new Asteroid(xPosition-(r/2*Math.cos(randomPlacement)), yPosition - (r/2*Math.sin(randomPlacement)), 
+				secondChild = new Asteroid(xPosition-(r/2*Math.cos(randomAngle)), yPosition - (r/2*Math.sin(randomAngle)), 
 						-1.5*parentVelocity*Math.cos(randomAngle),-1.5*parentVelocity*Math.sin(randomAngle),
 						r/2);
-				this.getWorld().addEntity(secondChild);
-			} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException e) {
-			}		
+				worldToAddTo.addEntity(secondChild);
+				} catch (IllegalPositionException | IllegalRadiusException | IllegalEntityException e) {
+			}
+			// When we come out of this creation, the planetoid is already terminated
+			// So we return out of this function immediatly.
+			return;
  		}
+ 		super.terminate();
  	}
  	
- 	/**
- 	 * Moves this planetoid during a certain duration, depending on their velocity.
- 	 * 
- 	 * @param duration
- 	 * 		  The time during which this planetoid moves
- 	 * @throws IllegalRadiusException 
- 	 * @post The distanceTravelled is incremented by the amount of kilometers that the planetoid had moved.
- 	 * 		 That amount is calculated using the duration and the velocity of this ship.
- 	 * 		 | new.getDistanceTravelled() += duration*this.getTotalVelocity()
- 	 */
- 	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
- 		// TODO misschien hier al krimpen
- 		super.move(duration);
- 		// TODO ik denk dat dit een juiste manier is om dit te beschrijven.
- 		this.distanceTraveled += duration*this.getTotalVelocity();		
- 		shrink(distanceTraveled);
- 	}
+ // ---------------- Getters -------------------
  	
- 	/**
- 	 * This method shrinks this planetoid based on the distance it has travelled.
- 	 * If the planetoid no longer has a valid radius, through this shrinking, it 
- 	 * is terminated.
- 	 * 
- 	 * @param distanceTravelled
- 	 * 		  The amount of kilometres travelled by this planetoid
- 	 * @effect The radius of this planetoid is shrunken
- 	 * 		   | new. getRadius() == (getInitialRadius() - (0.0001)*distanceTravelled);
- 	 * @effect If the radius is not valid, the planetoid is terminated.
- 	 * 		   | if !isValidRadius()
- 	 * 				| then this.terminate(); 
- 	 */
- 	private void shrink(double distanceTravelled){
- 		double shrunk_radius = (getInitialRadius() - (0.0001)*distanceTravelled);
- 		
- 		try {
-			setRadius(shrunk_radius);
-		} catch (IllegalRadiusException e) {
-			this.terminate();
-		}
- 	}
- 	
- 	
-	/**
-	 * Variable registering the default density of a planetoid.
-	 */
-	protected final static double default_Density = 0.917*(Math.pow(10.0, 12.0));
-	
-	
 	/**
 	 * Returns the distance this planetoid has travelled.
 	 */
@@ -220,20 +150,110 @@ public class Planetoid extends MinorPlanet {
 	@Basic
 	public double getInitialRadius(){
 		return this.initialRadius;
-	}
+	}	
+ 	
+ 	/**
+ 	 * This method checks whether the given distance is a valid value for 
+ 	 * the distance traveled. The distance is valid if it is not so big as to make
+ 	 * decline the radius beneath a size of 5 right away.
+ 	 * 
+ 	 * @param distance
+ 	 * 	      The distance to check
+ 	 * @return Whether this total traveled distance is valid.
+ 	 * 		   | result = 0.000001*distance < (this.getRadius()-5.0)
+ 	 */
+  	public boolean isValidDistanceTraveled(double distance){
+  		return 0.000001*distance < (this.getRadius()-5.0);
+  	}
 	
+ 	
+ // ---------------- Setters -------------------
+ 	
+ 	// TODO kan sowieso ook door hogerliggende functie worden overgenomen
 	/**
-	 * Variable registering the distance this planetoid has travelled.
-	 * Initialised to a value of zero.
-	 */
-	protected double distanceTraveled = 0;
+ 	 * This method sets the mass of this planetoid depending on it's size (=defined by radius)
+ 	 * 
+ 	 * @param radius
+ 	 * 		  The radius of this planetoid.
+ 	 * @post The new mass of this planetoid now equals the value calculated using the formula with the given radius.
+ 	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+ 	 */
+ 	private void setPlanetoidMass(double radius){
+ 		this.setMass(default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3)));
+ 	}
+ 	
+ 	
+ 	/**
+ 	 * This method sets the total distance traveled to the
+ 	 * given value. 
+ 	 * 
+ 	 * @param totalDistanceTraveled
+ 	 * 		  The amount of distance traveled to set.
+ 	 * @post If the given value is not valid, this entity is terminated.
+ 	 * 		 |if !isValidDistanceTraveled(totalDistanceTraveled)
+ 	 * 		 | 		this.terminate()
+ 	 * @post If the given value is valid, the new distance traveled is equal
+ 	 * 		 to the given value.
+ 	 * 	     |if isValidDistanceTraveled(totalDistanceTraveled)
+ 	 * 		 | 	new.distanceTraveled == totalDistanceTraveled
+ 	 */
+ 	private void setDistanceTraveled(double totalDistanceTraveled){
+ 		if (!isValidDistanceTraveled(totalDistanceTraveled)){
+ 			this.terminate();
+ 		}
+ 		else{
+ 			this.distanceTraveled = totalDistanceTraveled;
+ 		}
+ 	}
+
+// ----------------------- MOVING AND SHRINKING -----------------
+ 	
+ 	/**
+ 	 * Moves this planetoid during a certain duration, depending on their velocity.
+ 	 * 
+ 	 * @param duration
+ 	 * 		  The time during which this planetoid moves
+ 	 * @post The distanceTravelled is incremented by the amount of kilometers that the planetoid had moved.
+ 	 * 		 That amount is calculated using the duration and the velocity of this ship.
+ 	 * 		 | new.getDistanceTravelled() += duration*this.getTotalVelocity()
+ 	 *@effect Every time the planetoid is moved, it is shrunken based on the distance it
+ 	 *		  has traveled in total.
+ 	 *		  |shrink(distanceTraveled);
+ 	 */
+ 	@Override
+ 	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
+ 		super.move(duration);
+ 		this.distanceTraveled += duration*this.getTotalVelocity();		
+ 		shrink(distanceTraveled);
+ 	}
+ 	
+ 	/**
+ 	 * This method shrinks this planetoid based on the distance it has travelled.
+ 	 * If the planetoid no longer has a valid radius, through this shrinking, it 
+ 	 * is terminated.
+ 	 * 
+ 	 * @param distanceTravelled
+ 	 * 		  The amount of kilometres travelled by this planetoid
+ 	 * @effect The radius of this planetoid is shrunken
+ 	 * 		   | new. getRadius() == (getInitialRadius() - (0.000001)*distanceTravelled);
+ 	 * @effect If the radius is not valid, the planetoid is terminated.
+ 	 * 		   | if !isValidRadius()
+ 	 * 				| then this.terminate(); 
+ 	 */
+ 	private void shrink(double distanceTravelled){
+ 		double shrunk_radius = (getInitialRadius() - (0.000001)*distanceTravelled);
+ 		
+ 		try {
+			setRadius(shrunk_radius);
+		} catch (IllegalRadiusException e) {
+			this.terminate();
+		}
+ 	}
+
+// -------------- COLLISION CASES --------------------
 	
-	/**
-     * Variable registering the radius that this planetoid had upon creation.
-     */
-    protected final double initialRadius;
-    
-  //@Override
+    //TODO DOCUMENTATIE
+    @Override
   	public void handleOtherEntityCollision(Entity entity){
   		if(entity instanceof MinorPlanet){
   			//casual collision
@@ -251,8 +271,26 @@ public class Planetoid extends MinorPlanet {
   		}
   	}
   	
-  	public boolean isValidDistanceTraveled(double distance){
-  		return true;
-  	}
+  	
+  	
+//-------------VARIABLES - INITIALISING-----------
+	
+	/**
+	 * Variable registering the default density of a planetoid.
+	 */
+	private final static double default_Density = 0.917*(Math.pow(10.0, 12.0));
+	
+  	
+	/**
+	 * Variable registering the distance this planetoid has travelled.
+	 * Initialised to a value of zero.
+	 */
+	private double distanceTraveled = 0;
+	
+	/**
+     * Variable registering the radius that this planetoid had upon creation.
+     */
+    private final double initialRadius;
+  	
 	
 }

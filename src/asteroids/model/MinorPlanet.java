@@ -50,6 +50,7 @@ public abstract class MinorPlanet extends Entity {
 	public MinorPlanet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius)
 			throws IllegalPositionException, IllegalRadiusException {
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
+		
 	}
 	
 	
@@ -58,12 +59,12 @@ public abstract class MinorPlanet extends Entity {
 	 * 
 	 * @param  radius
 	 * 		   The radius to check.
-	 * @return The radius must, at all times, be bigger than 5km.
-	 * 		   |radius > 5;
+	 * @return The radius must, at all times, be bigger or equal to 5km.
+	 * 		   |radius >= 5;
 	 */
 	@Override
 	public boolean isValidRadius(double radius){
-		return super.isValidRadius(radius) && radius>5;
+		return super.isValidRadius(radius) && radius>=5;
 	}
 
 }

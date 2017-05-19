@@ -37,14 +37,13 @@ public class AssignmentStatement extends Statement {
 	//RUN
 	public boolean isValidVariable(List<Expression> arguments){
 		return 
-				() &&
 				(this.getExpression().getResult(null, arguments) instanceof Double);
 		//TODO
 	}
 	
 	@Override
 	public void run(List<Expression> arguments) {
-		if (isValidVariable())
+		if (isValidVariable(arguments))
 			this.getProgram().addVariable(this.getName(), this.getExpression());
 		
 		else

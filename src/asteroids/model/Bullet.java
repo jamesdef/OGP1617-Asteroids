@@ -4,9 +4,6 @@ import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 import asteroids.model.exceptions.*;
 
-//TODO if a bullet hits it's own ship, it is reloaded but its bounces
-// are not forgotten, where shall we say this?
-
 /**
  * A class for dealing with bullets, which are a kind of entity in space. 
  * These have a certain position, velocity, radius, mass and density.
@@ -224,10 +221,10 @@ public class Bullet extends Entity {
  	 * @param radius
  	 * 		  The radius of this bullet.
  	 * @post The new mass of this bullet now equals the value calculated using the formula with the given radius.
- 	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+ 	 * 		 |new.mass == default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3));
  	 */
  	private void setBulletMass(double radius){
- 		this.setMass(default_Density*(4/3)*Math.PI*(Math.pow(radius, 3)));
+ 		this.setMass(default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3)));
  	}
      
 
@@ -357,6 +354,54 @@ public class Bullet extends Entity {
 			this.max_Bounces=bounces;
 	}
 	
+	
+	//TODO documentatie
+	
+	
+	//TODO if a bullet hits it's own ship, it is reloaded but its bounces
+	// are not forgotten, where shall we say this?
+	@Override
+	public void handleOtherEntityCollision(Entity entity){
+		if(entity instanceof Ship){
+			if(this.getSource() == entity){
+				// We return so as to make sure this bullet is not terminated 
+				// while being loaded upon a ship.
+				return;
+			} else {
+				this.terminate();
+			}
+		}
+		this.terminate();
+
+				
+	}
+	
+	@Override
+	public void handleBoundaryCollision(){
+	 this.handbleBoundaryCollisionsCount();
+	 if(!this.isTerminated()){
+		 super.handleBoundaryCollision();
+	 }
+		
+	}
+	
+	public void handbleBoundaryCollisionsCount(){
+		int nbBouncesLeft = this.getBouncesLeft();
+		if(nbBouncesLeft == 1){
+			this.terminate();
+		} else {
+			this.decrementBouncesLeft(); 
+		}
+	}
+	
+	/**
+	 * Method registering if this entity is deadly.
+	 */
+	@Override
+	public Boolean isDeadly(){
+		return true;
+	}
+	
 
 // ---------------------  Initialising Variables & Defaults -------------------------------
 	
@@ -395,48 +440,16 @@ public class Bullet extends Entity {
 	/**
 	 * Variable registering the default density of a bullet.
 	 */
-	protected final static double default_Density = 7.8*(Math.pow(10.0, 12.0));
+	private final static double default_Density = 7.8*(Math.pow(10.0, 12.0));
 	
 	/**
 	 * Variable registering the density of this bullet.
 	 */
 	private double density = default_Density;
 	
-	/**
-	 * Variable registering the Default_Mass of a bullet
-	 */
-	protected final static double default_Mass = default_Density*(4.0/3.0)*Math.PI*(Math.pow(min_Radius, 3.0));
-	
-	//@Override
-	public void handleOtherEntityCollision(Entity entity){
-		if(entity instanceof Ship){
-			if(this.getSource() == entity){
-				//this.setShip((Ship) entity);
-			} else {
-				this.terminate();
-			}
-		}
-		this.terminate();
-
-				
-	}
-	
-	//@Override
-	public void handleBoundaryCollision(){
-	 this.handbleBoundaryCollisionsCount();
-	 if(!this.isTerminated()){
-		 super.handleBoundaryCollision();
-	 }
-		
-	}
-	
-	public void handbleBoundaryCollisionsCount(){
-		int nbBouncesLeft = this.getBouncesLeft();
-		if(nbBouncesLeft == 1){
-			this.terminate();
-		} else {
-			this.decrementBouncesLeft(); 
-		}
-	}
-	
+//	/** TODO is deze code echt overbodig?
+//	 * Variable registering the Default_Mass of a bullet
+//	 */
+//	private final static double default_Mass = default_Density*(4.0/3.0)*Math.PI*(Math.pow(min_Radius, 3.0));
+//	
 }
