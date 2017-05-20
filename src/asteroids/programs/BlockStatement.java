@@ -8,7 +8,6 @@ import asteroids.model.Program;
 public class BlockStatement extends Statement {
 	
 	public BlockStatement(List<Statement> statementsList){
-		System.out.println("BLOCKSTATEMENT CONSTRUCTOR");
 		this.setStatementsList(statementsList);
 	}
 	
@@ -31,9 +30,12 @@ public class BlockStatement extends Statement {
 	//RUN
 	@Override
 	public void run(List<Expression> arguments) {
+		System.out.println("BLOCKSTATEMENT > RUN");
+
 		for (Statement statement : statementsList) {
+			System.out.println("BLOCKSTATEMENT > RUN STATEMENT : " +statement);
+
 			statement.setProgram(this.getProgram());
-			System.out.println("program setter is" + this.getProgram());
 			statement.run(arguments);
 		}
 	}
@@ -80,6 +82,17 @@ public class BlockStatement extends Statement {
 					
 					if(inStatement){
 						System.out.println("BLOCKSTATEMENT > FOUND failedAction in this IFELSESTATEMENT " + statement);
+						runFromHere = true;
+					}	
+				}
+				
+				if(statement instanceof WhileStatement){
+					System.out.println("BLOCKSTATEMENT > FOUND WHILESTATEMENT IN BLOCK, DIGGING INTO IT " + statement);
+
+					boolean inStatement = ((WhileStatement) statement).navigateToAction(bookmark, arguments);
+					
+					if(inStatement){
+						System.out.println("BLOCKSTATEMENT > FOUND failedAction in this WhileStatement " + statement);
 						runFromHere = true;
 					}	
 				}

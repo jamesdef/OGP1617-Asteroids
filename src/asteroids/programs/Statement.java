@@ -9,6 +9,8 @@ public abstract class Statement {
 
 
 	public void runAt(Bookmark bookmark, List<Expression> arguments){
+		System.out.println("STATEMENT " + this +" Runat");
+
 		if(bookmark.getFailedAction() == null){
 			System.out.println("STATEMENT > failedAction is null, RUN STATEMENT from beginning ");
 			this.run(arguments);

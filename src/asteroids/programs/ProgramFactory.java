@@ -31,7 +31,7 @@ public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, S
 	@Override
 	public Statement createWhileStatement(Expression condition, Statement body, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		try{
-			return new WhileStatement((BooleanInterface) condition, body);
+			return new WhileStatement((BooleanExpression) condition, body);
 		} catch(ClassCastException e){
 			throw new IllegalArgumentException("no boolean");
 		}
@@ -93,7 +93,7 @@ public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, S
 	@Override
 	public Expression createChangeSignExpression(Expression expression, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		try {
-			return new SignChangeExpression((ArithmeticInterface) expression);
+			return new SignChangeExpression((DoubleExpression) expression);
 		} catch (ClassCastException e) {
 			throw new IllegalArgumentException("You've made a negation with a non-arithmetic expression");
 		}
@@ -102,7 +102,7 @@ public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, S
 	@Override
 	public Expression createNotExpression(Expression expression, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		try{
-			return new NegationExpression((BooleanInterface) expression);
+			return new NegationExpression((BooleanExpression) expression);
 		} catch(ClassCastException e){
 			throw new IllegalArgumentException("no boolean value");
 		}
@@ -210,9 +210,14 @@ public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, S
 	}
 
 	@Override
-	public Expression createLessThanExpression(Expression e1, Expression e2, SourceLocation location) { System.out.println("PROGRAMFACTORY");
+	public Expression createLessThanExpression(Expression e1, Expression e2, SourceLocation location) { 
+		System.out.println("PROGRAMFACTORY createLessThanExpression");
 	try {
-		return new SmallerThanExpression((Expression) e1, (Expression) e2);
+
+		System.out.println(e1);
+		System.out.println(e2);
+
+		return new LessThanExpression((DoubleExpression) e1, (DoubleExpression) e2);
 	} catch (ClassCastException e) {
 		throw new IllegalArgumentException("");
 	}
@@ -228,7 +233,7 @@ public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, S
 	public Expression createAdditionExpression(Expression e1, Expression e2, SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
 		try{
-			return new AdditionExpression((Expression) e1, (Expression) e2);
+			return new AdditionExpression((DoubleExpression) e1, (DoubleExpression) e2);
 		} catch (ClassCastException e) {
 			throw new IllegalArgumentException();
 		}
@@ -238,7 +243,7 @@ public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, S
 	public Expression createMultiplicationExpression(Expression e1, Expression e2, SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
 	try{
-		return new MultiplicationExpression((ArithmeticInterface) e1, (ArithmeticInterface) e2);
+		return new MultiplicationExpression((DoubleExpression) e1, (DoubleExpression) e2);
 	} catch (ClassCastException e) {
 		throw new IllegalArgumentException();
 	}
@@ -247,7 +252,7 @@ public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, S
 	@Override
 	public Expression createSqrtExpression(Expression e, SourceLocation location) { System.out.println("PROGRAMFACTORY");
 	try {
-		return new SqrtExpression((ArithmeticInterface) e);
+		return new SqrtExpression((DoubleExpression) e);
 	} catch (ClassCastException f) {
 		throw new IllegalArgumentException("non artihmetic");
 }

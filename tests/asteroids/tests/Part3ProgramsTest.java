@@ -68,15 +68,38 @@ public class Part3ProgramsTest {
   }
   
   @Test
-  public void testWhileStatement_SeveralIterations() throws ModelException {
-    max_score += 18;
-    String code = "a := 10; " + "while a < 20.5 { " + "  print a; " + "  a := a + 2.0; " + "}";
+  public void testWhileStatement_Interruptable() throws ModelException {
+    max_score += 25;
+    String code = "a := 10; " + "while a < 20.5 { " + "  print a; " + " skip; " + "  a := a + 2.0; " + "}"
+        + "print 0.0; ";
     Program program = ProgramParser.parseProgramFromString(code, programFactory);
     facade.loadProgramOnShip(ship1, program);
-    List<Object> results = facade.executeProgram(ship1, 1.0);
-    Object[] expecteds = { 10.0, 12.0, 14.0, 16.0, 18.0, 20.0 };
+    List<Object> results = facade.executeProgram(ship1, 0.3);
+    assertNull(results);
+    score += 5;
+    results = facade.executeProgram(ship1, 0.65);
+    assertNull(results);
+    score += 5;
+    results = facade.executeProgram(ship1, 0.57);
+    Object[] expecteds = { 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 0.0 };
+    System.out.println(results);
     assertArrayEquals(expecteds, results.toArray());
-    score += 18;
+    score += 15;
   }
+  
+  @Test
+  public void testWhileStatement_NestedWhiles() throws ModelException {
+    max_score += 20;
+    String code = "a := 10; " + "sum := 0.0; " + "while 0.5 < a { " + "  temp := 6.0;" + "  while 0.5 < temp { "
+        + "    sum := sum + (temp*a); " + "    temp := temp + -1.0;" + "  } " + "  a := a + -1.0; " + "}"
+        + "print sum; ";
+    Program program = ProgramParser.parseProgramFromString(code, programFactory);
+    facade.loadProgramOnShip(ship1, program);
+    List<Object> results = facade.executeProgram(ship1, 0.3);
+    Object[] expecteds = { 1155.0 };
+    assertArrayEquals(expecteds, results.toArray());
+    score += 20;
+  }
+
   
 }

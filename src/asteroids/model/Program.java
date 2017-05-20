@@ -111,16 +111,16 @@ public class Program {
 	
 	//VARIABLES
 	
-	private Map<String, Expression> variables = new HashMap<String, Expression>();
+	private Map<String, Object> variables = new HashMap<String, Object>();
 
 	
-	public Map<String, Expression> getVariables() {
+	public Map<String, Object> getVariables() {
 		return variables;
 	}
 	
-	public void addVariable(String name, Expression expression) {
+	public void addVariable(String name, Object object) {
 		// TODO Auto-generated method stub
-		this.variables.put(name, expression);
+		this.variables.put(name, object);
 
 		
 	}

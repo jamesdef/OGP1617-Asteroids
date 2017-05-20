@@ -43,7 +43,6 @@ public abstract class BinaryExpression<B> extends Expression{
 
 	protected Object getRightOperandResult(Function function, List<Expression> arguments) {
 		((Expression) this.getRightOperand()).setProgram(getProgram());
-
 		return ((Expression) this.getRightOperand()).getResult(function, arguments);
 	}
 	

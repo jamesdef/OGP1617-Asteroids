@@ -4,7 +4,7 @@ import java.util.List;
 
 import asteroids.model.Program;
 
-class DoubleLiteralExpression extends Expression implements ArithmeticInterface  {
+class DoubleLiteralExpression extends Expression implements DoubleExpression  {
 
 	protected DoubleLiteralExpression(double value) {
 		setValue(value);
@@ -21,12 +21,12 @@ class DoubleLiteralExpression extends Expression implements ArithmeticInterface 
 		return this.value;
 	}
 
-
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
 		return (Double) this.getValue();
 	}
-	
+
+
 
 
 	

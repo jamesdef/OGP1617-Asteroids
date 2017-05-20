@@ -48,7 +48,8 @@ public class AssignmentStatement extends Statement {
 	@Override
 	public void run(List<Expression> arguments) {
 		if (isValidVariable(this.getName(), this.getExpression(), arguments)){
-			this.getProgram().addVariable(this.getName(), this.getExpression());
+			this.getProgram().addVariable(this.getName(), 
+					this.getExpression().getResult(null, arguments));
 		}
 		else{
 			System.out.println("throwing illegal argument for "

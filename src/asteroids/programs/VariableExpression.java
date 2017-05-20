@@ -5,7 +5,7 @@ import java.util.Map;
 
 import asteroids.model.Program;
 
-public class VariableExpression extends Expression implements ArithmeticInterface{
+public class VariableExpression extends Expression implements DoubleExpression{
 
 	protected VariableExpression(String name){
 		System.out.println("VARIABLEEXP name: " + name);
@@ -20,17 +20,14 @@ public class VariableExpression extends Expression implements ArithmeticInterfac
 	}
 	
 	private void setName(String name) throws IllegalArgumentException {
-		System.out.println("VARIABLEEXP NAME SET TO: " + name);
 		this.name = name;
 	}
 
 	
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
-		
-		Expression resultExpression = this.getProgram().getVariables().get(this.getName());
-		System.out.println("VARIABLEEXP > GETRESULT name: " + name + " is exp: " + resultExpression);
-
+		Object resultExpression = this.getProgram().getVariables().get(this.getName());
+	
 		if (resultExpression == null)
 			throw new IllegalArgumentException();
 

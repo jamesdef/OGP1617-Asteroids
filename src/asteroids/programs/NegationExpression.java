@@ -2,9 +2,9 @@ package asteroids.programs;
 
 import java.util.List;
 
-public class NegationExpression extends UnaryExpression<BooleanInterface> implements BooleanInterface {
+public class NegationExpression extends UnaryExpression<BooleanExpression> implements BooleanExpression {
 
-	public NegationExpression(BooleanInterface operand) throws IllegalArgumentException {
+	protected NegationExpression(BooleanExpression operand) {
 		super(operand);
 	}
 

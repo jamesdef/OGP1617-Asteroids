@@ -2,16 +2,9 @@ package asteroids.programs;
 
 import java.util.List;
 
-public class AdditionExpression extends BinaryExpression {
+public class AdditionExpression extends BinaryExpression<DoubleExpression> implements DoubleExpression {
 
-	/*protected AdditionExpression(ArithmeticInterface leftExpression, ArithmeticInterface rightExpression)
-			throws IllegalArgumentException {
-		super(leftExpression, rightExpression);
-	}
-
-*/
-
-	protected AdditionExpression(Object leftExpression, Object rightExpression) throws IllegalArgumentException {
+	protected AdditionExpression(DoubleExpression leftExpression, DoubleExpression rightExpression) throws IllegalArgumentException {
 		super(leftExpression, rightExpression);
 	}
 

@@ -2,22 +2,18 @@ package asteroids.programs;
 
 import java.util.List;
 
-public class MultiplicationExpression extends ArithmeticBinaryExpression implements ArithmeticInterface {
+public class MultiplicationExpression extends BinaryExpression<DoubleExpression> implements DoubleExpression {
 
-	protected MultiplicationExpression(ArithmeticInterface leftExpression, ArithmeticInterface rightExpression)
-			throws IllegalArgumentException {
+	protected MultiplicationExpression(DoubleExpression leftExpression, DoubleExpression rightExpression) throws IllegalArgumentException {
 		super(leftExpression, rightExpression);
-		
-		System.out.println("RUNNING MULT EXP WITH: " + leftExpression + " " + rightExpression );
-
 	}
 
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
-		Double left = (Double) this.solveLeftOperand(function, arguments);
-		Double right = (Double) this.solveRightOperand(function, arguments);
+		Double left = (Double) this.getLeftOperandResult(function, arguments);
+		Double right = (Double) this.getRightOperandResult(function, arguments);
 
-		return (left*right);
+		return (left+right);
 	}
 
 }
