@@ -5,7 +5,7 @@ import java.util.List;
 public class SqrtExpression extends ArithmeticUnaryExpression{
 
 
-	protected SqrtExpression(Expression operand) {
+	protected SqrtExpression(ArithmeticInterface operand) {
 		super(operand);
 		// TODO Auto-generated constructor stub
 	}
@@ -14,10 +14,10 @@ public class SqrtExpression extends ArithmeticUnaryExpression{
 	protected Object getResult(Function function, List<Expression> arguments) {
 		// TODO Auto-generated method stub
 		
-		Double operand = this.getNumericValue(program, actualArgs, function);
+		Double operandResult = (Double) this.solveOperand(function, arguments);
 		
-		if (operand >= 0)
-			return Math.sqrt(Operand);
+		if (operandResult >= 0)
+			return Math.sqrt(operandResult);
 		else
 			throw new IllegalArgumentException();
 	}

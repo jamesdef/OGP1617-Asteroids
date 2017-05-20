@@ -2,24 +2,19 @@ package asteroids.programs;
 
 import java.util.List;
 
-public class NegationExpression extends UnaryExpression implements BooleanInterface {
+public class NegationExpression extends UnaryExpression<BooleanInterface> implements BooleanInterface {
 
-	protected NegationExpression(Expression operand) {
+	public NegationExpression(BooleanInterface operand) throws IllegalArgumentException {
 		super(operand);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
-		// TODO Auto-generated method stub
+	protected Object getResult(Function function, List<Expression> arguments) throws IllegalArgumentException{
+		return ! (Boolean) getOperandResult(function, arguments);
 		
-		if (isValidBoolean(getOperand())) {
-			return !(Boolean) getResult(function, arguments);
-		} else {
-			throw new IllegalArgumentException();
-		}
 	}
 
+	
 }
 
 

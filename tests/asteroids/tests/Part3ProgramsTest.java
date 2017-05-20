@@ -23,6 +23,8 @@ import asteroids.model.Ship;
 import asteroids.model.World;
 import asteroids.part3.facade.IFacade;
 import asteroids.model.Program;
+import asteroids.programs.BlockStatement;
+import asteroids.programs.ProgramFactory;
 import asteroids.part3.programs.IProgramFactory;
 import asteroids.part3.programs.internal.ProgramParser;
 import asteroids.util.ModelException;
@@ -64,238 +66,17 @@ public class Part3ProgramsTest {
     bullet1 = facade.createBullet(300, 320, 10, 5, 50);
     facade.addBulletToWorld(filledWorld, bullet1);
   }
-
   
-  
-  
-  // Fire statement
-
   @Test
-  public void testFireStatement_EnoughTimeLeft() throws ModelException {
-    max_score += 3;
-    String code = "fire; " + "print 0.4; ";
-    int oldNbBullets = facade.getNbBulletsOnShip(ship1);
-    Program program = ProgramParser.parseProgramFromString(code, programFactory);
-    facade.loadProgramOnShip(ship1, program);
-    List<Object> results = facade.executeProgram(ship1, 0.45);
-    assertEquals(oldNbBullets - 1, facade.getNbBulletsOnShip(ship1));
-    Object[] expecteds = { 0.4 };
-    assertArrayEquals(expecteds, results.toArray());
-    score += 3;
-  }
-
-  @Test
-  public void testFireStatement_NotEnoughTimeLeft() throws ModelException {
-    max_score += 3;
-    String code = "fire; " + "print 0.4; ";
-    int oldNbBullets = facade.getNbBulletsOnShip(ship1);
-    Program program = ProgramParser.parseProgramFromString(code, programFactory);
-    facade.loadProgramOnShip(ship1, program);
-    List<Object> results = facade.executeProgram(ship1, 0.15);
-    assertEquals(oldNbBullets, facade.getNbBulletsOnShip(ship1));
-    assertNull(results);
-    score += 3;
-  }
-
-  @Test
-  public void testFireStatement_InFunctionBody() throws ModelException {
-    try {
-      max_score += 3;
-      String code = "def f { " + "  fire; " + "  return 5.0; " + "}" + "print f(); ";
-      Program program = ProgramParser.parseProgramFromString(code, programFactory);
-      facade.loadProgramOnShip(ship1, program);
-      facade.executeProgram(ship1, 0.3);
-      fail();
-    } catch (ModelException exc) {
-      score += 3;
-    }
-  }
-
-  // Turn statement
-
-  @Test
-  public void testTurnStatement_ValidAngleEnoughTimeLeft() throws ModelException {
-    max_score += 3;
-    String code = "turn 1.0; " + "print 0.4; ";
-    facade.turn(ship1, 1.5);
-    Program program = ProgramParser.parseProgramFromString(code, programFactory);
-    facade.loadProgramOnShip(ship1, program);
-    List<Object> results = facade.executeProgram(ship1, 0.45);
-    assertEquals(2.5, facade.getShipOrientation(ship1), EPSILON);
-    Object[] expecteds = { 0.4 };
-    assertArrayEquals(expecteds, results.toArray());
-    score += 3;
-  }
-
-  @Test
-  public void testTurnStatement_NotEnoughTimeLeft() throws ModelException {
-    max_score += 3;
-    String code = "turn 1.0; " + "print 0.4; ";
-    facade.turn(ship1, 1.5);
-    Program program = ProgramParser.parseProgramFromString(code, programFactory);
-    facade.loadProgramOnShip(ship1, program);
-    List<Object> results = facade.executeProgram(ship1, 0.15);
-    assertEquals(1.5, facade.getShipOrientation(ship1), EPSILON);
-    assertNull(results);
-    score += 3;
-  }
-
-  @Test
-  public void testTurnStatement_InvalidAngle() throws ModelException {
-    max_score += 5;
-    try {
-      String code = "turn 10.0; " + "print 0.4; ";
-      facade.turn(ship1, 1.5);
-      Program program = ProgramParser.parseProgramFromString(code, programFactory);
-      facade.loadProgramOnShip(ship1, program);
-      List<Object> results = facade.executeProgram(ship1, 0.45);
-      // It is allowed to do nothing in case of an illegal angle.
-      assertEquals(1.5, facade.getShipOrientation(ship1), EPSILON);
-      Object[] expecteds = { 0.4 };
-      assertArrayEquals(expecteds, results.toArray());
-      score += 5;
-    } catch (ModelException exc) {
-      assertEquals(1.5, facade.getShipOrientation(ship1), EPSILON);
-      score += 5;
-    }
-  }
-
-  @Test
-  public void testTurnStatement_InFunctionBody() throws ModelException {
-    try {
-      max_score += 3;
-      String code = "def f { " + "  turn 1.0; " + "  return 5.0; " + "}" + "print f(); ";
-      Program program = ProgramParser.parseProgramFromString(code, programFactory);
-      facade.loadProgramOnShip(ship1, program);
-      facade.executeProgram(ship1, 0.3);
-      fail();
-    } catch (ModelException exc) {
-      score += 3;
-    }
-  }
-
-  // Thruster ON statement
-
-  @Test
-  public void testThrusterOnStatement_EnoughTimeLeft() throws ModelException {
-    if (nbStudentsInTeam > 1) {
-      max_score += 3;
-      String code = "thrust; " + "print 0.4; ";
-      Program program = ProgramParser.parseProgramFromString(code, programFactory);
-      facade.loadProgramOnShip(ship1, program);
-      List<Object> results = facade.executeProgram(ship1, 0.45);
-      assertTrue(facade.isShipThrusterActive(ship1));
-      Object[] expecteds = { 0.4 };
-      assertArrayEquals(expecteds, results.toArray());
-      score += 3;
-    }
-  }
-
-  @Test
-  public void testThrusterStatement_NotEnoughTimeLeft() throws ModelException {
-    if (nbStudentsInTeam > 1) {
-      max_score += 3;
-      String code = "thrust; " + "print 0.4; ";
-      Program program = ProgramParser.parseProgramFromString(code, programFactory);
-      facade.loadProgramOnShip(ship1, program);
-      List<Object> results = facade.executeProgram(ship1, 0.15);
-      assertFalse(facade.isShipThrusterActive(ship1));
-      assertNull(results);
-      score += 3;
-    }
-  }
-
-  @Test
-  public void testThrusterOnStatement_InFunctionBody() throws ModelException {
-    if (nbStudentsInTeam > 1) {
-      try {
-        max_score += 3;
-        String code = "def f { " + "  thrust; " + "  return 5.0; " + "}" + "print f(); ";
-        Program program = ProgramParser.parseProgramFromString(code, programFactory);
-        facade.loadProgramOnShip(ship1, program);
-        facade.executeProgram(ship1, 0.3);
-        fail();
-      } catch (ModelException exc) {
-        score += 3;
-      }
-    }
-  }
-
-  // Thruster OFF statement
-
-  @Test
-  public void testThrusterOffStatement_EnoughTimeLeft() throws ModelException {
-    if (nbStudentsInTeam > 1) {
-      max_score += 3;
-      String code = "thrust; " + "print 0.4; " + "thrust_off; " + "print 0.8; ";
-      Program program = ProgramParser.parseProgramFromString(code, programFactory);
-      facade.loadProgramOnShip(ship1, program);
-      facade.executeProgram(ship1, 0.3);
-      assertTrue(facade.isShipThrusterActive(ship1));
-      List<Object> results = facade.executeProgram(ship1, 0.35);
-      assertFalse(facade.isShipThrusterActive(ship1));
-      Object[] expecteds = { 0.4, 0.8 };
-      assertArrayEquals(expecteds, results.toArray());
-      score += 3;
-    }
-  }
-
-  @Test
-  public void testThrusterOffStatement_NotEnoughTimeLeft() throws ModelException {
-    if (nbStudentsInTeam > 1) {
-      max_score += 3;
-      String code = "thrust; " + "print 0.4; " + "thrust_off; " + "print 0.8;";
-      Program program = ProgramParser.parseProgramFromString(code, programFactory);
-      facade.loadProgramOnShip(ship1, program);
-      facade.executeProgram(ship1, 0.2);
-      assertTrue(facade.isShipThrusterActive(ship1));
-      List<Object> results = facade.executeProgram(ship1, 0.15);
-      assertTrue(facade.isShipThrusterActive(ship1));
-      assertNull(results);
-      score += 3;
-    }
-  }
-
-  @Test
-  public void testThrusterOffStatement_InFunctionBody() throws ModelException {
-    if (nbStudentsInTeam > 1) {
-      try {
-        max_score += 3;
-        String code = "def f { " + "  thrust_off; " + "  return 5.0; " + "}" + "print f(); ";
-        Program program = ProgramParser.parseProgramFromString(code, programFactory);
-        facade.loadProgramOnShip(ship1, program);
-        facade.executeProgram(ship1, 0.3);
-        fail();
-      } catch (ModelException exc) {
-        score += 3;
-      }
-    }
-  }
-
-  // Skip statement
-
-  @Test
-  public void testSkipStatement_EnoughTimeLeft() throws ModelException {
-    max_score += 3;
-    String code = "skip; " + "print 0.4;";
+  public void testWhileStatement_SeveralIterations() throws ModelException {
+    max_score += 18;
+    String code = "a := 10; " + "while a < 20.5 { " + "  print a; " + "  a := a + 2.0; " + "}";
     Program program = ProgramParser.parseProgramFromString(code, programFactory);
     facade.loadProgramOnShip(ship1, program);
     List<Object> results = facade.executeProgram(ship1, 1.0);
-    Object[] expecteds = { 0.4 };
+    Object[] expecteds = { 10.0, 12.0, 14.0, 16.0, 18.0, 20.0 };
     assertArrayEquals(expecteds, results.toArray());
-    score += 3;
+    score += 18;
   }
-
-  @Test
-  public void testSkipStatement_NotEnoughTimeLeft() throws ModelException {
-    max_score += 3;
-    String code = "skip; " + "print 0.4;";
-    Program program = ProgramParser.parseProgramFromString(code, programFactory);
-    facade.loadProgramOnShip(ship1, program);
-    List<Object> results = facade.executeProgram(ship1, 0.1);
-    assertNull(results);
-    score += 3;
-  }
-
-
+  
 }

@@ -6,12 +6,13 @@ import asteroids.model.exceptions.IllegalRadiusException;
 import asteroids.model.exceptions.IllegalShipException;
 import asteroids.part3.programs.SourceLocation;
 
-class FireAction extends ActionStatement {
+public class FireAction extends ActionStatement {
 
 	/// CONSTRUCTOR ///
 	
 	public FireAction() {
 		//setSourceLocation(location);
+		System.out.println("FIREACTION");
 	}
 
 

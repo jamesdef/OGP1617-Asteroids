@@ -3,6 +3,7 @@ package asteroids.programs;
 import java.util.List;
 
 import asteroids.model.Program;
+import asteroids.model.Ship;
 
 public abstract class Expression {
 	
@@ -21,23 +22,15 @@ public abstract class Expression {
 	}
 	
 	protected Ship getShip() {
-		return this.getExpressionProgram().getProgramShip();
-	}
-	
-	public Expression getArgumentExpression(Expression key, List<Expression> arguments){
-		int index = O;
-
-		return arguments.get(index);
+		return this.getProgram().getShip();
 	}
 	
 	
+	protected abstract Object getResult(Function function, List<Expression> arguments);
 	
-	
-	
-	protected abstract Object getResult(Function function, List<Expression> arguments) {
-	
-	protected Object getArgumentExpression(MyExpression operand, List<MyExpression> actualArgs) {
-		return getArgument(operand, actualArgs).getExpressionResult(getExpressionProgram(), actualArgs);
+	protected Object getArgumentExpression(Expression operand, List<Expression> actualArgs) {
+		return null;
+		//return getArgument(operand, actualArgs).getExpressionResult(getProgram(), actualArgs);
 	}
 	
 }

@@ -7,6 +7,8 @@ public class AssignmentStatement extends Statement {
 	public AssignmentStatement(String name, Expression expression) {
 		setName(name);
 		setExpression(expression);
+		
+		System.out.println("ASSIGNMENTSTATEMENT, name: " + name + " exp: " + expression);
 	}
 	
 	//NAME
@@ -25,7 +27,7 @@ public class AssignmentStatement extends Statement {
 	//EXPRESSION
 	private Expression expression;
 	
-	public void setExpression(Expression expression){
+	public void setExpression(Expression expression) throws IllegalArgumentException{
 		this.expression = expression;
 	}
 	
@@ -35,19 +37,24 @@ public class AssignmentStatement extends Statement {
 	
 	
 	//RUN
-	public boolean isValidVariable(List<Expression> arguments){
+	public boolean isValidVariable(String name, Expression expression, List<Expression> arguments){
+		expression.setProgram(getProgram());
 		return 
-				(this.getExpression().getResult(null, arguments) instanceof Double);
+				((!this.getProgram().getFunctions().containsKey(name)) &&
+				(expression.getResult(null, arguments) instanceof Double));
 		//TODO
 	}
 	
 	@Override
 	public void run(List<Expression> arguments) {
-		if (isValidVariable(arguments))
+		if (isValidVariable(this.getName(), this.getExpression(), arguments)){
 			this.getProgram().addVariable(this.getName(), this.getExpression());
-		
-		else
+		}
+		else{
+			System.out.println("throwing illegal argument for "
+					+ "ASSIGNMENTSTATEMENT, name: " + name + " exp: " + expression);
 			throw new IllegalArgumentException();
+		}
 		
 	}
 

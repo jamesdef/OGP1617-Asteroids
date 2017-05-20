@@ -8,7 +8,7 @@ import asteroids.model.Program;
 
 public class Function {
 
-	public void Function(String name, Statement body){
+	public Function(String name, Statement body){
 		setName(name);
 		setBody(body);
 	}

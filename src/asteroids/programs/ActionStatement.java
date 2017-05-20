@@ -22,20 +22,35 @@ public abstract class ActionStatement extends Statement {
 	
 	@Override
 	public void run(List<Expression> arguments){
+		System.out.println("ACTIONSTATEMENT > RUNNING TRY " + this);
 		
 		if(enoughTimeLeft()){
 			this.getProgram().subtractTimeLeft(getActionTime());
-		//	executeActionStatement(getProgram());
-			this.getProgram().getBookmark().addPerformedAction();
+			try {
+				this.executeAction(getProgram());
+			} catch (IllegalPositionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalRadiusException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalShipException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else {
+			System.out.println("AS > NOT ENOUGH TIME LEFT, SETTING THIS AS failedA " + this);
+			this.getProgram().updateBookmark(this);
 			this.getProgram().setRunning(false);	
+
+			throw new IllegalPathStateException();
 		}
 	}
 	
 	public boolean enoughTimeLeft(){
 		double timeLeft = this.getProgram().getTimeLeft();
-		return (timeLeft >= getActionTime());
+		return !(timeLeft < getActionTime());
 	}
 	
 	

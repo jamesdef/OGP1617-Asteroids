@@ -18,6 +18,10 @@ public interface ArithmeticInterface {
 		return 
 				(expression instanceof ParameterExpression) 
 				||
+				(expression instanceof VariableExpression) 
+				||
+				(expression instanceof DoubleLiteralExpression) 
+				||
 				(((result != null) && !(result instanceof Entity)));
 	
 	}

@@ -1,20 +1,22 @@
 package asteroids.model;
+import java.awt.geom.IllegalPathStateException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import asteroids.programs.ActionStatement;
 import asteroids.programs.Bookmark;
 import asteroids.programs.Expression;
 import asteroids.programs.Function;
+import asteroids.programs.InsufficientRuntimeException;
 import asteroids.programs.Statement;
 
 
 
 public class Program {
-
-
-	protected Program(List<Function> functionsList, Statement mainStatement){
+	public Program(List<Function> functionsList, Statement mainStatement){
+		System.out.println("PROGRAM CONSTRUCTOR");
 		this.setFunctions(functionsList);
 		this.setMainStatement(mainStatement);
 	}
@@ -34,14 +36,20 @@ public class Program {
 	
 	
 	public List<Object> run(double dt){
+		System.out.println("RUN PROGRAM with dt =  " + dt + "prev gtl is: "+getTimeLeft()+" ---------------------");
 		addTime(dt);
-	/*	try {
-			main.runAt(this.getBookmark());
-	//		return getPrintOuts();
-		} catch () {
-	//		return null;
-		}		*/
-		return null;
+		try {
+			System.out.println("RUN WITH BOOKMARK: " + this.getBookmark());		
+			this.getMainStatement().setProgram(this);
+			this.getMainStatement().runAt(this.getBookmark(), null);
+			
+			System.out.println("RETURNING GETPRINTS: " + getPrints());
+			return getPrints();
+			
+		} catch (IllegalPathStateException e) {
+			System.out.println("RUN PROGRAM > GOT ILLEGALPATHSTATEEXCEPTION, returning null");
+			return null;
+		}	
 	}
 	
 	public void setRunning(boolean running){
@@ -55,7 +63,7 @@ public class Program {
 	
 	//BOOKMARK
 	
-	private Bookmark bookmark;
+	private Bookmark bookmark = new Bookmark();
 	
 	public void setBookmark(Bookmark bookmark){
 		this.bookmark = bookmark;
@@ -65,8 +73,8 @@ public class Program {
 		return this.bookmark;
 	}
 	
-	public void updateBookmark(Bookmark bookmark){
-		
+	public void updateBookmark(ActionStatement actionStatement){
+		this.bookmark.setFailedAction(actionStatement);
 	}
 	
 	
@@ -80,6 +88,10 @@ public class Program {
 	}
 	
 	
+	public Statement getMainStatement(){
+		return this.mainStatement;
+	}
+	
 	//FUNCTIONS
 	
 	private Map<String, Function> functions = new HashMap<String, Function>();
@@ -91,7 +103,7 @@ public class Program {
 		}
 	}
 	
-	protected Map<String, Function> getFunctions() {
+	public Map<String, Function> getFunctions() {
 		return functions;
 	}
 	
@@ -102,7 +114,7 @@ public class Program {
 	private Map<String, Expression> variables = new HashMap<String, Expression>();
 
 	
-	protected Map<String, Expression> getVariables() {
+	public Map<String, Expression> getVariables() {
 		return variables;
 	}
 	
@@ -117,9 +129,11 @@ public class Program {
 	//PRINTS
 	
 	private List<Object> prints = new ArrayList<>();
-
-	protected void addPrint(Object object) {
-		prints.add(object);
+	
+	public void addToPrints(Object printResult) {
+		// TODO Auto-generated method stub
+		this.prints.add(printResult);
+		
 	}
 	
 	protected List<Object> getPrints(){
@@ -135,13 +149,19 @@ public class Program {
 		return this.ship;
 	}
 
+	public void setShip(Ship ship) {
+		System.out.println("SHIP SET");
+		this.ship = ship;
+	}
+
 	public void subtractTimeLeft(double dt) {
 		// TODO Auto-generated method stub
-		
-		this.timeLeft-=dt;
+		this.timeLeft -= dt;
 		
 	}
 
+	
+	
 	
 	
 	

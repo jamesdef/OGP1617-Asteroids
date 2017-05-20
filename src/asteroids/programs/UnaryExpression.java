@@ -1,23 +1,31 @@
 package asteroids.programs;
 
-public abstract class UnaryExpression extends Expression {
+import java.util.List;
 
-	protected UnaryExpression(Expression operand){
+public abstract class UnaryExpression<U> extends Expression {
+
+	protected UnaryExpression(U operand){
 		setOperand(operand);
 	}
 	
-	public void setOperand(Expression operand){
+	
+	//OPERAND
+	private U operand;
+
+	public void setOperand(U operand){
 		this.operand= operand;
 	}
 	
-	public Expression getOperand(){
+	
+	protected U getOperand(){
 		return this.operand;
+
 	}
 	
-	private Expression operand;
-	
-	
-	
+	protected Object getOperandResult(Function function, List<Expression> arguments) {
+		return ((Expression) this.getOperand()).getResult(function, arguments);
+	}
+
 	
 	
 	

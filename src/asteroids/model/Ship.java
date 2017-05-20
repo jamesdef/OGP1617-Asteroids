@@ -1,6 +1,7 @@
 package asteroids.model;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import asteroids.model.exceptions.IllegalBulletException;
@@ -1011,6 +1012,8 @@ public class Ship extends Entity {
 		private Program program = null;
 		
 		public void setProgram(Program program){
+			System.out.println("SETTING PROGRAM ON SHIP");
+			program.setShip( this );
 			this.program = program;
 		}
 		
@@ -1018,8 +1021,9 @@ public class Ship extends Entity {
 			return this.program;
 		}
 		
-		public void executeProgram(double dt){
-			
+		public List<Object> executeProgram(double dt){
+			System.out.println("SHIP EXECUTEPROGRAM");
+			return this.getProgram().run(dt);
 		}
 		
 

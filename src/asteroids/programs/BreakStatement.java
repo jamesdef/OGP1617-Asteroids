@@ -1,5 +1,13 @@
 package asteroids.programs;
 
-public class BreakStatement {
+import java.util.List;
+
+public class BreakStatement extends Statement {
+
+	@Override
+	public void run(List<Expression> arguments) {
+		throw new IllegalAccessError();
+		
+	}
 
 }

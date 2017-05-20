@@ -2,33 +2,15 @@ package asteroids.programs;
 
 import java.util.List;
 
-public class ArithmeticUnaryExpression extends UnaryExpression implements ArithmeticInterface {
+public abstract class ArithmeticUnaryExpression extends UnaryExpression<ArithmeticInterface> implements ArithmeticInterface {
 
-	protected ArithmeticUnaryExpression(Expression operand) {
+	protected ArithmeticUnaryExpression(ArithmeticInterface operand) {
 		super(operand);
-		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
-	
-	public Object getNumericValue(Function function, List<Expression> arguments) {
-	//	Double parameter = parameterArray[0];
-		
-		Double numericValue = (Double) this.getArgumentExpression(getOperand(), arguments).getResult(function, arguments);
-		
-		if (numericValue != null)
-			return numericValue;
-		else {
-			if (isValidArithmeticOperand())
-				return (double) getOperandResult(program, actualArgs, function);
-			else
-				throw new IllegalArgumentException();
-		}
+	public Object solveOperand(Function function, List<Expression> arguments) {
+		return (double) getOperandResult(function, arguments);
 	}
 
 }

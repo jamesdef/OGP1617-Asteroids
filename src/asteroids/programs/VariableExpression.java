@@ -5,46 +5,37 @@ import java.util.Map;
 
 import asteroids.model.Program;
 
-public class VariableExpression extends Expression{
+public class VariableExpression extends Expression implements ArithmeticInterface{
 
-	private Program program;
-
-	public VariableExpression(String name, Program program){
+	protected VariableExpression(String name){
+		System.out.println("VARIABLEEXP name: " + name);
 		this.setName(name);
-		this.setProgram(program);
 	}
 	
-	private void setProgram(Program program) {
-		// TODO Auto-generated method stub
-		this.program= program;
-		
-	}
-
-	private void setName(String name) {
-		// TODO Auto-generated method stub
-		this.name = name;
-		
-	}
-
+	//NAME
 	private String name;
 	
 	protected String getName(){
 		return this.name;
 	}
+	
+	private void setName(String name) throws IllegalArgumentException {
+		System.out.println("VARIABLEEXP NAME SET TO: " + name);
+		this.name = name;
+	}
 
+	
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
-		// TODO Auto-generated method stub
 		
-		if(function != null){
-			Map<String, Object> variables = function.getVariables();
+		Expression resultExpression = this.getProgram().getVariables().get(this.getName());
+		System.out.println("VARIABLEEXP > GETRESULT name: " + name + " is exp: " + resultExpression);
+
+		if (resultExpression == null)
+			throw new IllegalArgumentException();
+
+		return resultExpression;
 			
-		}
-		
-		
-		
-		
-		return null;
 	}
 
 	

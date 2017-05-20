@@ -9,18 +9,17 @@ public abstract class Statement {
 
 
 	public void runAt(Bookmark bookmark, List<Expression> arguments){
-		if(bookmark == null){
+		if(bookmark.getFailedAction() == null){
+			System.out.println("STATEMENT > failedAction is null, RUN STATEMENT from beginning ");
 			this.run(arguments);
 		} else {
-			this.navigateToAction(bookmark);
-			
-			//INDIEN 1 -> MOET NU DE TWEEDE ACTION UITVOEREN
+			System.out.println("STATEMENT > failedAction not null, RUN STATEMENT from navigate ");
+
+			this.navigateToAction(bookmark, arguments);
 		}
+
 	}
 	
-	public void navigateToAction(Bookmark bookmark){
-		
-	}
 	
 
 	//RUN
@@ -37,9 +36,6 @@ public abstract class Statement {
 	public void setProgram(Program program){
 		this.program = program;
 		
-		//if(this instanceof )
-		
-		//statement
 	}
 	
 	
@@ -47,6 +43,23 @@ public abstract class Statement {
 	public Ship getShip(){
 		return this.getProgram().getShip();
 	}
+	
+
+	public boolean navigateToAction(Bookmark bookmark, List<Expression> arguments) {
+		Boolean failedIsThis = (bookmark.getFailedAction() == this);
+		System.out.println("SIMPEL STATEMENT > NAVIGATETOACTION, failedAction is this: " + failedIsThis);
+		return (failedIsThis);
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

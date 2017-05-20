@@ -8,33 +8,35 @@ class TurnAction extends ActionStatement {
 
 	/// CONSTRUCTOR ///
 
-	public TurnAction(Expression angle, SourceLocation location) {
+	public TurnAction(Expression angle) {
+		System.out.println("TURN ACTION with angle: " + angle);
 		setAngle(angle);
-		//setSourceLocation(location);
 	}
 
 	
-	/// BASIC PROPERTIES ///
-	
+	//ANGLE
 	private Expression angle;
-
-	
-	/// GETTERS ///
 	
 	private Expression getAngle() {
 		return angle;
 	}
 
-	
 	private void setAngle(Expression angle) {
 		this.angle = angle;
 	}
 
+	
+	//EXECTUTE
 	@Override
 	public void executeAction(Program program) {
+		System.out.println("EXECUTING TURN ACTION");
 		try {
-			program.getShip().turn(getAngle().getValue());
+			Double angleValue = (Double) this.getAngle().getResult(null, null);
+			this.getShip().turn(angleValue);
+			System.out.println(this.getShip());
 		} catch (AssertionError error) {
+			System.out.println("assertionerror");
+
 			throw new IllegalArgumentException();
 		}
 		

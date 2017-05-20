@@ -9,238 +9,284 @@ import java.util.List;
 public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, Statement, Function, Program> {
 
 	@Override
-	public Program createProgram(List<Function> functions, Statement main) {
+	public Program createProgram(List<Function> functions, Statement main) { 
+		System.out.println("PROGRAMFACTORY CreateProgram");
 		// TODO Auto-generated method stub
-		return null;
+		
+		return new Program(functions, main);
 	}
 
 	@Override
-	public Function createFunctionDefinition(String functionName, Statement body, SourceLocation sourceLocation) {
+	public Function createFunctionDefinition(String functionName, Statement body, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new Function(functionName, body);
 	}
 
 	@Override
-	public Statement createAssignmentStatement(String variableName, Expression value, SourceLocation sourceLocation) {
+	public Statement createAssignmentStatement(String variableName, Expression value, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new AssignmentStatement(variableName,value);
 	}
 
 	@Override
-	public Statement createWhileStatement(Expression condition, Statement body, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+	public Statement createWhileStatement(Expression condition, Statement body, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
+		try{
+			return new WhileStatement((BooleanInterface) condition, body);
+		} catch(ClassCastException e){
+			throw new IllegalArgumentException("no boolean");
+		}
 	}
 
 	@Override
-	public Statement createBreakStatement(SourceLocation sourceLocation) {
+	public Statement createBreakStatement(SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new BreakStatement();
 	}
 
 	@Override
-	public Statement createReturnStatement(Expression value, SourceLocation sourceLocation) {
+	public Statement createReturnStatement(Expression value, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new ReturnStatement(value);
 	}
 
 	@Override
 	public Statement createIfStatement(Expression condition, Statement ifBody, Statement elseBody,
-			SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+			SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
+		try {
+			return new IfElseStatement((BooleanInterface) condition, ifBody, elseBody);
+		} catch (ClassCastException error) { System.out.println("PROGRAMFACTORY");
+			throw new IllegalArgumentException();
+		}
 	}
 
 	@Override
-	public Statement createPrintStatement(Expression value, SourceLocation sourceLocation) {
+	public Statement createPrintStatement(Expression value, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		
+		return new PrintStatement(value);
 	}
 
 	@Override
-	public Statement createSequenceStatement(List<Statement> statements, SourceLocation sourceLocation) {
+	public Statement createSequenceStatement(List<Statement> statements, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new BlockStatement(statements);
 	}
 
 	@Override
-	public Expression createReadVariableExpression(String variableName, SourceLocation sourceLocation) {
+	public Expression createReadVariableExpression(String variableName, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new VariableExpression(variableName);
 	}
 
 	@Override
-	public Expression createReadParameterExpression(String parameterName, SourceLocation sourceLocation) {
+	public Expression createReadParameterExpression(String parameterName, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new ParameterExpression(parameterName);
 	}
 
 	@Override
 	public Expression createFunctionCallExpression(String functionName, List<Expression> actualArgs,
-			SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+			SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
+		return new FunctionExpression(functionName, actualArgs);
 	}
 
 	@Override
-	public Expression createChangeSignExpression(Expression expression, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+	public Expression createChangeSignExpression(Expression expression, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
+		try {
+			return new SignChangeExpression((ArithmeticInterface) expression);
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException("You've made a negation with a non-arithmetic expression");
+		}
 	}
 
 	@Override
-	public Expression createNotExpression(Expression expression, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+	public Expression createNotExpression(Expression expression, SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
+		try{
+			return new NegationExpression((BooleanInterface) expression);
+		} catch(ClassCastException e){
+			throw new IllegalArgumentException("no boolean value");
+		}
 	}
 
 	@Override
-	public Expression createDoubleLiteralExpression(double value, SourceLocation location) {
+	public Expression createDoubleLiteralExpression(double value, SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new DoubleLiteralExpression(value);
 	}
 
 	@Override
-	public Expression createNullExpression(SourceLocation location) {
+	public Expression createNullExpression(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new NullExpression();
 	}
 
 	@Override
-	public Expression createSelfExpression(SourceLocation location) {
+	public Expression createSelfExpression(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new SelfExpression();
 	}
 
 	@Override
-	public Expression createShipExpression(SourceLocation location) {
+	public Expression createShipExpression(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new ShipEntityExpression();
 	}
 
 	@Override
-	public Expression createAsteroidExpression(SourceLocation location) {
+	public Expression createAsteroidExpression(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new AsteroidEntityExpression();
 	}
 
 	@Override
-	public Expression createPlanetoidExpression(SourceLocation location) {
+	public Expression createPlanetoidExpression(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new PlanetoidEntityExpression();
 	}
 
 	@Override
-	public Expression createBulletExpression(SourceLocation location) {
+	public Expression createBulletExpression(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new BulletEntityExpression();
 	}
 
 	@Override
-	public Expression createPlanetExpression(SourceLocation location) {
+	public Expression createPlanetExpression(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new PlanetEntityExpression();
 	}
 
 	@Override
-	public Expression createAnyExpression(SourceLocation location) {
+	public Expression createAnyExpression(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new AnyEntityExpression();
 	}
 
 	@Override
-	public Expression createGetXExpression(Expression e, SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+	public Expression createGetXExpression(Expression e, SourceLocation location) { System.out.println("PROGRAMFACTORY");
+		try {
+			return new PositionXExpression(e);
+		} catch (IllegalArgumentException exception) {
+			throw new IllegalArgumentException("no entity");
+		}
 	}
 
 	@Override
-	public Expression createGetYExpression(Expression e, SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+	public Expression createGetYExpression(Expression e, SourceLocation location) { System.out.println("PROGRAMFACTORY");
+		try {
+			return new PositionYExpression(e);
+		} catch (IllegalArgumentException exception) {
+			throw new IllegalArgumentException("no entity");
+		}
 	}
 
 	@Override
-	public Expression createGetVXExpression(Expression e, SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+	public Expression createGetVXExpression(Expression e, SourceLocation location) { System.out.println("PROGRAMFACTORY");
+		try {
+			return new VelocityXExpression(e);
+		} catch (IllegalArgumentException exception) {
+			throw new IllegalArgumentException("no entity");
+		}
 	}
 
 	@Override
-	public Expression createGetVYExpression(Expression e, SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+	public Expression createGetVYExpression(Expression e, SourceLocation location) { System.out.println("PROGRAMFACTORY");
+		try {
+			return new VelocityYExpression(e);
+		} catch (IllegalArgumentException exception) {
+			throw new IllegalArgumentException("no entity");
+		}
 	}
 
 	@Override
-	public Expression createGetRadiusExpression(Expression e, SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+	public Expression createGetRadiusExpression(
+			Expression e, SourceLocation location) { 
+		System.out.println("PROGRAMFACTORY radiusexp");
+		try {
+			return new RadiusExpression(e);
+		} catch (IllegalArgumentException exception) {
+			throw new IllegalArgumentException("not an entity");
+		}
 	}
 
 	@Override
-	public Expression createLessThanExpression(Expression e1, Expression e2, SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+	public Expression createLessThanExpression(Expression e1, Expression e2, SourceLocation location) { System.out.println("PROGRAMFACTORY");
+	try {
+		return new SmallerThanExpression((Expression) e1, (Expression) e2);
+	} catch (ClassCastException e) {
+		throw new IllegalArgumentException("");
+	}
 	}
 
 	@Override
-	public Expression createEqualityExpression(Expression e1, Expression e2, SourceLocation location) {
+	public Expression createEqualityExpression(Expression e1, Expression e2, SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new EqualExpression(e1, e2);
 	}
 
 	@Override
-	public Expression createAdditionExpression(Expression e1, Expression e2, SourceLocation location) {
+	public Expression createAdditionExpression(Expression e1, Expression e2, SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		try{
+			return new AdditionExpression((Expression) e1, (Expression) e2);
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	@Override
-	public Expression createMultiplicationExpression(Expression e1, Expression e2, SourceLocation location) {
+	public Expression createMultiplicationExpression(Expression e1, Expression e2, SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+	try{
+		return new MultiplicationExpression((ArithmeticInterface) e1, (ArithmeticInterface) e2);
+	} catch (ClassCastException e) {
+		throw new IllegalArgumentException();
+	}
 	}
 
 	@Override
-	public Expression createSqrtExpression(Expression e, SourceLocation location) {
-		// TODO Auto-generated method stub
-		return null;
+	public Expression createSqrtExpression(Expression e, SourceLocation location) { System.out.println("PROGRAMFACTORY");
+	try {
+		return new SqrtExpression((ArithmeticInterface) e);
+	} catch (ClassCastException f) {
+		throw new IllegalArgumentException("non artihmetic");
+}
 	}
 
 	@Override
-	public Expression createGetDirectionExpression(SourceLocation location) {
+	public Expression createGetDirectionExpression(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new DirectionExpression();
 	}
 
 	@Override
-	public Statement createThrustOnStatement(SourceLocation location) {
+	public Statement createThrustOnStatement(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new EnableThrust();
 	}
 
 	@Override
-	public Statement createThrustOffStatement(SourceLocation location) {
+	public Statement createThrustOffStatement(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new DisableThrust(location);
 	}
 
 	@Override
-	public Statement createFireStatement(SourceLocation location) {
+	public Statement createFireStatement(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new FireAction();
 	}
 
 	@Override
-	public Statement createTurnStatement(Expression angle, SourceLocation location) {
+	public Statement createTurnStatement(Expression angle, SourceLocation location) { 
+		System.out.println("PROGRAMFACTORY TURNACTION");
 		// TODO Auto-generated method stub
-		return null;
+		return new TurnAction(angle);
 	}
 
 	@Override
-	public Statement createSkipStatement(SourceLocation location) {
+	public Statement createSkipStatement(SourceLocation location) { System.out.println("PROGRAMFACTORY");
 		// TODO Auto-generated method stub
-		return null;
+		return new SkipAction(location);
 	}
 }

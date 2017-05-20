@@ -11,6 +11,7 @@ class SkipAction extends ActionStatement {
 	/// CONSTRUCTOR ///
 	
 	public SkipAction(SourceLocation location) {
+		System.out.println("SKIPACTION");
 		//setSourceLocation(location);
 	}
 
