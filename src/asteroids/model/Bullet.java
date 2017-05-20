@@ -1,8 +1,10 @@
 package asteroids.model;
 
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
+import asteroids.model.exceptions.IllegalShipException;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
-import asteroids.model.exceptions.*;
 
 /**
  * A class for dealing with bullets, which are a kind of entity in space. 
@@ -194,7 +196,7 @@ public class Bullet extends Entity {
         //If the ship is effective, the location of this bullet is changed to the center of the ship.
         if (ship!=null)
 			try {
-				this.setPosition(ship.getxPosition(),ship.getyPosition());
+				this.setPosition(ship.getXPosition(),ship.getYPosition());
 			} catch (IllegalPositionException e) {
 				// Zal niet voorkomen; de positie van een schip moet op elk moment legaal zijn.
 				// Java verplicht ons enkel deze try/Catch in te voeren.
@@ -300,13 +302,12 @@ public class Bullet extends Entity {
 	 * 
 	 * @return True if the radius exceeds the minimal radius
 	 * 		   false if the radius is less than the minimal_radius. 
-	 * 		   Or if the radius is Infinity or not a number.
 	 * 		   | radius >= getMinRadius();
 	 */
-    @Raw @Override
+    @Override
 	public boolean isValidRadius(double radius){
-		return (radius >= Bullet.getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
-	}
+		return (super.isValidRadius(radius) && radius >= Bullet.getMinRadius());
+    }
 	
 	
 // ---------------------- Bounces -----------------------------------------------------
@@ -446,10 +447,5 @@ public class Bullet extends Entity {
 	 * Variable registering the density of this bullet.
 	 */
 	private double density = default_Density;
-	
-//	/** TODO is deze code echt overbodig?
-//	 * Variable registering the Default_Mass of a bullet
-//	 */
-//	private final static double default_Mass = default_Density*(4.0/3.0)*Math.PI*(Math.pow(min_Radius, 3.0));
-//	
+
 }

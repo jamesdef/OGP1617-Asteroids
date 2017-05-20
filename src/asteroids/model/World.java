@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import asteroids.model.exceptions.IllegalBulletException;
 import asteroids.model.exceptions.IllegalCollisionException;
@@ -118,63 +119,28 @@ public class World {
 //        return (Set<T>)this.entities.values().stream().filter(entity -> c.isInstance(entity)).collect(Collectors.toSet());
 //    }
 	
+	
+	// Je wilt een set terug geven die enkel die elementen bevat die van dat classetype zijn
+	// dat je opvraagd.
+	// Hiervoor maken we een (TODO stream) stream van alle entities in deze wereld.
+	// We filteren daaruit (TODO met lambda) die entiteiten die van de opgegeven klasse zijn.
+	// Tenslotte voegen we deze allemaal samen in een set (die natuuurlijk enkel objecten
+	// van de specifieke klasse bevat)
+	
+	// TODO: vragen: moet c erbij als parameter in de documentatie?
 	/**
-	 * Returns a set of all ships that belong to this world.
-	 * @return a set of all ships that belong to this world.
+	 * Returns a set of specific entities of class c, that  belong to this world.
+	 * 
+	 * @param c  The type of the entities that we want to collect.
+	 * 
+	 * @return A collection of all the entities of the given type, that belong to this world.
+	 * 		   |  @see implementation
 	 */
-	public Set<Ship> getAllShips(){
-		Set<Ship> ships = new HashSet<>();
-		for(Entity entityToCheck: this.getAllEntities()){
-			if (entityToCheck instanceof Ship){
-				ships.add((Ship)entityToCheck);
-			}
-		}
-		return ships;
+	@SuppressWarnings("unchecked")
+	public <T extends  Entity> Set<T> getSpecificEntities(Class<T> c){
+		// This cast is unchecked, but this causes no problems because we KNOW it is right.
+		return (Set<T>)this.getAllEntities().stream().filter(c::isInstance).collect(Collectors.toSet());
 	}
-	
-	/**
-	 * Returns a set of all bullets that belong to this world.
-	 * @return a set of all bullets that belong to this world.
-	 */
-	public Set<Bullet> getAllBullets(){
-		Set<Bullet> bullets = new HashSet<>();
-		for(Entity entityToCheck: this.getAllEntities()){
-			if (entityToCheck instanceof Bullet){
-				bullets.add((Bullet)entityToCheck);
-			}
-		}
-		return bullets;
-	}
-	
-	/**
-	 * Returns a set of all asteroids that belong to this world.
-	 * @return a set of all asteroids that belong to this world.
-	 */
-	public Set<Asteroid> getAllAsteroids(){
-		Set<Asteroid> asteroids = new HashSet<>();
-		for(Entity entityToCheck: this.getAllEntities()){
-			if (entityToCheck instanceof Asteroid){
-				asteroids.add((Asteroid)entityToCheck);
-			}
-		}
-		return asteroids;
-	}
-	
-	/**
-	 * Returns a set of all planetoids that belong to this world.
-	 * @return a set of all planetoids that belong to this world.
-	 */
-	public Set<Planetoid> getAllPlanetoids(){
-		Set<Planetoid> planetoids = new HashSet<>();
-		for(Entity entityToCheck: this.getAllEntities()){
-			if (entityToCheck instanceof Planetoid){
-				planetoids.add((Planetoid)entityToCheck);
-			}
-		}
-		return planetoids;
-	}
-	
-	
 	
 	/**
 	 * A method returning the amount of entities within this world.
@@ -452,8 +418,8 @@ public class World {
 	 */
 	public Boolean withinWorldBoundaries(Entity object){
 	
-		double x = object.getxPosition();
-		double y = object.getyPosition();
+		double x = object.getXPosition();
+		double y = object.getYPosition();
 		double width = this.getWidth();
 		double height = this.getHeight();
 		double radius = object.getRadius();

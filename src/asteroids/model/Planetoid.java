@@ -105,8 +105,8 @@ public class Planetoid extends MinorPlanet {
  			World worldToAddTo = this.getWorld();
  			super.terminate();	
  			
- 			double xPosition = this.getxPosition();
- 			double yPosition = this.getyPosition();
+ 			double xPosition = this.getXPosition();
+ 			double yPosition = this.getYPosition();
  			double r = this.getRadius();
  			double parentVelocity = this.getTotalVelocity();
  			double randomAngle = Math.random() *2.0*Math.PI; 

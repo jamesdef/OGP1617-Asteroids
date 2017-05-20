@@ -25,6 +25,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar 	Each ship has proper bullets as its belongings.
  *		 	|hasProperBullets()
  *
+ * TODO voorbeeld van liskov: klasse invariant verstrenging.
  * @invar 	The radius of each ship must be a valid value.
  * 			|isValidRadius(getRadius())
  *
@@ -380,8 +381,7 @@ public class Ship extends Entity {
 		return Ship.min_Radius;
 	}
 
-	// TODO dit is liskov, documentatie kan enkel verstrengen
-			// moet dus niet gekopieerd zijn
+	// TODO dit is liskov
 	/** 
 	 * Checks whether the given radius has a valid value.
 	 * 
@@ -520,8 +520,8 @@ public class Ship extends Entity {
 		if(getThrustState() == true){
 			//If the acceleration is negative, then we leave the velocity untouched.
 			double a = Math.max(0, getPossibleAcceleration());
-			double NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()))*duration;
-			double NewyVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()))*duration;
+			double NewxVelocity = this.getXVelocity() + a*(Math.cos(this.getOrientation()))*duration;
+			double NewyVelocity = this.getYVelocity() + a*(Math.sin(this.getOrientation()))*duration;
 			this.setVelocity(NewxVelocity, NewyVelocity);	
 			}	
 	}
@@ -675,7 +675,7 @@ public class Ship extends Entity {
 	 * 		   We are obliged to throw these exceptions, even though we know that the default bullet will be legal.
 	 */
 	public void loadBullet() throws IllegalPositionException, IllegalRadiusException{
-		Bullet bullet = new Bullet(this.getxPosition(), this.getyPosition(), this.getxVelocity(), this.getyVelocity(),
+		Bullet bullet = new Bullet(this.getXPosition(), this.getYPosition(), this.getXVelocity(), this.getYVelocity(),
 												Bullet.getMinRadius());
 		bullet.setShip(this);
 		this.bullets.add(bullet);
@@ -713,8 +713,8 @@ public class Ship extends Entity {
 		}
 		this.bullets.add(bullet);
 		bullet.setShip(this);
-		bullet.setPosition(this.getxPosition(), this.getyPosition());
-		bullet.setVelocity(this.getxVelocity(), this.getyVelocity());
+		bullet.setPosition(this.getXPosition(), this.getYPosition());
+		bullet.setVelocity(this.getXVelocity(), this.getYVelocity());
 	}
 	
 	/**
@@ -816,8 +816,8 @@ public class Ship extends Entity {
 			
 			double margin = 1.05;
 			
-			double bulletXPos = this.getxPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.cos(this.getOrientation());
-			double bulletYPos=  this.getyPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.sin(this.getOrientation());
+			double bulletXPos = this.getXPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.cos(this.getOrientation());
+			double bulletYPos=  this.getYPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.sin(this.getOrientation());
 		
 			double xSpeed = getInitialBulletSpeed()*Math.cos(this.getOrientation());
 			double ySpeed = getInitialBulletSpeed()*Math.sin(this.getOrientation());
@@ -894,7 +894,7 @@ public class Ship extends Entity {
 				if(((Bullet) entity).getSource() == this){
 					// The Bullet is first placed to the centre of this ship,
 					// so that it is fully within this ship and can be loaded.	
-					((Bullet) entity).setPosition(this.getxPosition(),this.getyPosition());
+					((Bullet) entity).setPosition(this.getXPosition(),this.getYPosition());
 					
 					this.loadBullet((Bullet) entity);
 						return;
@@ -907,18 +907,6 @@ public class Ship extends Entity {
 			}
 			this.terminate();
 		}		
-	}
-	
-	
-	//TODO Documentatie 
-	public boolean overlapsWithOther(){
-		for(Entity entity: this.getWorld().getAllEntities()){
-			if(this.significantOverlap(entity)){
-				System.out.println("overlap terminate");
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	//TODO Documentatie 
@@ -934,11 +922,9 @@ public class Ship extends Entity {
 			if(this.overlapsWithOther()){
 				this.terminate();
 			}
-			
 		} catch (Exception exception) {
             this.terminate();
-        }
-		
+        }	
 	}
 	
     
