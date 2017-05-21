@@ -8,11 +8,13 @@ import asteroids.model.Program;
 
 public class Function {
 
-	public Function(String name, Statement body){
+	public Function(String name, Statement bodyStatement){
 		setName(name);
-		setBody(body);
+		setBody(bodyStatement);
 	}
 	
+	
+	//
 	protected Statement getBody(){
 		return this.body;
 	}
@@ -39,6 +41,10 @@ public class Function {
 	
 	protected void setBody(Statement body){
 		this.body = body;
+	}
+	
+	protected boolean isValidFuntionBodyStatement(){
+		return true;
 	}
 	
 	private Program program;
