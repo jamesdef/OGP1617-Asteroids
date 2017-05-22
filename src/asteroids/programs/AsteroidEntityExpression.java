@@ -10,7 +10,7 @@ public class AsteroidEntityExpression extends EntityExpression {
 
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
-		Set<Asteroid> asteroids = this.getAllAsteroids();
+		Set<Asteroid> asteroids = getWorld().getAllAsteroids();
 		
 		return (Asteroid) this.getClosest(asteroids);
 	}

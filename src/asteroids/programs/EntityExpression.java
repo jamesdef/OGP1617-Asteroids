@@ -20,30 +20,14 @@ public abstract class EntityExpression extends Expression {
 	
 	
 	//WORLD
-	private World getWorld() {
+	protected World getWorld() {
 		return this.getShip().getWorld();
 	}
 	
 	protected Set<Entity> getOtherEntities() {
 		return getWorld().getAllEntities();
 	}
-	
-	protected Set<Ship> getAllShips() {
-		return getWorld().getAllShips();
-	}
-	
-	protected Set<Asteroid> getAllAsteroids() {
-		return getWorld().getAllAsteroids();
-	}
-	
-	protected Set<Planetoid> getAllPlanetoids() {
-		return getWorld().getAllPlanetoids();
-	}
-	
-	protected Set<Bullet> getAllBullets() {
-		return getWorld().getAllBullets();
-	}
-	
+
 	protected Set<MinorPlanet> getAllMinorPlanets() {
 		Set<? extends MinorPlanet> set;
 		set.

@@ -11,7 +11,8 @@ public class ShipEntityExpression extends EntityExpression{
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
 		
-		Set<Ship> ships = this.getAllShips();
+		
+		Set<Ship> ships = this.getWorld().getAllShips();
 		
 		ships.remove(this.getShip());
 

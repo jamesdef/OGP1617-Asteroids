@@ -9,7 +9,9 @@ public class PlanetoidEntityExpression extends EntityExpression{
 
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
-		Set<Planetoid> planetoids = this.getAllPlanetoids();
+		
+		Set<Planetoid> planetoids = getWorld().getAllPlanetoids();
+		
 		return (Planetoid) this.getClosest(planetoids);
 	}
 
