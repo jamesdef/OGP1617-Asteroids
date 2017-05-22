@@ -69,7 +69,22 @@ public class Asteroid extends MinorPlanet{
  		this.setMass(default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3)));
  	}
 	
-
+ 	/**
+ 	 * This handles the collision between an asteroid 
+ 	 * and a certain entity.
+ 	 * 
+ 	 * @param entity
+ 	 * 		  The other entity in this collision
+ 	 * 
+ 	 * @effect If the other entity is a minor planet
+ 	 * 		 the collision is handled as a casual collision.
+ 	 * 		 | @see implementation
+ 	 * 
+ 	 * @effect If the other entity is a bullet,
+ 	 * 		 the asteroid is terminated.
+ 	 * 		 | if(entity instanceof Bullet){
+	 *		 |        this.terminate();
+ 	 */
 	@Override
 	public void handleOtherEntityCollision(Entity entity){
 		if(entity instanceof MinorPlanet){

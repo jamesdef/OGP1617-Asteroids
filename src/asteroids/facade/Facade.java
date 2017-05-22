@@ -563,7 +563,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public double getPlanetoidTotalTraveledDistance(Planetoid planetoid) throws ModelException {
-		return planetoid.getDistanceTravelled();
+		return planetoid.getDistanceTraveled();
 	}
 
 	@Override

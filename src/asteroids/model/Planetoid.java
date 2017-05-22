@@ -141,7 +141,7 @@ public class Planetoid extends MinorPlanet {
 	 * Returns the distance this planetoid has travelled.
 	 */
 	@Basic
-	public double getDistanceTravelled(){
+	public double getDistanceTraveled(){
 		return this.distanceTraveled;
 	}
 	/**
@@ -166,8 +166,12 @@ public class Planetoid extends MinorPlanet {
   		return 0.000001*distance < (this.getRadius()-5.0);
   	}
 	
-  	//TODO 
-  	public double getDefaulyDensity(){
+  	/**
+  	 * Returns the default density for this planetoid.
+  	 */
+  	@Basic
+  	public static double getDefaulyDensity(){
+  		return Planetoid.default_Density;
   		
   	}
  	
@@ -179,10 +183,10 @@ public class Planetoid extends MinorPlanet {
  	 * @param radius
  	 * 		  The radius of this planetoid.
  	 * @post The new mass of this planetoid now equals the value calculated using the formula with the given radius.
- 	 * 		 |new.mass == default_Density*(4/3)*Math.PI*(Math.pow(radius, 3));
+ 	 * 		 |new.mass == getDefaulyDensity()*(4/3)*Math.PI*(Math.pow(radius, 3));
  	 */
  	private void setPlanetoidMass(double radius){
- 		this.setMass(default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3)));
+ 		this.setMass(getDefaulyDensity()*(4.0/3.0)*Math.PI*(Math.pow(radius, 3)));
  	}
  	
  	
