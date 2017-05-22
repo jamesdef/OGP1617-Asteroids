@@ -1,7 +1,9 @@
 package asteroids.programs;
 
 import asteroids.model.Program;
-import asteroids.part3.programs.SourceLocation;
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
+import asteroids.model.exceptions.IllegalShipException;
 import asteroids.programs.ActionStatement;
 
 class TurnAction extends ActionStatement {
@@ -9,7 +11,7 @@ class TurnAction extends ActionStatement {
 	/// CONSTRUCTOR ///
 
 	public TurnAction(Expression angle) {
-		System.out.println("TURN ACTION with angle: " + angle);
+		System.out.println("TURN ACTION with angle: " + angle.getResult(null, null));
 		setAngle(angle);
 	}
 
@@ -23,15 +25,21 @@ class TurnAction extends ActionStatement {
 
 	private void setAngle(Expression angle) {
 		this.angle = angle;
+		System.out.println("angle set as: " + angle.getResult(null, null));
+
 	}
 
 	
 	//EXECTUTE
 	@Override
-	public void executeAction(Program program) {
-		System.out.println("EXECUTING TURN ACTION");
+	public void executeAction(Program program) 
+			throws IllegalPositionException, IllegalRadiusException, IllegalShipException
+	{
+		System.out.println("EXECUTING TURN ACTION, program is: " + program);
+		Double angleValue = (Double) this.getAngle().getResult(null, null);
+		System.out.println("ANGLE VALUE IS: " + angleValue);
+
 		try {
-			Double angleValue = (Double) this.getAngle().getResult(null, null);
 			this.getShip().turn(angleValue);
 			System.out.println(this.getShip());
 		} catch (AssertionError error) {

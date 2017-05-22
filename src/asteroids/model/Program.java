@@ -23,7 +23,6 @@ public class Program {
 
 	
 	//RUN
-	private boolean running = false;	
 	private double timeLeft = 0;
 	
 	public double getTimeLeft(){
@@ -52,22 +51,11 @@ public class Program {
 		}	
 	}
 	
-	public void setRunning(boolean running){
-		this.running = running;
-	}
-	
-	public boolean running(){
-		return this.running;
-	}
 	
 	
 	//BOOKMARK
 	
 	private Bookmark bookmark = new Bookmark();
-	
-	public void setBookmark(Bookmark bookmark){
-		this.bookmark = bookmark;
-	}
 	
 	public Bookmark getBookmark(){
 		return this.bookmark;

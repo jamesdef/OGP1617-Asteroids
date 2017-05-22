@@ -285,7 +285,8 @@ public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, S
 	@Override
 	public Statement createTurnStatement(Expression angle, SourceLocation location) { 
 		System.out.println("PROGRAMFACTORY TURNACTION");
-		// TODO Auto-generated method stub
+		System.out.println("PROGRAMFACTORY TURNACTION with: " + angle.getResult(null, null));
+
 		return new TurnAction(angle);
 	}
 

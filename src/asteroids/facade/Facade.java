@@ -103,7 +103,12 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public void turn(Ship ship, double angle) throws ModelException {
-		ship.turn(angle);
+		try {
+			ship.turn(angle);
+		} catch (AssertionError e) {
+			throw new ModelException("Invalid Turn");
+		}
+		
 	}
 
 	@Override

@@ -42,8 +42,6 @@ public abstract class ActionStatement extends Statement {
 		else {
 			System.out.println("AS > NOT ENOUGH TIME LEFT, SETTING THIS AS failedA " + this);
 			this.getProgram().updateBookmark(this);
-			this.getProgram().setRunning(false);	
-
 			throw new IllegalPathStateException();
 		}
 	}

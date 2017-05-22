@@ -308,6 +308,8 @@ public class Ship extends Entity {
 	 */
 	@Raw
 	public void setOrientation(double orientation){
+		System.out.println("orientation" + orientation);
+		System.out.println(isValidOrientation(orientation));
 		assert isValidOrientation(orientation);
 		this.orientation = orientation;	
 	}
@@ -565,9 +567,10 @@ public class Ship extends Entity {
 	 * 		   |this.setOrientation(scaledAngle);
 	 */
 	public void turn(double angle){
+		System.out.println("hello ship turning: " + angle);
 		double newAngle = this.getOrientation() + angle;
-		double ScaledAngle = scaleangle(newAngle);
-		this.setOrientation(ScaledAngle);
+	//	double ScaledAngle = scaleangle(newAngle);
+		this.setOrientation(angle);
 	}
 
 	/**

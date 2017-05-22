@@ -13,7 +13,7 @@ public class MultiplicationExpression extends BinaryExpression<DoubleExpression>
 		Double left = (Double) this.getLeftOperandResult(function, arguments);
 		Double right = (Double) this.getRightOperandResult(function, arguments);
 
-		return (left+right);
+		return (left * right);
 	}
 
 }
