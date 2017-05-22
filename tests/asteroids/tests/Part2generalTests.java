@@ -13,6 +13,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import asteroids.model.*;
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
 import asteroids.facade.Facade;
 import asteroids.part2.facade.IFacade;
 import asteroids.util.ModelException;
