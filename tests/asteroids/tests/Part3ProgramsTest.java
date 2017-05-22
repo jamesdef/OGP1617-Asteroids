@@ -1646,11 +1646,11 @@ public class Part3ProgramsTest {
 
     // Turn statement
 
-    /*@Test
+    @Test
     public void testTurnStatement_ValidAngleEnoughTimeLeft() throws ModelException {
       max_score += 3;
-      String code = "turn 1.1; " + "print 0.4; ";
-      facade.turn(ship1, 1.4);
+      String code = "turn 1.0; " + "print 0.4; ";
+      facade.turn(ship1, 1.5);
       Program program = ProgramParser.parseProgramFromString(code, programFactory);
       facade.loadProgramOnShip(ship1, program);
       List<Object> results = facade.executeProgram(ship1, 0.45);
@@ -1671,14 +1671,13 @@ public class Part3ProgramsTest {
       assertEquals(1.5, facade.getShipOrientation(ship1), EPSILON);
       assertNull(results);
       score += 3;
-    }*/
+    }
 
     @Test
     public void testTurnStatement_InvalidAngle() throws ModelException {
       max_score += 5;
       try {
     	  
-    	  System.out.println("testTurnStatement_InvalidAngle");
         String code = "turn 10.0; " + "print 0.4; ";
         facade.turn(ship1, 1.5);
         Program program = ProgramParser.parseProgramFromString(code, programFactory);
@@ -1697,7 +1696,7 @@ public class Part3ProgramsTest {
       }
     }
 
-   /* @Test
+    @Test
     public void testTurnStatement_InFunctionBody() throws ModelException {
       try {
         max_score += 3;
@@ -1709,7 +1708,7 @@ public class Part3ProgramsTest {
       } catch (ModelException exc) {
         score += 3;
       }
-    }*/
+    }
 
     // Thruster ON statement
 

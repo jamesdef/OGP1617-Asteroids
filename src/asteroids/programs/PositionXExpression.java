@@ -13,7 +13,7 @@ public class PositionXExpression extends EntityPropertyExpression {
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
 		// TODO Auto-generated method stub
-		return this.getOperandResultingEntity().getxPosition();
+		return this.getOperandResultingEntity().getXPosition();
 	}
 
 }

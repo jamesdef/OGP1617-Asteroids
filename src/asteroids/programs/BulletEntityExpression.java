@@ -10,7 +10,7 @@ public class BulletEntityExpression extends EntityExpression {
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
 
-		Set<? extends Bullet> bullets = this.getAllBullets();
+		Set<? extends Bullet> bullets = getWorld().getSpecificEntities(Bullet.class);
 
 		bullets.removeIf(bullet -> !isFiredFromShip((Bullet) bullet));
 		
