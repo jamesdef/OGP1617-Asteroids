@@ -13,7 +13,9 @@ public class FunctionExpression extends Expression {
 	protected Object getResult(Function function, List<Expression> arguments) {
 		Map<String, Object> globalVariables = this.getProgram().getVariables();
 		
+
 		//this.getFunction().updateLocalVariables
+
 		
 		return null;
 	}

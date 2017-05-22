@@ -2,6 +2,8 @@ package asteroids.model;
 
 import asteroids.model.exceptions.IllegalPositionException;
 import asteroids.model.exceptions.IllegalRadiusException;
+import be.kuleuven.cs.som.annotate.Model;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with MinorPlanets, a specific kind of entities.
@@ -48,6 +50,7 @@ public abstract class MinorPlanet extends Entity {
 	 *	       |setRadius(radius);
 	 *
 	 */
+	@Raw @Model
 	public MinorPlanet(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius)
 			throws IllegalPositionException, IllegalRadiusException {
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);

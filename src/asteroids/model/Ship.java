@@ -583,8 +583,8 @@ public class Ship extends Entity {
 	
 //---------------------BULLETS --------------------------
     
-    
-    /**
+	//TODO blijkbaar moet je een kopie pakken
+	/**
 	 * Return the bullets owned by this ship.
 	 * @return the bullets owned by this ship
 	 */ 
@@ -595,6 +595,7 @@ public class Ship extends Entity {
 		
 		return bullets;
 	}
+	
 
 	/**
 	 * Returns the number of bullets this ship contains.
