@@ -53,7 +53,7 @@ public class ProgramFactory<E, S, F, P> implements IProgramFactory<Expression, S
 	public Statement createIfStatement(Expression condition, Statement ifBody, Statement elseBody,
 			SourceLocation sourceLocation) { System.out.println("PROGRAMFACTORY");
 		try {
-			return new IfElseStatement((BooleanInterface) condition, ifBody, elseBody);
+			return new IfElseStatement((BooleanExpression) condition, ifBody, elseBody);
 		} catch (ClassCastException error) { System.out.println("PROGRAMFACTORY");
 			throw new IllegalArgumentException();
 		}

@@ -12,7 +12,7 @@ public class ReturnStatement extends Statement {
 
 	@Override
 	public void run(List<Expression> arguments) {
-		// TODO Auto-generated method stub
+		throw new IllegalArgumentException();
 		
 	}
 
