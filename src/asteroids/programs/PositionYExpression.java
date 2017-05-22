@@ -12,7 +12,7 @@ public class PositionYExpression extends EntityPropertyExpression {
 
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
-		return this.getOperandResultingEntity().getyPosition();
+		return this.getOperandResultingEntity().getYPosition();
 	}
 
 }

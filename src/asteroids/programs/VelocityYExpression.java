@@ -11,7 +11,7 @@ public class VelocityYExpression extends EntityPropertyExpression {
 
 	@Override
 	protected Object getResult(Function function, List<Expression> arguments) {
-		return this.getOperandResultingEntity().getyVelocity();
+		return this.getOperandResultingEntity().getYVelocity();
 	}
 
 }

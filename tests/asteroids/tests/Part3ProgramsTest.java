@@ -1649,8 +1649,8 @@ public class Part3ProgramsTest {
     @Test
     public void testTurnStatement_ValidAngleEnoughTimeLeft() throws ModelException {
       max_score += 3;
-      String code = "turn 1.1; " + "print 0.4; ";
-      facade.turn(ship1, 1.4);
+      String code = "turn 1.0; " + "print 0.4; ";
+      facade.turn(ship1, 1.5);
       Program program = ProgramParser.parseProgramFromString(code, programFactory);
       facade.loadProgramOnShip(ship1, program);
       List<Object> results = facade.executeProgram(ship1, 0.45);

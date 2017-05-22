@@ -562,8 +562,10 @@ public class Ship extends Entity {
 	public void turn(double angle){
 		System.out.println("hello ship turning: " + angle);
 		double newAngle = this.getOrientation() + angle;
-	//	double ScaledAngle = scaleangle(newAngle);
-		this.setOrientation(angle);
+	//	double ScaledAngle = scaledangle(newAngle);
+		this.setOrientation(newAngle);
+		System.out.println("hello ship angle is now: " + this.getOrientation());
+
 	}
 
 	/**

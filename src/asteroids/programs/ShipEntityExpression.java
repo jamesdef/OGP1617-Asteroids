@@ -12,7 +12,7 @@ public class ShipEntityExpression extends EntityExpression{
 	protected Object getResult(Function function, List<Expression> arguments) {
 		
 		
-		Set<Ship> ships = this.getWorld().getAllShips();
+		Set<Ship> ships = this.getWorld().getSpecificEntities(Ship.class);
 		
 		ships.remove(this.getShip());
 

@@ -67,27 +67,20 @@ public class Part3TestFull {
     facade.addBulletToWorld(filledWorld, bullet1);
   }
  
-@Test
-    public void testTurnStatement_InvalidAngle() throws ModelException {
-      max_score += 5;
-      try {
-    	  
-    	  System.out.println("testTurnStatement_InvalidAngle");
-        String code = "turn 10.0; " + "print 0.4; ";
-        facade.turn(ship1, 1.5);
-        Program program = ProgramParser.parseProgramFromString(code, programFactory);
-        facade.loadProgramOnShip(ship1, program);
-        List<Object> results = facade.executeProgram(ship1, 0.45);
-        
-        // It is allowed to do nothing in case of an illegal angle.
-        
-        assertEquals(1.5, facade.getShipOrientation(ship1), EPSILON);
-        Object[] expecteds = { 0.4 };
-        assertArrayEquals(expecteds, results.toArray());
-        score += 5;
-      } catch (ModelException exc) {
-        assertEquals(1.5, facade.getShipOrientation(ship1), EPSILON);
-        score += 5;
-      }
-    }
+
+  
+  @Test
+  public void testTurnStatement_ValidAngleEnoughTimeLeft() throws ModelException {
+    max_score += 3;
+    String code = "turn 1.0; " + "print 0.4; ";
+    facade.turn(ship1, 1.5);
+    Program program = ProgramParser.parseProgramFromString(code, programFactory);
+    facade.loadProgramOnShip(ship1, program);
+    List<Object> results = facade.executeProgram(ship1, 0.45);
+    assertEquals(2.5, facade.getShipOrientation(ship1), EPSILON);
+    Object[] expecteds = { 0.4 };
+    assertArrayEquals(expecteds, results.toArray());
+    score += 3;
+  }
+  
 }

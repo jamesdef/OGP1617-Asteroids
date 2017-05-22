@@ -28,13 +28,6 @@ public abstract class EntityExpression extends Expression {
 		return getWorld().getAllEntities();
 	}
 
-	protected Set<MinorPlanet> getAllMinorPlanets() {
-		Set<? extends MinorPlanet> set;
-		set.
-		set.addAll((Collection<?>) getWorld().getAllPlanetoids());
-		return set;
-		
-	}
 	
 	protected Entity getClosest(Set<? extends Entity> set){
 		Ship ship = this.getShip();
