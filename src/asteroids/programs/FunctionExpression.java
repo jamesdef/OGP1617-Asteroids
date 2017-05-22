@@ -13,7 +13,7 @@ public class FunctionExpression extends Expression {
 	protected Object getResult(Function function, List<Expression> arguments) {
 		Map<String, Object> globalVariables = this.getProgram().getVariables();
 		
-		this.getFunction().updateLocalVariables
+		//this.getFunction().updateLocalVariables
 		
 		return null;
 	}
@@ -42,8 +42,8 @@ public class FunctionExpression extends Expression {
 	//ARGUMENTSLIST
 	private List<Expression> arguments;
 
-	private void setArguments(List<MyExpression> arguments) {
-		this.arguments = arguments;
+	private void setArguments(List<Expression> arguments) {
+	//	this.arguments = arguments;
 	}
 
 	

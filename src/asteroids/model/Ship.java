@@ -589,7 +589,11 @@ public class Ship extends Entity {
 	 * @return the bullets owned by this ship
 	 */ 
 	public Set<Bullet> getBullets() {
-		return this.bullets;	
+		Set<Bullet> bullets = new HashSet <Bullet>();	
+		
+		bullets.addAll(this.bullets);
+		
+		return bullets;
 	}
 
 	/**

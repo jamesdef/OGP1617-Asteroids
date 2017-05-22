@@ -4,7 +4,7 @@ import java.util.List;
 
 public class IfElseStatement extends Statement{
 
-	public IfElseStatement(BooleanInterface condition, Statement ifBody, Statement elseBody) {
+	public IfElseStatement(BooleanExpression condition, Statement ifBody, Statement elseBody) {
 		System.out.println("IFELSESTATEMENT " + ifBody);
 
 		this.setCondition(condition);
@@ -34,14 +34,14 @@ public class IfElseStatement extends Statement{
 	}
 	
 	//CONDITION
-	private BooleanInterface condition;
+	private BooleanExpression condition;
 	
-	public void setCondition(BooleanInterface condition){
+	public void setCondition(BooleanExpression condition){
 		this.condition = condition;
 		((Expression) condition).setProgram(getProgram());
 	}
 	
-	public BooleanInterface getCondition(){
+	public BooleanExpression getCondition(){
 		return this.condition;
 	}
 	
