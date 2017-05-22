@@ -906,38 +906,53 @@ public abstract class Entity {
 		return CollisionCoordinates;
 	}	
 
-
-	// TODO DOCUMENTATIE COLLISSIONS
 	/**
-	 * This method handles 
+	 * This method handles a boundary collision i.e. a
+	 * collision between an entity and a boundary of the world that this is in.
+	 * 
+	 * @post The sign of the x- or y-velocity will be contrary to its previous value.
+	 * 		 Which one depends on whether the collision is a collision with a vertical boundary
+	 * 		 (x-velocity is changed) or a horizontal one (y-velocity is changed).
+	 *		 |@see implementation
 	 */
 	public void handleBoundaryCollision(){
 	
 		// A horizontal collision occurs when the x-position is around the
 		// distance of the radius of this ship. Or same thing but on the other side.
-		boolean horizontally = 
+		boolean collisionWithVerticalBoundary = 
 				(this.getXPosition()< 1.01 * this.getRadius()) || 
 				(this.getXPosition() > (this.getWorld().getWidth() - 1.01 * this.getRadius()));
 		
 		// A vertical collision occurs when the y-position is around the
 		// distance of the radius of this ship. Or same thing but on the other side.		
-		boolean vertically = 
+		boolean collisionWithHorizontalBoundary = 
 				(this.getYPosition()< 1.01 * this.getRadius()) || 
 				(this.getYPosition() > (this.getWorld().getHeight() - 1.01 * this.getRadius()));
 
 
-		if(horizontally){
+		if(collisionWithVerticalBoundary){
 			this.setVelocity(-this.getXVelocity(), this.getYVelocity());
 		} 
 
-		if (vertically) {
+		if (collisionWithHorizontalBoundary) {
 			this.setVelocity(this.getXVelocity(), -this.getYVelocity());
 		}
 
 	}
 	
-	// TODO: hebben abstracte methoden documentatie?
-	public abstract void handleOtherEntityCollision(Entity entityB) throws IllegalPositionException, IllegalBulletException;
+	/**
+	 * Handles the collision between two entities.
+	 * Depending on the entity on which this method is invoked,
+	 * the collision is handled in a different way.
+	 * 
+	 * @param other
+	 * 		  The other entity in this collision.
+	 * @throws IllegalPositionException
+	 * 		   Thrown if the position of one of the entities is invalid.
+	 * @throws IllegalBulletException
+	 * 		   Thrown if the bullet in this collision is not valid.
+	 */
+	public abstract void handleOtherEntityCollision(Entity other) throws IllegalPositionException, IllegalBulletException;
 
 	/**
 	 * This method handles a casual collision between two entities.
@@ -1008,7 +1023,7 @@ public abstract class Entity {
 	}
 	
 	/**
-	 * Method registering if this entity is deadly.
+	 * Boolean registering if this entity is deadly.
 	 * Meaning that if it hits another entity, that other entity is terminated.
 	 * The default is set to false and is changed within deadly entities.
 	 */

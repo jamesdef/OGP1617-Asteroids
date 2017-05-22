@@ -93,7 +93,11 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public void turn(Ship ship, double angle) throws ModelException {
-		ship.turn(angle);
+		try {
+			ship.turn(angle);
+		} catch (AssertionError e) {
+			throw new ModelException("Invalid turn");
+	}
 	}
 
 	@Override
@@ -153,7 +157,11 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public void setThrusterActive(Ship ship, boolean active) throws ModelException {
-		ship.setThrusterActivity(active);
+		try{
+			ship.setThrusterActivity(active);
+		} catch (Exception e) {
+			throw new ModelException ("Thruster setting failed");
+		}
 	}
 
 	@Override
@@ -417,7 +425,6 @@ public class Facade implements asteroids.part3.facade.IFacade {
 		return 2;
 	}
 
-	// TODO deze methodes moeten generisch efficienter 
 	
 	@Override
 	public Set<? extends Asteroid> getWorldAsteroids(World world) throws ModelException {

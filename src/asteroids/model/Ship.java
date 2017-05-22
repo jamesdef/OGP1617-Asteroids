@@ -400,13 +400,6 @@ public class Ship extends Entity {
 	
 	
 //-------- MOVING, TURNING AND ACCELERATING-----
-	
-	/**
-	 * The variable thrust defines whether the thrust of this ship is enabled or not.
-	 * It is initialised as being disabled.
-	 */
-	private boolean thrusterActivity = false;
-	
 	/**
 	 * This method can enable the thrust for this ship.
 	 */
@@ -880,9 +873,21 @@ public class Ship extends Entity {
 		 return false;	
 	}
 	
-	
-	// TODO DOCUMENTATION EN WAAROM GEEN OVERRIDE?
-	
+	/**
+	 * This method handles the collision in case one of the colliding
+	 * entities is a ship. It checks what kind of collision we our dealing with 
+	 * and resolves (this side of) the collision. 
+	 * 
+	 * @param entity
+	 * 		  The entity with which this ship collides.
+	 * 
+	 * @effect If this ship collides with another ship, 
+	 * 		  the collision is handled as a casual collision.
+	 * 		  If it collides with a deadly entity, it is terminated, 
+	 * 		  but not if that entity is a bullet fired by this ship.
+	 * 		  In that case, it is loaded back upon the ship.
+	 * 		  | @see implementation
+	 */
 	@Override
 	public void handleOtherEntityCollision(Entity entity) throws IllegalPositionException, IllegalBulletException{
 		
@@ -899,25 +904,37 @@ public class Ship extends Entity {
 					this.loadBullet((Bullet) entity);
 						return;
 				}
-				else {
-					this.terminate();
-					// Termination is reeds gebeurd.
-					return;
-				}
 			}
 			this.terminate();
 		}		
 	}
 	
-	//TODO Documentatie 
+	/**
+	 * This method teleports this ship to a random
+	 * place in this world.
+	 * 
+	 * @post If the ship overlaps with another entity
+	 * 		 upon placement, the ship is immediatly terminated.
+	 * 		 The other entity is left untouched.
+	 * 		 | if(new.overlapsWithOther())
+	 *		 |		 then this.terminate()
+	 *
+	 * @post If the ship does not overlap in its new position,
+	 * 		 if takes on the random position as its new position.
+	 * 		 |radius = this.getRadius()
+	 * 		 |randomXCoord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
+	 *	     |rancomYCoord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
+	 * 		 | new.getXPosition = randomXCoord
+	 * 		 | new.getYPosition = randomYCoord
+	 */
 	public void teleport(){
 		
 		double radius = this.getRadius();
-		double randomXcord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
-		double rancomYcord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
+		double randomXCoord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
+		double rancomYCoord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
 		
 		try{
-			this.setPosition(randomXcord, rancomYcord);
+			this.setPosition(randomXCoord, rancomYCoord);
 			
 			if(this.overlapsWithOther()){
 				this.terminate();
@@ -929,6 +946,12 @@ public class Ship extends Entity {
 	
     
 // -----------------------  VARIABLES (DEFAULTS & FINAL) --------
+	
+	/**
+	 * The variable thrust defines whether the thrust of this ship is enabled or not.
+	 * It is initialised as being disabled.
+	 */
+	private boolean thrusterActivity = false;
 	
 	/**
 	 * A variable registering the bullets owned by this ship.

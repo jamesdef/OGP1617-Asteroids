@@ -166,10 +166,13 @@ public class Planetoid extends MinorPlanet {
   		return 0.000001*distance < (this.getRadius()-5.0);
   	}
 	
+  	//TODO 
+  	public double getDefaulyDensity(){
+  		
+  	}
  	
  // ---------------- Setters -------------------
  	
- 	// TODO kan sowieso ook door hogerliggende functie worden overgenomen
 	/**
  	 * This method sets the mass of this planetoid depending on it's size (=defined by radius)
  	 * 
@@ -271,6 +274,7 @@ public class Planetoid extends MinorPlanet {
   		}
   	}
   	
+
   	
   	
 //-------------VARIABLES - INITIALISING-----------
