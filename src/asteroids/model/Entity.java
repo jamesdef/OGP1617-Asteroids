@@ -16,9 +16,7 @@ import be.kuleuven.cs.som.annotate.Raw;
 // TODO: oppassen met finals
 // TODO: Throws moeten enkel in de specifactie staan als ze uitermate relevant zijn
 // TODO: Postcondities en classe invarianten niet herhalen bij subklassen en overriding
-// TODO: Constructoren zijn raw als ze niet de laatste subklasse zijn.
-// TODO: De constructor van een abstracte klasse is steeds 'model'
-// TODO: Value klasse voor vector operaties
+
 
 /** 
  *  A class for dealing with entities. 
@@ -95,6 +93,9 @@ public abstract class Entity {
 
 	/**
 	 * This method terminates this entity.
+	 * 
+	 * @post If this entity was in a world, it is removed thereof.
+	 * 		 |new.getWorld() == null
 	 * 
 	 * @post This entity is now terminated
 	 * 		| new.isTerminated() == true
