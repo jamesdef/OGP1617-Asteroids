@@ -5,10 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.RuntimeErrorException;
+
 import asteroids.model.Asteroid;
 import asteroids.model.Bullet;
 import asteroids.model.Entity;
 import asteroids.model.Planetoid;
+import asteroids.model.Program;
 import asteroids.model.Ship;
 import asteroids.model.World;
 import asteroids.model.exceptions.IllegalBulletException;
@@ -19,6 +22,8 @@ import asteroids.model.exceptions.IllegalPositionException;
 import asteroids.model.exceptions.IllegalRadiusException;
 import asteroids.model.exceptions.IllegalShipException;
 import asteroids.part2.CollisionListener;
+import asteroids.part3.programs.IProgramFactory;
+import asteroids.programs.ProgramFactory;
 import asteroids.util.ModelException;
 
 public class Facade implements asteroids.part3.facade.IFacade {
@@ -96,8 +101,10 @@ public class Facade implements asteroids.part3.facade.IFacade {
 		try {
 			ship.turn(angle);
 		} catch (AssertionError e) {
-			throw new ModelException("Invalid turn");
-	}
+
+			throw new ModelException("Invalid Turn");
+		}
+
 	}
 
 	@Override
@@ -566,32 +573,40 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public List<Object> executeProgram(Ship ship, double dt) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return ship.executeProgram(dt);	
+		} catch (IllegalArgumentException | RuntimeErrorException | IllegalAccessError error) {
+			System.out.println("FACADE > EXECUTEPROGRAM CATCH ILLEGALARGUMENTERROR");
+			throw new ModelException("exec");
+		}
 	}
 
-//	@Override
-////	public Program getShipProgram(Ship ship) throws ModelException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	@Override
+	public Program getShipProgram(Ship ship) throws ModelException {
+		try {
+			return ship.getProgram();
+		} catch (IllegalArgumentException illegalArgumentException) {
+			throw new ModelException("get");
+		}
+	}
 
-//	@Override
-//	public void loadProgramOnShip(Ship ship, Program program) throws ModelException {
-//		// TODO Auto-generated method stub
-//	
-//	}
 
-//	@Override
-//	public List<Object> executeProgram(Ship ship, double dt) throws ModelException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public IProgramFactory<?, ?, ?, ? extends Program> createProgramFactory() throws ModelException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	@Override
+	public void loadProgramOnShip(Ship ship, Program program) throws ModelException {
+		try {
+			ship.setProgram(program);		
+		} catch (IllegalArgumentException | NullPointerException error) {
+			throw new ModelException("load");
+		}
+	}
 
+
+	@Override
+	public IProgramFactory<?, ?, ?, ? extends Program> createProgramFactory() throws ModelException {
+		try {
+			return new ProgramFactory();
+			} catch (IllegalArgumentException illegalArgumentException) {
+			throw new ModelException("these are not valid arguments #79");
+		}
+	}
 }

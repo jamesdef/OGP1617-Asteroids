@@ -1,6 +1,7 @@
 package asteroids.model;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import asteroids.model.exceptions.IllegalBulletException;
@@ -308,6 +309,8 @@ public class Ship extends Entity {
 	 */
 	@Raw
 	public void setOrientation(double orientation){
+		System.out.println("orientation" + orientation);
+		System.out.println(isValidOrientation(orientation));
 		assert isValidOrientation(orientation);
 		this.orientation = orientation;	
 	}
@@ -557,9 +560,10 @@ public class Ship extends Entity {
 	 * 		   |this.setOrientation(scaledAngle);
 	 */
 	public void turn(double angle){
+		System.out.println("hello ship turning: " + angle);
 		double newAngle = this.getOrientation() + angle;
-		double ScaledAngle = scaleangle(newAngle);
-		this.setOrientation(ScaledAngle);
+	//	double ScaledAngle = scaleangle(newAngle);
+		this.setOrientation(angle);
 	}
 
 	/**
@@ -1007,4 +1011,32 @@ public class Ship extends Entity {
 	 * A variable defining the force that an active thruster can exert on a ship.
 	 */
 	private double thrustforce = 1.1E18;
+	
+		
+		
+		
+		//-----------------------------------
+		// PROGRAMS
+		//------------------------------------
+		
+		
+		
+		private Program program = null;
+		
+		public void setProgram(Program program){
+			System.out.println("SETTING PROGRAM ON SHIP");
+			program.setShip( this );
+			this.program = program;
+		}
+		
+		public Program getProgram(){
+			return this.program;
+		}
+		
+		public List<Object> executeProgram(double dt){
+			System.out.println("SHIP EXECUTEPROGRAM");
+			return this.getProgram().run(dt);
+		}
+		
+
 }

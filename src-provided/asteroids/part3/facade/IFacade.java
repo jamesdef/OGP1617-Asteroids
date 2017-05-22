@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import asteroids.model.*;
+import asteroids.programs.*;
 import asteroids.part3.programs.IProgramFactory;
 import asteroids.util.ModelException;
 
@@ -241,13 +242,13 @@ public interface IFacade extends asteroids.part2.facade.IFacade {
 	 * Return the program loaded on the given ship.
 	 */
 //	TODO PUT THIS IN COMMENT
-//	public Program getShipProgram(Ship ship) throws ModelException;
+	public Program getShipProgram(Ship ship) throws ModelException;
 
 	/**
 	 * Load the given program on the given ship.
 	 */
 //	TODO PUT THIS IN COMMENT
-//	public void loadProgramOnShip(Ship ship, Program program) throws ModelException;
+	public void loadProgramOnShip(Ship ship, Program program) throws ModelException;
 
 	/**
 	 * Execute the program loaded on the given ship during the given period of
@@ -265,5 +266,5 @@ public interface IFacade extends asteroids.part2.facade.IFacade {
 	 * Creates a new program factory.
 	 */
 //	TODO put this in comment
-//	public IProgramFactory<?, ?, ?, ? extends Program> createProgramFactory() throws ModelException;
+	public IProgramFactory<?, ?, ?, ? extends Program> createProgramFactory() throws ModelException;
 }
