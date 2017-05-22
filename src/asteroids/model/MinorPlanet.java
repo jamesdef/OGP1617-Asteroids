@@ -7,6 +7,7 @@ import asteroids.model.exceptions.IllegalRadiusException;
  * A class for dealing with MinorPlanets, a specific kind of entities.
  * They have a certain position, radius, velocity.
  * 
+ *			// TODO LISKOV want isValidRadius wordt verstrengd
  * @invar 	The radius of each minor planet must be a valid value.
  * 			|isValidRadius(getRadius()) 
  * 

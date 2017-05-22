@@ -26,6 +26,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar 	Each ship has proper bullets as its belongings.
  *		 	|hasProperBullets()
  *
+ * TODO voorbeeld van liskov: klasse invariant verstrenging.
  * @invar 	The radius of each ship must be a valid value.
  * 			|isValidRadius(getRadius())
  *
@@ -383,8 +384,7 @@ public class Ship extends Entity {
 		return Ship.min_Radius;
 	}
 
-	// TODO dit is liskov, documentatie kan enkel verstrengen
-			// moet dus niet gekopieerd zijn
+	// TODO dit is liskov
 	/** 
 	 * Checks whether the given radius has a valid value.
 	 * 
@@ -403,13 +403,6 @@ public class Ship extends Entity {
 	
 	
 //-------- MOVING, TURNING AND ACCELERATING-----
-	
-	/**
-	 * The variable thrust defines whether the thrust of this ship is enabled or not.
-	 * It is initialised as being disabled.
-	 */
-	private boolean thrusterActivity = false;
-	
 	/**
 	 * This method can enable the thrust for this ship.
 	 */
@@ -523,8 +516,8 @@ public class Ship extends Entity {
 		if(getThrustState() == true){
 			//If the acceleration is negative, then we leave the velocity untouched.
 			double a = Math.max(0, getPossibleAcceleration());
-			double NewxVelocity = this.getxVelocity() + a*(Math.cos(this.getOrientation()))*duration;
-			double NewyVelocity = this.getyVelocity() + a*(Math.sin(this.getOrientation()))*duration;
+			double NewxVelocity = this.getXVelocity() + a*(Math.cos(this.getOrientation()))*duration;
+			double NewyVelocity = this.getYVelocity() + a*(Math.sin(this.getOrientation()))*duration;
 			this.setVelocity(NewxVelocity, NewyVelocity);	
 			}	
 	}
@@ -679,7 +672,7 @@ public class Ship extends Entity {
 	 * 		   We are obliged to throw these exceptions, even though we know that the default bullet will be legal.
 	 */
 	public void loadBullet() throws IllegalPositionException, IllegalRadiusException{
-		Bullet bullet = new Bullet(this.getxPosition(), this.getyPosition(), this.getxVelocity(), this.getyVelocity(),
+		Bullet bullet = new Bullet(this.getXPosition(), this.getYPosition(), this.getXVelocity(), this.getYVelocity(),
 												Bullet.getMinRadius());
 		bullet.setShip(this);
 		this.bullets.add(bullet);
@@ -717,8 +710,8 @@ public class Ship extends Entity {
 		}
 		this.bullets.add(bullet);
 		bullet.setShip(this);
-		bullet.setPosition(this.getxPosition(), this.getyPosition());
-		bullet.setVelocity(this.getxVelocity(), this.getyVelocity());
+		bullet.setPosition(this.getXPosition(), this.getYPosition());
+		bullet.setVelocity(this.getXVelocity(), this.getYVelocity());
 	}
 	
 	/**
@@ -820,8 +813,8 @@ public class Ship extends Entity {
 			
 			double margin = 1.05;
 			
-			double bulletXPos = this.getxPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.cos(this.getOrientation());
-			double bulletYPos=  this.getyPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.sin(this.getOrientation());
+			double bulletXPos = this.getXPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.cos(this.getOrientation());
+			double bulletYPos=  this.getYPosition() + margin*(this.getRadius() + bullet.getRadius())*Math.sin(this.getOrientation());
 		
 			double xSpeed = getInitialBulletSpeed()*Math.cos(this.getOrientation());
 			double ySpeed = getInitialBulletSpeed()*Math.sin(this.getOrientation());
@@ -884,9 +877,21 @@ public class Ship extends Entity {
 		 return false;	
 	}
 	
-	
-	// TODO DOCUMENTATION EN WAAROM GEEN OVERRIDE?
-	
+	/**
+	 * This method handles the collision in case one of the colliding
+	 * entities is a ship. It checks what kind of collision we our dealing with 
+	 * and resolves (this side of) the collision. 
+	 * 
+	 * @param entity
+	 * 		  The entity with which this ship collides.
+	 * 
+	 * @effect If this ship collides with another ship, 
+	 * 		  the collision is handled as a casual collision.
+	 * 		  If it collides with a deadly entity, it is terminated, 
+	 * 		  but not if that entity is a bullet fired by this ship.
+	 * 		  In that case, it is loaded back upon the ship.
+	 * 		  | @see implementation
+	 */
 	@Override
 	public void handleOtherEntityCollision(Entity entity) throws IllegalPositionException, IllegalBulletException{
 		
@@ -898,55 +903,59 @@ public class Ship extends Entity {
 				if(((Bullet) entity).getSource() == this){
 					// The Bullet is first placed to the centre of this ship,
 					// so that it is fully within this ship and can be loaded.	
-					((Bullet) entity).setPosition(this.getxPosition(),this.getyPosition());
+					((Bullet) entity).setPosition(this.getXPosition(),this.getYPosition());
 					
 					this.loadBullet((Bullet) entity);
 						return;
-				}
-				else {
-					this.terminate();
-					// Termination is reeds gebeurd.
-					return;
 				}
 			}
 			this.terminate();
 		}		
 	}
 	
-	
-	//TODO Documentatie 
-	public boolean overlapsWithOther(){
-		for(Entity entity: this.getWorld().getAllEntities()){
-			if(this.significantOverlap(entity)){
-				System.out.println("overlap terminate");
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	//TODO Documentatie 
+	/**
+	 * This method teleports this ship to a random
+	 * place in this world.
+	 * 
+	 * @post If the ship overlaps with another entity
+	 * 		 upon placement, the ship is immediatly terminated.
+	 * 		 The other entity is left untouched.
+	 * 		 | if(new.overlapsWithOther())
+	 *		 |		 then this.terminate()
+	 *
+	 * @post If the ship does not overlap in its new position,
+	 * 		 if takes on the random position as its new position.
+	 * 		 |radius = this.getRadius()
+	 * 		 |randomXCoord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
+	 *	     |rancomYCoord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
+	 * 		 | new.getXPosition = randomXCoord
+	 * 		 | new.getYPosition = randomYCoord
+	 */
 	public void teleport(){
 		
 		double radius = this.getRadius();
-		double randomXcord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
-		double rancomYcord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
+		double randomXCoord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
+		double rancomYCoord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
 		
 		try{
-			this.setPosition(randomXcord, rancomYcord);
+			this.setPosition(randomXCoord, rancomYCoord);
 			
 			if(this.overlapsWithOther()){
 				this.terminate();
 			}
-			
 		} catch (Exception exception) {
             this.terminate();
-        }
-		
+        }	
 	}
 	
     
 // -----------------------  VARIABLES (DEFAULTS & FINAL) --------
+	
+	/**
+	 * The variable thrust defines whether the thrust of this ship is enabled or not.
+	 * It is initialised as being disabled.
+	 */
+	private boolean thrusterActivity = false;
 	
 	/**
 	 * A variable registering the bullets owned by this ship.

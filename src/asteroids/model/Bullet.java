@@ -1,8 +1,10 @@
 package asteroids.model;
 
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
+import asteroids.model.exceptions.IllegalShipException;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
-import asteroids.model.exceptions.*;
 
 /**
  * A class for dealing with bullets, which are a kind of entity in space. 
@@ -194,7 +196,7 @@ public class Bullet extends Entity {
         //If the ship is effective, the location of this bullet is changed to the center of the ship.
         if (ship!=null)
 			try {
-				this.setPosition(ship.getxPosition(),ship.getyPosition());
+				this.setPosition(ship.getXPosition(),ship.getYPosition());
 			} catch (IllegalPositionException e) {
 				// Zal niet voorkomen; de positie van een schip moet op elk moment legaal zijn.
 				// Java verplicht ons enkel deze try/Catch in te voeren.
@@ -224,7 +226,7 @@ public class Bullet extends Entity {
  	 * 		 |new.mass == default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3));
  	 */
  	private void setBulletMass(double radius){
- 		this.setMass(default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3)));
+ 		super.setMass(default_Density*(4.0/3.0)*Math.PI*(Math.pow(radius, 3)));
  	}
      
 
@@ -300,13 +302,12 @@ public class Bullet extends Entity {
 	 * 
 	 * @return True if the radius exceeds the minimal radius
 	 * 		   false if the radius is less than the minimal_radius. 
-	 * 		   Or if the radius is Infinity or not a number.
 	 * 		   | radius >= getMinRadius();
 	 */
-    @Raw @Override
+    @Override
 	public boolean isValidRadius(double radius){
-		return (radius >= Bullet.getMinRadius() && (!Double.isNaN(radius) && radius != Double.POSITIVE_INFINITY));
-	}
+		return (super.isValidRadius(radius) && radius >= Bullet.getMinRadius());
+    }
 	
 	
 // ---------------------- Bounces -----------------------------------------------------
@@ -354,12 +355,20 @@ public class Bullet extends Entity {
 			this.max_Bounces=bounces;
 	}
 	
-	
-	//TODO documentatie
-	
-	
-	//TODO if a bullet hits it's own ship, it is reloaded but its bounces
-	// are not forgotten, where shall we say this?
+	/**
+	 * Handles the collision between a certain entity and a bullet.
+	 * 
+	 * @post If the other entity is a ship and it is the source
+	 * 		 of this bullet: the bullet is not terminated.
+	 * 		 |if ((entity instanceof Ship) 
+	 *		 |				&& this.getSource() == entity)
+	 * 		 |      then new.!isTerminated()
+	 * 
+	 * @post In any other case; 
+	 * 		 the bullet is terminated upon collision.
+	 * 		 |else 
+	 * 		 | 	this.isTerminated()
+	 */
 	@Override
 	public void handleOtherEntityCollision(Entity entity){
 		if(entity instanceof Ship){
@@ -367,24 +376,46 @@ public class Bullet extends Entity {
 				// We return so as to make sure this bullet is not terminated 
 				// while being loaded upon a ship.
 				return;
-			} else {
-				this.terminate();
-			}
+			} 
 		}
-		this.terminate();
-
-				
+		this.terminate();		
 	}
 	
+	/**
+	 * The collison between a bullet and 
+	 * a boundary is handled here. 
+	 * 
+	 * @effect  Another bounce is counted.
+	 * 			|this.handbleBoundaryCollisionsCount()
+	 * 
+	 * @effect If the bullet is not yet terminated
+	 * 		   after counting another bullet-boundary collision,
+	 * 		   the collision is handled in the regular way.
+	 * 		   | if(!this.isTerminated())
+	 *	 	   |		then super.handleBoundaryCollision()
+	 */
 	@Override
 	public void handleBoundaryCollision(){
-	 this.handbleBoundaryCollisionsCount();
-	 if(!this.isTerminated()){
-		 super.handleBoundaryCollision();
-	 }
-		
+		this.handbleBoundaryCollisionsCount();
+		if(!this.isTerminated()){
+			super.handleBoundaryCollision();
+		}
 	}
 	
+	/**
+	 * This method handles the count for a collision 
+	 * between a bullet and a boundary.
+	 * A bullet can only bounce into a boundary a set
+	 * number of times.
+	 * 
+	 * @post if the bullet only has one bullet left
+	 * 		 it is terminated upon collision.
+	 * 		 |if(nbBouncesLeft == 1)
+	 *		 |		then this.terminate()
+	 *@effect if the bullet still has more than one bounce left, 
+	 *		  the number of bounces is now decremented.
+	 *		 | this.decrementBouncesLeft()
+	 */
 	public void handbleBoundaryCollisionsCount(){
 		int nbBouncesLeft = this.getBouncesLeft();
 		if(nbBouncesLeft == 1){
@@ -395,7 +426,7 @@ public class Bullet extends Entity {
 	}
 	
 	/**
-	 * Method registering if this entity is deadly.
+	 * Boolean registering if this entity is deadly.
 	 */
 	@Override
 	public Boolean isDeadly(){
@@ -446,10 +477,5 @@ public class Bullet extends Entity {
 	 * Variable registering the density of this bullet.
 	 */
 	private double density = default_Density;
-	
-//	/** TODO is deze code echt overbodig?
-//	 * Variable registering the Default_Mass of a bullet
-//	 */
-//	private final static double default_Mass = default_Density*(4.0/3.0)*Math.PI*(Math.pow(min_Radius, 3.0));
-//	
+
 }

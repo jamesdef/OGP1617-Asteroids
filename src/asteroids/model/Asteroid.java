@@ -82,7 +82,7 @@ public class Asteroid extends MinorPlanet{
 	}
 	
 	/**
-	 * Method registering if this entity is deadly.
+	 * Boolean registering if this entity is deadly.
 	 */
 	@Override
 	public Boolean isDeadly(){

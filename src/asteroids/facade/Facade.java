@@ -11,12 +11,9 @@ import asteroids.model.Asteroid;
 import asteroids.model.Bullet;
 import asteroids.model.Entity;
 import asteroids.model.Planetoid;
+import asteroids.model.Program;
 import asteroids.model.Ship;
 import asteroids.model.World;
-import asteroids.model.Planetoid;
-import asteroids.model.Asteroid;
-import asteroids.model.Program;
-
 import asteroids.model.exceptions.IllegalBulletException;
 import asteroids.model.exceptions.IllegalCollisionException;
 import asteroids.model.exceptions.IllegalDurationException;
@@ -25,8 +22,6 @@ import asteroids.model.exceptions.IllegalPositionException;
 import asteroids.model.exceptions.IllegalRadiusException;
 import asteroids.model.exceptions.IllegalShipException;
 import asteroids.part2.CollisionListener;
-
-
 import asteroids.part3.programs.IProgramFactory;
 import asteroids.programs.ProgramFactory;
 import asteroids.util.ModelException;
@@ -106,9 +101,10 @@ public class Facade implements asteroids.part3.facade.IFacade {
 		try {
 			ship.turn(angle);
 		} catch (AssertionError e) {
+
 			throw new ModelException("Invalid Turn");
 		}
-		
+
 	}
 
 	@Override
@@ -168,7 +164,11 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public void setThrusterActive(Ship ship, boolean active) throws ModelException {
-		ship.setThrusterActivity(active);
+		try{
+			ship.setThrusterActivity(active);
+		} catch (Exception e) {
+			throw new ModelException ("Thruster setting failed");
+		}
 	}
 
 	@Override
@@ -255,12 +255,12 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public Set<? extends Ship> getWorldShips(World world) throws ModelException {
-		return world.getAllShips();
+		return world.getSpecificEntities(Ship.class);
 	}
 
 	@Override
 	public Set<? extends Bullet> getWorldBullets(World world) throws ModelException {
-		return world.getAllBullets();
+		return world.getSpecificEntities(Bullet.class);
 	}
 
 	@Override
@@ -432,11 +432,10 @@ public class Facade implements asteroids.part3.facade.IFacade {
 		return 2;
 	}
 
-	// TODO deze methodes moeten generisch efficienter 
 	
 	@Override
 	public Set<? extends Asteroid> getWorldAsteroids(World world) throws ModelException {
-		return world.getAllAsteroids();
+		return world.getSpecificEntities(Asteroid.class);
 	}
 
 	@Override
@@ -455,7 +454,7 @@ public class Facade implements asteroids.part3.facade.IFacade {
 
 	@Override
 	public Set<? extends Planetoid> getWorldPlanetoids(World world) throws ModelException {
-		return world.getAllPlanetoids();
+		return world.getSpecificEntities(Planetoid.class);
 	}
 
 	@Override
