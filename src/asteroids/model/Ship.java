@@ -18,10 +18,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * A class for dealing with ships, which are a kind of entity in space. 
  * These have a certain position, velocity, radius, speed and orientation.
  * The ship has a thrusther with which it can accelerate. The ship also has a mass and a certain density.
- * A ship can have bullets, which it can fire. A ship can collide with other things in it's world.
- * 
- * @invar 	The invariants of the superclass 'Entity' are described there.
- * 			They ofcourse hold for this subclass.
+ * A ship can have bullets, which it can fire.
  *
  * @invar 	Each ship has proper bullets as its belongings.
  *		 	|hasProperBullets()
@@ -82,14 +79,14 @@ public class Ship extends Entity {
 	 * @effect The given mass is set as the mass of this new ship.
 	 * 		   |setMass(mass);
 	 * 
-	 * @effect The given parameters are set as the properties of the new ship.
-	 * 		   |super(xPosition, yPosition, xVelocity, yVelocity, radius, orientation);
+	 * @effect The given parameters are set as the properties of the new ship
+	 * 		   |super(xPosition, yPosition, xVelocity, yVelocity, radius);
+	 * 		   |setOrientation( orientation);
+		       |setShipMass(mass);
 	 *
 	 *@note    Any new ship initialized with this constructor (via superclass Entity)
 	 * 		   will satisfy all its class invariants. The setters will see to this in their implementation.
 	 */
-
-	// Position X and Y are described seperatly, this proves to be the easiest to work with. Same goes for velocity.
 	public Ship(double xPosition, double yPosition, double xVelocity, double yVelocity, double radius, double orientation,double mass) 
 							throws IllegalPositionException, IllegalRadiusException{
 		super(xPosition, yPosition, xVelocity, yVelocity, radius);
@@ -136,9 +133,10 @@ public class Ship extends Entity {
     public void terminate(){
 
     	if (this.getNbOfBullets() != 0) {
-    		Set<Bullet> toremovebullets = new HashSet<>();
-    		toremovebullets.addAll(bullets);
-    	for (Bullet bullet : toremovebullets){
+    		Set<Bullet> toRemovebullets = new HashSet<>();
+    		toRemovebullets.addAll(bullets);
+    		//TODO
+    	for (Bullet bullet : toRemovebullets){
     		removeBullet(bullet);
     	}}
     	//We can now safely terminate the empty ship as an entity.
@@ -199,11 +197,11 @@ public class Ship extends Entity {
 	 * 		 |	then new.getDensity() == density
 	 * @post If the given value is not valid, the density is set to the minimum density.
 	 * 		|if (!isValidDensity(density)){
-	 *		|	then new.density = Min_Density;
+	 *		|	then new.density = getMinDensity();
 	 */
 	public void setDensity(double density){
 		if (!isValidDensity(density)){
-			density = min_Density;
+			density = getMinDensity();
 		}
 		this.density = density;
 	}
@@ -214,10 +212,10 @@ public class Ship extends Entity {
 	 * @param density
 	 * 		  The density to check.
 	 * @return True if the given density is greater than or equal to the Minimum Density
-	 * 		   |density >= Min_Density
+	 * 		   |density >= getMinDensity();
 	 */
 	public boolean isValidDensity(double density){
-		return (density >= min_Density);
+		return (density >= getMinDensity());
 	}
         
     //MASS - Total programming<
@@ -251,7 +249,7 @@ public class Ship extends Entity {
      * 
      * @return  The mass of the ship itself plus the mass of
      * 			objects carried by the ship
-     * 			|return this.getMass() + GetMassOfAllBulletsOwnedByThisShip;
+     * 			|result = this.getMass() + GetMassOfAllBulletsOwnedByThisShip;
      */
 	public double getTotalMass(){
 		
@@ -497,7 +495,8 @@ public class Ship extends Entity {
 	 *  Raises the velocity of the ship if the thruster is enabled.
 	 *  This raising is based on a given duration, the possible acceleration and the ship's orientation.
 	 * 
-	 * @param The duration during which the acceleration happens.
+	 * @param duration
+	 * 		  The duration during which the acceleration happens.
 	 * 
 	 * @post If the possible acceleration is negative or the thruster is disable;
 	 * 		 The velocity is left untouched
@@ -528,11 +527,9 @@ public class Ship extends Entity {
 	 * 
 	 * @effect The ship itself is moved, as well as all the entities that are in it.
 	 * 		   |super.move(duration);
-	 *	
 	 *			|for (Bullet bullet: this.bullets)
 	 *			|		bullet.move(duration);
-	 *
-	 *@note Throws imposed via move, handled in documentation there.
+	 *TODO liskov throws in superklasse move nakijken
 	 */
 	@Override
 	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
@@ -548,26 +545,25 @@ public class Ship extends Entity {
 	 * 
 	 * @param angle
 	 * 		  The angle to add to the orientation of the ship
-	 * 
+	 *  TODO
 	 * @post  The scaledangle is calculated by a seperate method
 	 * 		  | scaledAngle = scaleAngle(this.getOrientation() + angle)
 	 * 
-	 * @post   The new orientation is equal to the calculated scaled angle.
-	 * 		  |new.getOrientation() == scaledAngle
 	 * 
 	 * @effect The given angle is first added to the orientation and then scaled.
 	 * 		   The new orientation is then asserted to be within 0-2PI range in the setOrientation() method.
-	 * 		   |this.setOrientation(scaledAngle);
+	 * 		   |this.setOrientation(newAngle);
 	 */
 	public void turn(double angle){
 		System.out.println("hello ship turning: " + angle);
 		double newAngle = this.getOrientation() + angle;
-	//	double ScaledAngle = scaledangle(newAngle);
 		this.setOrientation(newAngle);
 		System.out.println("hello ship angle is now: " + this.getOrientation());
 
 	}
 
+	// TODO 
+	
 	/**
 	 *  Scales the given angle so that it is within 0<= angle < 2*PI
 	 * 

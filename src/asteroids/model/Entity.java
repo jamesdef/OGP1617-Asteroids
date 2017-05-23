@@ -21,7 +21,7 @@ import be.kuleuven.cs.som.annotate.Raw;
 /** 
  *  A class for dealing with entities. 
  *  We could define these as 'objects that can move through space'.
- *  Entities can interact with eachother upon collision.
+ *  Entities can interact with each other upon collision.
  *  It can belong to a certain world.
  *  Properties described are: position, velocity,radius, density and mass.
  *  
@@ -38,7 +38,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * 			|hasProperWorld()
  * 
  * 
- * @version 2.0
+ * @version 3.0
  * @author Michiel De Koninck & James Defauw
  *
  */
@@ -171,7 +171,7 @@ public abstract class Entity {
 	/**
 	 * Returns the velocity in an array: (Vx,Vy).
 	 * 
-	 * @return A set of doubles; the xVelocity and yVelocity.
+	 * @return An array of doubles; the xVelocity and yVelocity.
 	 * 		   |double[] Velocity = {getxVelocity(),getyVelocity()}
 	 * 		   |return Velocity
 	 */
@@ -183,12 +183,12 @@ public abstract class Entity {
 
 	/**
 	 * Return the total velocity of this Entity.
+	 * 
 	 * @return the total velocity of this Entity.
 	 * @note The total velocity of a Entity is computed:
-	 * 		 by taking the square root of the sum of the
-	 * 		 secondpowers of the horizontal and vertical velocity.
-	 * 		-> sqrt(Vx^2+Vy^2)
+	 * 		 by taking the norm of the velocity-vector.
 	 */
+	//TODO naam veranderen vd functie
 	@Basic
 	public double getTotalVelocity(){
 		Vector speedVector = new Vector(getXVelocity(),getYVelocity());
@@ -229,9 +229,6 @@ public abstract class Entity {
 		return this.mass;
 	}
 
-
-
-	// ------------SETTERS--------------
 
 	//---------------WORLD; associations--------------
 
@@ -286,9 +283,10 @@ public abstract class Entity {
 	 * 		   |result == (   (canHaveAsWorld(getWorld()) &&
 	 * 						  ((getWorld() == null) || getWorld().hasEntity(this)))   )
 	 */
+	//TODO
 	@Raw
 	public boolean hasProperWorld(){
-		return (canHaveAsWorld(getWorld()) && ((getWorld() == null) || getWorld().hasEntity(this)));
+		return (getWorld().hasEntity(this));
 	}
 
 	//--------------POSITION-----------------------
@@ -332,11 +330,7 @@ public abstract class Entity {
 	 */
 	@Raw
 	public static boolean isValidPosition(double xPosition, double yPosition){
-
-
 		return (isValidCoordinate(xPosition) && isValidCoordinate(yPosition));
-
-
 
 	}
 
@@ -411,12 +405,11 @@ public abstract class Entity {
 	 * 		   as the norm of the velocity components) 
 	 * 		   exceeds the maximum. This returns true.
 	 * 		 	Otherwise it will return false.
-	 * 		 | (Math.sqrt(Math.pow(getyVelocity(),2)+Math.pow(getxVelocity(),2)) > getMaxVelocity());	
+	 * 		 | (speedVector.norm() > getMaxVelocity());	
 	 */
 	@Raw
 	public boolean exceedsMaxVelocity(double xVelocity, double yVelocity){
-		Vector speedVector = new Vector(xVelocity, yVelocity);
-		
+		Vector speedVector = new Vector(xVelocity, yVelocity);	
 		return (speedVector.norm() > getMaxVelocity());
 	}
 
@@ -427,6 +420,8 @@ public abstract class Entity {
 	public static double getMaxVelocity(){
 		return Entity.max_Velocity;
 	}
+	
+	//TODO
 
 	/**
 	 * Return the minimum velocity an entity can have.
@@ -593,7 +588,7 @@ public abstract class Entity {
 	
 	
 	/**
-	 *  Return the distance betwheen two entities.
+	 *  Return the distance between two entities.
 	 * 
 	 * @param other
 	 *        The other entity of which we want to know the distance to this entity.
@@ -636,7 +631,8 @@ public abstract class Entity {
 
 		double centerDistance = this.getCenterDistance(other);
 		
-		return (centerDistance < 0.999*(this.getRadius() + other.getRadius()));
+		//TODO: rounding variable
+		return (centerDistance < 0.99*(this.getRadius() + other.getRadius()));
 	}
 	
 	/**
@@ -741,12 +737,12 @@ public abstract class Entity {
 		double[] entityPosition = { this.getXPosition() + this.getXVelocity() * T,
 				this.getYPosition() + this.getYVelocity() * T };
 
-		double xTime = getTimeToBoundaryAxisCollsion(this.getXVelocity(), this.getXPosition(),
+		double horizontalCollisionTime = getTimeToBoundaryAxisCollsion(this.getXVelocity(), this.getXPosition(),
 				this.getWorld().getWidth());
 
 		//Because the entity is always a circle, the collision with the boundary will always be
 		// exactly one time the radius away from the center.
-		if(T == xTime){
+		if(T == horizontalCollisionTime){
 			if(this.getXVelocity() >0){
 				entityPosition[0]+= this.getRadius();
 			} else {
@@ -768,9 +764,9 @@ public abstract class Entity {
 
 
 	/**
-	 * This method calculaties the time until this entity collides with a boundary.
+	 * This method calculates the time until this entity collides with a boundary.
 	 * This either in the x- or y- direction. 
-	 * There is a zero border (can be seen as the x- or y-axis) and a far boundary (paralel to the axis, at a certain length).
+	 * There is a zero border (can be seen as the x- or y-axis) and a far boundary (parallel to the axis, at a certain length).
 	 * 
 	 * 
 	 * @param axisVelocity
@@ -778,7 +774,7 @@ public abstract class Entity {
 	 * @param axisPosition
 	 * 		  The position as according to a certain axis (x or y)
 	 * @param worldAxisLength
-	 * 		  The length of this wordth (either the height or the width, depending on the given axis (x or y) )
+	 * 		  The length of this world (either the height or the width, depending on the given axis (x or y) )
 	 * @return The time to the furthest boundary or to the zero boundary, depending on which is the smallest.
 	 * 		   It returns the smallest of the two.
 	 * 		  @see implementation
@@ -862,11 +858,6 @@ public abstract class Entity {
 	 * 		   Null if they never collide.
 	 * 
 	 * @see implementation
-	 *		
-	 * 
-	 * @throws IllegalCollisionException
-	 * 		   Created within getTimeToCollision(other)
-	 * 		   We cannot calculate the collision position of two overlapping entities.
 	 */
 	public double[] getEntityCollisionPosition(Entity other) throws IllegalCollisionException{
 
@@ -948,10 +939,6 @@ public abstract class Entity {
 	 * 
 	 * @param other
 	 * 		  The other entity in this collision.
-	 * @throws IllegalPositionException
-	 * 		   Thrown if the position of one of the entities is invalid.
-	 * @throws IllegalBulletException
-	 * 		   Thrown if the bullet in this collision is not valid.
 	 */
 	public abstract void handleOtherEntityCollision(Entity other) throws IllegalPositionException, IllegalBulletException;
 
@@ -964,7 +951,7 @@ public abstract class Entity {
 	 *
 	 * @post The collision is only resolved if it hasn't been resolved already.
 	 * 		 | if (!this.getWorld().isCasualCollisionHandled())
-	 *       |		then old. getxVelocity == new. getyVelocity;
+	 *       |		then old. getxVelocity == new. getxVelocity;
 	 *       ---
 	 * @effect The collision is resolved by 
 	 * 		   changing the entities' directions and velocity;
@@ -1073,6 +1060,8 @@ public abstract class Entity {
 	 * Variable registering the maximum allowed velocity.
 	 */
 	private static final double max_Velocity = speedoflight;
+	
+	//TODO
 
 	/**
 	 * Variable registering the radius of this Entity.
@@ -1086,7 +1075,7 @@ public abstract class Entity {
 
 	/**
 	 * Variable registering the world to which this entity belongs.
-	 * Initialised as null; the entity has no world per default.
+	 * Initialized as null; the entity has no world per default.
 	 */
 	private World world = null;
 

@@ -21,6 +21,8 @@ import asteroids.model.Bullet;
 import asteroids.model.Planetoid;
 import asteroids.model.Ship;
 import asteroids.model.World;
+import asteroids.model.exceptions.IllegalPositionException;
+import asteroids.model.exceptions.IllegalRadiusException;
 import asteroids.part3.facade.IFacade;
 import asteroids.model.Program;
 
@@ -64,6 +66,8 @@ public class Part3CustomTests {
 	    facade.addShipToWorld(filledWorld, ship2);
 	    bullet1 = facade.createBullet(300, 320, 10, 5, 50);
 	    facade.addBulletToWorld(filledWorld, bullet1);
+	    
+	    
 	  }
 	  
 	  
@@ -71,8 +75,62 @@ public class Part3CustomTests {
 	// ASTEROID TESTS
 	//-------------------------------------------
 	 
-	  
+	  @Test
+	  public void testCreateAsteroid() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+		  Asteroid asteroid = new Asteroid(10, 10, 10, 10, 10);
+		  
+		  facade.addAsteroidToWorld(world, asteroid);
+		  
+		  assert(world == facade.getAsteroidWorld(asteroid));
+	      
+	   }
 	
+	  
+	//-------------------------------------------
+	// SHIP ASTEROID COLLISIONS TESTS
+	//-------------------------------------------
+	  
+	  @Test
+	  public void testAsteroidShipCollision() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+	      Ship ship = facade.createShip(100, 100, 10, 0, 10, 0, 1.0E20);
+		  Asteroid asteroid = new Asteroid(200, 100, 0, 0, 10);
+		  
+		  facade.addShipToWorld(world, ship);
+		  facade.addAsteroidToWorld(world, asteroid);
+		  
+		  facade.evolve(world, 10, null);
+		  
+		  assertTrue(facade.isTerminatedShip(ship));
+		  assertTrue(!facade.isTerminatedAsteroid(asteroid));
+
+	      
+	   }
+	  
+	  @Test
+	  public void testAsteroidAsteroidCollision() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+		  Asteroid asteroid1 = new Asteroid(200, 100, 0, 0, 10);
+		  Asteroid asteroid1 = new Asteroid(200, 100, 0, 0, 10);
+		  
+		  facade.addAsteroidToWorld(world, asteroid1);
+		  facade.addAsteroidToWorld(world, asteroid2);
+		  
+		  facade.evolve(world, 10, null);
+		  
+		  assertTrue(facade.isTerminatedShip(ship));
+		  assertTrue(!facade.isTerminatedAsteroid(asteroid));
+
+	      
+	   }
+		 
 	  
 	//-------------------------------------------
 	// PLANETOID TESTS

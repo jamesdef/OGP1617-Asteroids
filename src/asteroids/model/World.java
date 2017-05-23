@@ -54,9 +54,10 @@ public class World {
 	}
 	
 	/*
-	 * Default constructor, ceates a world of maximum size.
+	 * Default constructor, creates a world of maximum size.
 	 * 
 	 * @effect An empty world is created, with maximum size.
+	 * 	       | @see implementation
 	 */
 	public World() {
 		this(upper_bound, upper_bound);
@@ -95,7 +96,9 @@ public class World {
 
 	
 	/**
-	 * Return the entities located in this world at a certain positionas a map (using location as the key of each entity).
+	 * Return the entities located in this world at a certain position as
+	 *  a map (using location as the key of each entity).
+	 *  
 	 * @return a map holding the entities and their positions.
 	 */ 
 	public HashMap<String,Entity> getEntities() {
@@ -164,7 +167,7 @@ public class World {
 	 
 	 
 	
-	/** TOTAL PROGRAMMING
+	/** 
 	 * Sets the width of this world to the absolute of the given value.
 	 * 
 	 * @param width
@@ -172,7 +175,7 @@ public class World {
 	 * 
 	 * @post if the given width is greater than the upper bound
 	 * 		 the width is set to be equal to the upper bound.
-	 * 
+	 * 	     TODO
 	 * @post if the given width is negative, it's opposite value is set.
 	 * 	     Via the absolute
 	 * 		|widthpositive = Math.abs(width);
@@ -181,17 +184,19 @@ public class World {
 	 *       | new.getWidth() == width
 	 *
 	 */
-	public void setWidth(double width){
+	public final void setWidth(double width){
 		double widthpositive = Math.abs(width);
 		if (widthpositive  > upper_bound) {
 			this.width = upper_bound;
 		}
-		else if (widthpositive  >0){
+		else if (widthpositive  >=0){
 			this.width = widthpositive;
 		}
 	}
 	
-	/** TOTAL PROGRAMMING
+	// TODO kan samennemen; exact zelfde
+	
+	/**
 	 * Sets the height of this world to the absolute of the given value.
 	 * 
 	 * @param height
@@ -208,12 +213,12 @@ public class World {
 	 *       the height is changed to the given value.
 	 *       | new.getHeight() == height
 	 */
-	public void setHeight(double height){
+	public final void setHeight(double height){
 		double heightpositive = Math.abs(height);
 		if (heightpositive > upper_bound) {
 			this.height = upper_bound;
 		}
-		else if (heightpositive >0){
+		else if (heightpositive >=0){
 			this.height = heightpositive;
 		}
 	}
@@ -225,6 +230,7 @@ public class World {
 	/**
 	 * This method checks whether all the entities in this world 
 	 * 		are in fact proper entities.
+	 * 
 	 * @return True if this world can have all of the entities that are within it
 	 * 		   as its entities. Also, every entity within this world should reference this world.
 	 * 		   | @see implementation
@@ -339,15 +345,6 @@ public class World {
 	 */
 	
 	public Boolean canHaveAsEntity(Entity entity){
-		
-		// 1 is het probleem!
-//		System.out.println("1:" + entity.isTerminated() );
-//		System.out.println("2:" + this.isTerminated() );
-//		System.out.println("3:" + entity == null );
-//		System.out.println("4:" + (entity.getWorld() != null && this != entity.getWorld()));
-//		System.out.println("5:" + !this.withinWorldBoundaries(entity) );
-//		System.out.println("6:" + (entity instanceof Bullet && ((Bullet)entity).getShip()!= null));
-
 
 		if (entity.isTerminated() || this.isTerminated() || entity == null  || (entity.getWorld() != null && this != entity.getWorld())
 				|| !this.withinWorldBoundaries(entity) || (entity instanceof Bullet && ((Bullet)entity).getShip()!= null)){
@@ -428,8 +425,7 @@ public class World {
 	 * 
 	 * @param Dt
 	 * 		  The given duration
-	 * @throws IllegalDurationException
-	 * 		   |!isValidDuration()
+	 * 
 	 * @post  Each entity is moved and so it's key in getEntities()
 	 * 		  must change to the new location of that entity.
 	 * 		|for(Entity entity: this.getAllEntities())
@@ -447,8 +443,8 @@ public class World {
 			entity.move(Dt);
 			// After moving an entity, its key changes. 
 			// And thus we must update this.
+			//TODO
 			this.entities.put((StringMaker(entity.getPosition())), entity);
-			
 			if(entity instanceof Ship){
 				((Ship) entity).accelerate(Dt);
 			}			
@@ -468,15 +464,13 @@ public class World {
 	 * 
 	 * @param Dt
 	 * 		  The duration with which we will evolve.
-	 * @effect | @see implementation
 	 * 
 	 * @throws IllegalDurationExcepton 
 	 * 		   The given duration is not a valid duration.
 	 * 		   | Dt < 0
 	 */
 	public void evolve(double Dt) throws IllegalCollisionException, IllegalPositionException, IllegalDurationException, IllegalBulletException{
-		//NEXT ENTITY-BOUNDARY COLLISIONS INFO
-		
+				
 		if (! isValidDuration(Dt)){
 			throw new IllegalDurationException(Dt);
 		}
@@ -581,8 +575,6 @@ public class World {
 	 * 		   It does this by checking the time until each entity reaches a boundary;
 	 * 		   and then taking the smallest of times.
 	 * 		   | @see implementation
-	 * @throws IllegalCollisionException 
-	 * 			--> Handled within getTimeToCollision
 	 */
 	public double getTimeToNextEntityBoundaryCollision(){
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
@@ -624,7 +616,6 @@ public class World {
 	 * @return the time until the next collision between two entities.
 	 * 		   It does this by checking for each pair of entities, and taking the smallest time.
 	 * 		   | @see implementation
-	 * @throws IllegalCollisionException
 	 */
 	public double getTimeToNextEntityEntityCollision() throws IllegalCollisionException {
 		List<Entity> ArrayofEntities = new ArrayList<>(this.getAllEntities());
@@ -645,9 +636,9 @@ public class World {
 	/**
 	 * This method gets the two entities which will collide with eachother the soonest.
 	 * 
-	 * @return the two entities which will collide with eachother the soonest.
+	 * @return the two entities which will collide with each other the soonest.
 	 * 		   It does this by taking those 2 entities who have the smallest time until
-	 * 		   they collide with eachother.
+	 * 		   they collide with each other.
 	 * 		   | @see implementation
 	 * @throws IllegalCollisionException
 	 */
@@ -718,33 +709,31 @@ public class World {
 	
 	/**
 	 * A map containing the different entities (values) in this world,
-	 * allong with the position of their center (the key).
+	 * along with the position of their center (the key).
 	 * The key will be a string so that we can seek through the map without having problems
 	 * by creating new objects.
 	 */
 	private HashMap<String, Entity> entities = new HashMap<String,Entity>();
 	
 	/**
-	 * Variable registering the maxium possible width and heigth for all worlds.
+	 * Variable registering the maximum possible width and height for all worlds.
 	 * The default value for this is set to be the largest number achievable.
 	 */
 	private static double upper_bound = Double.MAX_VALUE;
 
 	/**
-	 * Variable registering the width of this world. The default value is set to
-	 * be half of the maximum possible Value.
+	 * Variable registering the width of this world. 
 	 */
-	private double width = (1/2)*upper_bound;
+	private double width;
 
 	/**
-	 * Variable registering the height of this world. The default value is set to
-	 * be half of the maximum possible Value.
+	 * Variable registering the height of this world.
 	 */
-	private double height = (1/2)*upper_bound;
+	private double height;
 	
 	/*
 	 * Variable registering whether this casual collision is handled.
-	 * Initialised as false.
+	 * Initialized as false.
 	 */
 	private boolean casualCollisionHandled = false;
 }
