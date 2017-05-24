@@ -9,14 +9,13 @@ import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with planetoids, a specific kind of minor planets.
- * They have a certain position, radius, velocity and mass.
  * When a planetoid is terminated, it spawns two new asteroid children.
  * 
- * @invar The mass of each planetoid must be valid.
- * 		  |this.getMass() > 0
+ * @invar  The distance traveled by this planetoid must be valid at all times
+ * 		   | isValidDistanceTraveled()
  * 
- * @version 3.0
- * @author Michiel & James
+ * @version 3.0     
+ * @author James Defauw & Michiel De Koninck
  *
  */
 
@@ -108,7 +107,7 @@ public class Planetoid extends MinorPlanet {
  			double xPosition = this.getXPosition();
  			double yPosition = this.getYPosition();
  			double r = this.getRadius();
- 			double parentVelocity = this.getTotalVelocity();
+ 			double parentVelocity = this.getVelocityNorm();
  			double randomAngle = Math.random() *2.0*Math.PI; 
  				
  			Asteroid firstChild;
@@ -163,7 +162,8 @@ public class Planetoid extends MinorPlanet {
  	 * 		   | result = 0.000001*distance < (this.getRadius()-5.0)
  	 */
   	public boolean isValidDistanceTraveled(double distance){
-  		return 0.000001*distance < (this.getRadius()-5.0);
+  		double rateOfShrinking = 0.000001;
+  		return rateOfShrinking*distance < (this.getRadius()-5.0);
   	}
 	
   	/**
@@ -216,13 +216,12 @@ public class Planetoid extends MinorPlanet {
 // ----------------------- MOVING AND SHRINKING -----------------
  	
  	/**
- 	 * Moves this planetoid during a certain duration, depending on their velocity.
+ 	 * Moves this planetoid during a certain duration.
  	 * 
- 	 * @param duration
- 	 * 		  The time during which this planetoid moves
  	 * @post The distanceTravelled is incremented by the amount of kilometers that the planetoid had moved.
  	 * 		 That amount is calculated using the duration and the velocity of this ship.
- 	 * 		 | new.getDistanceTravelled() += duration*this.getTotalVelocity()
+ 	 * 		 | new.getDistanceTravelled() += duration*this.getVelocityNorm()
+ 	 * 
  	 *@effect Every time the planetoid is moved, it is shrunken based on the distance it
  	 *		  has traveled in total.
  	 *		  |shrink(distanceTraveled);
@@ -230,7 +229,7 @@ public class Planetoid extends MinorPlanet {
  	@Override
  	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
  		super.move(duration);
- 		this.distanceTraveled += duration*this.getTotalVelocity();		
+ 		this.distanceTraveled += duration*this.getVelocityNorm();		
  		shrink(distanceTraveled);
  	}
  	
@@ -243,12 +242,15 @@ public class Planetoid extends MinorPlanet {
  	 * 		  The amount of kilometres travelled by this planetoid
  	 * @effect The radius of this planetoid is shrunken
  	 * 		   | new. getRadius() == (getInitialRadius() - (0.000001)*distanceTravelled);
- 	 * @effect If the radius is not valid, the planetoid is terminated.
+ 	 * 
+ 	 * @effect If the radius is not valid after shrinking, 
+ 	 * 		   the planetoid is terminated.
  	 * 		   | if !isValidRadius()
  	 * 				| then this.terminate(); 
  	 */
  	private void shrink(double distanceTravelled){
- 		double shrunk_radius = (getInitialRadius() - (0.000001)*distanceTravelled);
+ 		double rateOfShrinking = 0.000001;
+ 		double shrunk_radius = (getInitialRadius() - (rateOfShrinking)*distanceTravelled);
  		
  		try {
 			setRadius(shrunk_radius);
@@ -259,7 +261,24 @@ public class Planetoid extends MinorPlanet {
 
 // -------------- COLLISION CASES --------------------
 	
-    //TODO DOCUMENTATIE
+    /**
+     * Handles the collision between a planetoid
+     * and another entity.
+     * 
+     * @effect  If the other entity is a minor planet,
+     * 			the collision is handled as a casual collision
+     * 		    | @see implementation
+     * 
+     * @effect If the other entity is a bullet, this planetoid 
+     * 		   is terminated.
+     * 		   |if(entity instanceof Bullet)
+  	 *		   |		then this.terminate();
+  	 *
+     * @effect If the other entity is a ship, that ship
+     * 		   is teleported to a random location in this world.
+     * 		   |if(entity instanceof Ship){
+     *  	   |		then ((Ship) entity).teleport();
+     */
     @Override
   	public void handleOtherEntityCollision(Entity entity){
   		if(entity instanceof MinorPlanet){
@@ -273,7 +292,7 @@ public class Planetoid extends MinorPlanet {
   		}
   		
   		if(entity instanceof Ship){
-  			//ONLY ACTIVE HANDLER, THIS WILL HANDLE THE SHIP'S TELEPORTATION AS THE SHIP CLASS CAN'T BE UPDATED FROM PART 2
+  			//ONLY ACTIVE HANDLER, THIS WILL HANDLE THE SHIP'S TELEPORTATION
   			((Ship) entity).teleport();
   		}
   	}

@@ -6,14 +6,11 @@ import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with asteroids, a specific kind of minor planets.
- * They have a certain position, radius, velocity and mass.
  * Contrary to planetoids, the radius of an asteroid does not change.
  * 
- * @invar The mass of each asteroid must be valid.
- * 		  |this.getMass() > 0
  * 
- * @version 3.0
- * @author Michiel & James
+ * @version 3.0     
+ * @author James Defauw & Michiel De Koninck
  *
  */
 public class Asteroid extends MinorPlanet{
@@ -72,10 +69,7 @@ public class Asteroid extends MinorPlanet{
  	/**
  	 * This handles the collision between an asteroid 
  	 * and a certain entity.
- 	 * 
- 	 * @param entity
- 	 * 		  The other entity in this collision
- 	 * 
+	 *
  	 * @effect If the other entity is a minor planet
  	 * 		 the collision is handled as a casual collision.
  	 * 		 | @see implementation
@@ -110,7 +104,7 @@ public class Asteroid extends MinorPlanet{
 	/**
 	 * Variable registering the default density of an asteroid.
 	 */
-	private static double default_Density = 2.65*(Math.pow(10.0, 12.0));
+	private final static double default_Density = 2.65*(Math.pow(10.0, 12.0));
 	
 	
 }

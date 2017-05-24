@@ -8,10 +8,9 @@ import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with bullets, which are a kind of entity in space. 
- * These have a certain position, velocity, radius, mass and density.
  * A bullet can have an owner: a ship or a world. 
- * If it has a ship as its owner, it can not have a world as its owner.
- * If a bullet is fired, it has a source (a ship that fired it); unless this ship has been destroyed in the meanwhile.
+ * If a bullet is fired, it has a source (a ship that fired it); 
+ * unless this ship has been destroyed in the meanwhile.
  * A bullet can only bounce of a boundary a given number of times.
  *
  * @invar 	Each bullet must have a proper owner at all times.
@@ -29,9 +28,8 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar   The density of a ship must be valid.
  * 		    |isValidDensity(this.getDensity)
  * 
- * @version 2.0     
+ * @version 3.0     
  * @author James Defauw & Michiel De Koninck
-
  */
 public class Bullet extends Entity {
 	
@@ -129,7 +127,8 @@ public class Bullet extends Entity {
 	/**
 	 * Check whether this bullet has a proper owner. 
 	 * Meaning that it can not belong to both a world and a ship.
-	 * @return True if and only if this bullet has only one owner.
+	 * @return True if and only if this bullet has only one owner;
+	 * 		   either a world or a ship.
 	 * 		   | result !((this.getShip() != null && this.getWorld() != null)
 	 */
     @Raw
@@ -173,8 +172,6 @@ public class Bullet extends Entity {
 	 * @param ship
 	 * 		  The ship that we try to set as owner
 	 * 
-	 * @throws IllegalPositionException 
-	 * 
      * @pre If the given ship is not effective and this bullet references an effective ship,
      * 		that ship may not reference this bullet as one of its bullets.
      * 		| if ((ship == null) && (getShip()!=null))
@@ -198,8 +195,8 @@ public class Bullet extends Entity {
 			try {
 				this.setPosition(ship.getXPosition(),ship.getYPosition());
 			} catch (IllegalPositionException e) {
-				// Zal niet voorkomen; de positie van een schip moet op elk moment legaal zijn.
-				// Java verplicht ons enkel deze try/Catch in te voeren.
+				// Java obliges us to throw this exception, even though we
+				// know that we made sure that the position of each ship is legal at all times.
 			}
 	}
 	
@@ -257,29 +254,34 @@ public class Bullet extends Entity {
 	
 // ----------------- RADIUS ---------------------------------------------
 	
-	 /**
-     * This method makes it possible for the user to change the lower bound
-     * imposed upon bullets.
-     * 
-     * @param lowerbound
-     * 		  The new minimum radius.
-     * 
-     * @post The new universal lower bound for the radius is equal to the given value.
-     * 		 |new.getMinRadius() == Lower_Bound
-     * 
-     * @throws IllegalRadiusException 
-     * 		   The given l is not valid.
-     * 		   | !(Lower_bound > 0)
-     */
-	@Raw
-    public static void setMin_Radius(double lowerbound) throws IllegalRadiusException{
-    	if (isValidMinimumRadius(lowerbound)){
-    		Bullet.min_Radius = lowerbound;
-    	}
-    	else{
-    		throw new IllegalRadiusException(lowerbound);
-    	}
-    }
+	
+	// TODO is dit nu goed of niet, eigenlijk niet want dat moet final zijn; die min_radius
+	
+//	 /**
+//     * This method makes it possible for the user to change the lower bound
+//     * imposed upon bullets.
+//     * 
+//     * @param lowerbound
+//     * 		  The new minimum radius.
+//     * 
+//     * @post The new universal lower bound for the radius is equal to the given value.
+//     * 		 |new.getMinRadius() == Lower_Bound
+//     * 
+//     * @throws IllegalRadiusException 
+//     * 		   The given lowerbound is not valid.
+//     * 		   | !(isValidMinimumRadius(lowerbound))
+//     */
+//	@Raw
+//    public static void setMin_Radius(double lowerbound) throws IllegalRadiusException{
+//    	if (isValidMinimumRadius(lowerbound)){
+//    		Bullet.min_Radius = lowerbound;
+//    	}
+//    	else{
+//    		throw new IllegalRadiusException(lowerbound);
+//    	}
+//    }
+	
+	
     
 	/**
 	 * Check whether the given minimum radius is a valid limit.
@@ -296,10 +298,7 @@ public class Bullet extends Entity {
 
 	/** 
 	 * Checks whether the given radius has a valid value.
-	 * 
-	 * @param  radius
-	 * 		   The radius of the ship.
-	 * 
+	 *
 	 * @return True if the radius exceeds the minimal radius
 	 * 		   false if the radius is less than the minimal_radius. 
 	 * 		   | radius >= getMinRadius();
@@ -448,12 +447,14 @@ public class Bullet extends Entity {
 	 */
 	private int bounces_left = max_Bounces;
 	
+	//TODO moet eigenlijk final zijn
+	
 	/**
 	 * Variable registering the minimum allowed Radius.
 	 * The minimum radius may change in the future. 
 	 * But it will always remain the same for all Bullets.
 	 */
-	private static double min_Radius = 1.0;
+	private final static double min_Radius = 1.0;
 	
 	/**
 	 * Field initialising the existence of ship.

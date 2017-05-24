@@ -7,14 +7,12 @@ import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with MinorPlanets, a specific kind of entities.
- * They have a certain position, radius, velocity.
  * 
- *			// TODO LISKOV want isValidRadius wordt verstrengd
  * @invar 	The radius of each minor planet must be a valid value.
  * 			|isValidRadius(getRadius()) 
  * 
- * @version 3.0
- * @author Michiel & James
+ * @version 3.0     
+ * @author James Defauw & Michiel De Koninck
  *
  */
 
@@ -57,12 +55,9 @@ public abstract class MinorPlanet extends Entity {
 		
 	}
 	
-	
 	 /**
 	 * Checks whether the given radius has a valid value.
 	 * 
-	 * @param  radius
-	 * 		   The radius to check.
 	 * @return The radius must, at all times, be bigger or equal to 5km.
 	 * 		   |radius >= 5;
 	 */

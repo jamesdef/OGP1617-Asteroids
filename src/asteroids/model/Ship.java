@@ -16,14 +16,14 @@ import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for dealing with ships, which are a kind of entity in space. 
- * These have a certain position, velocity, radius, speed and orientation.
- * The ship has a thrusther with which it can accelerate. The ship also has a mass and a certain density.
+ * Ships have a certain orientation.
+ * The ship has a thrusther with which it can accelerate. 
+ * The ship also has a mass and a certain density.
  * A ship can have bullets, which it can fire.
  *
  * @invar 	Each ship has proper bullets as its belongings.
  *		 	|hasProperBullets()
  *
- * TODO voorbeeld van liskov: klasse invariant verstrenging.
  * @invar 	The radius of each ship must be a valid value.
  * 			|isValidRadius(getRadius())
  *
@@ -34,11 +34,10 @@ import be.kuleuven.cs.som.annotate.Raw;
  * 		    |isValidDensity(this.getDensity)
  * 
  * @invar	The orientation of the ship must be a valid value.
-* 			|isValidOrientation(getOrientation())
+ * 			|isValidOrientation(getOrientation())
  *   
- * @version 2.0     
+ * @version 3.0     
  * @author James Defauw & Michiel De Koninck
-
  */
 
 public class Ship extends Entity {
@@ -134,8 +133,7 @@ public class Ship extends Entity {
 
     	if (this.getNbOfBullets() != 0) {
     		Set<Bullet> toRemovebullets = new HashSet<>();
-    		toRemovebullets.addAll(bullets);
-    		//TODO
+    		toRemovebullets.addAll(this.bullets);
     	for (Bullet bullet : toRemovebullets){
     		removeBullet(bullet);
     	}}
@@ -229,13 +227,13 @@ public class Ship extends Entity {
      * 		   
      */
     public double getMassOfBullets(){
-    	double bulletMass = 0;
+    	double totalMassofBullets= 0;
     	
     	for (Bullet bullet: this.getBullets()){
-			bulletMass =+ bullet.getMass();
+    		totalMassofBullets += bullet.getMass();
 		}
 		
-		return bulletMass;
+		return totalMassofBullets;
     }
     
     
@@ -307,8 +305,6 @@ public class Ship extends Entity {
 	 */
 	@Raw
 	public void setOrientation(double orientation){
-		System.out.println("orientation" + orientation);
-		System.out.println(isValidOrientation(orientation));
 		assert isValidOrientation(orientation);
 		this.orientation = orientation;	
 	}
@@ -348,30 +344,6 @@ public class Ship extends Entity {
 	
 	
 // ------------------------------------ Radius --------------------------
-	
- 
-	 /**
-     * This method makes it possible for the user to change the lower bound
-     * imposed upon ships, for all ships.
-     * 
-     * @param lowerbound
-     * 		  The new minimum radius.
-     * 
-     * @post The new universal lower bound for the radius is equal to the given value.
-     * 		 |new.Min_Radius == Lower_Bound
-     * 
-     * @throws IllegalRadiusException 
-     * 		   The given lowerbound for the radius is not valid.
-     * 		   | !(Lower_bound > 0)
-     */
-    public void setMin_Radius(double lowerbound) throws IllegalRadiusException{
-    	if (lowerbound > 0){
-    		Ship.min_Radius = lowerbound;
-    	}
-    	else{
-    		throw new IllegalRadiusException(lowerbound);
-    	}
-    }
     
 	/**
 	 * Return the minimum radius a ship can have.
@@ -381,13 +353,8 @@ public class Ship extends Entity {
 	public static double getMinRadius(){
 		return Ship.min_Radius;
 	}
-
-	// TODO dit is liskov
 	/** 
 	 * Checks whether the given radius has a valid value.
-	 * 
-	 * @param  radius
-	 * 		   The radius of the ship.
 	 * 
 	 * @return True if the radius exceeds the minimal radius
 	 * 		   false if the radius is less than the minimal_radius. 
@@ -529,7 +496,6 @@ public class Ship extends Entity {
 	 * 		   |super.move(duration);
 	 *			|for (Bullet bullet: this.bullets)
 	 *			|		bullet.move(duration);
-	 *TODO liskov throws in superklasse move nakijken
 	 */
 	@Override
 	public void move(double duration) throws IllegalPositionException, IllegalDurationException{
@@ -545,41 +511,18 @@ public class Ship extends Entity {
 	 * 
 	 * @param angle
 	 * 		  The angle to add to the orientation of the ship
-	 *  TODO
-	 * @post  The scaledangle is calculated by a seperate method
-	 * 		  | scaledAngle = scaleAngle(this.getOrientation() + angle)
-	 * 
 	 * 
 	 * @effect The given angle is first added to the orientation and then scaled.
 	 * 		   The new orientation is then asserted to be within 0-2PI range in the setOrientation() method.
 	 * 		   |this.setOrientation(newAngle);
 	 */
 	public void turn(double angle){
-		System.out.println("hello ship turning: " + angle);
 		double newAngle = this.getOrientation() + angle;
 		this.setOrientation(newAngle);
-		System.out.println("hello ship angle is now: " + this.getOrientation());
-
-	}
-
-	// TODO 
-	
-	/**
-	 *  Scales the given angle so that it is within 0<= angle < 2*PI
-	 * 
-	 * @param angle
-	 * 		  The angle to scale 
-	 * @return returns the angle scaled to fit the boundaries of the orientation.
-	 *         | result = angle % getMax_Orientation;
-	 */
-	public double scaleangle(double angle){
-		double ScaledAngle = angle % getMaxOrientation();
-		return ScaledAngle;
 	}
 	
 //---------------------BULLETS --------------------------
     
-	//TODO blijkbaar moet je een kopie pakken
 	/**
 	 * Return the bullets owned by this ship.
 	 * @return the bullets owned by this ship
@@ -670,9 +613,6 @@ public class Ship extends Entity {
 	 * 		   this ships' collection of bullets is extended.
 	 * 		   | new.bullet.getShip() == this
 	 * 		   | this.hasBullet(bullet) == true
-	 * @throws IllegalRadiusException 
-	 * @throws IllegalPositionException 
-	 * 		   We are obliged to throw these exceptions, even though we know that the default bullet will be legal.
 	 */
 	public void loadBullet() throws IllegalPositionException, IllegalRadiusException{
 		Bullet bullet = new Bullet(this.getXPosition(), this.getYPosition(), this.getXVelocity(), this.getYVelocity(),
@@ -724,9 +664,6 @@ public class Ship extends Entity {
 	 * 		  The number of bullets to add to this ship.
 	 * @effect loadBullet is called upon a "numberOfBullets" amount of times.
 	 * 		   |@see implementation
-	 * @throws IllegalRadiusException 
-	 * @throws IllegalPositionException 
-	 * 		   We are obliged to throw these exceptions, even though we know that the default bullet will be legal.
 	 */
 	public void addMultipleBullets(int numberOfBullets) throws IllegalPositionException, IllegalRadiusException{
 		for(int i=0; i<numberOfBullets; i++){
@@ -736,13 +673,10 @@ public class Ship extends Entity {
 	
 	/**
 	 * This method adds a collection of bullets to its collection.
-	 * It only does this if each bullet can in fact be safely added to this ship.
-	 * If not, it throws an illegal Bulletexception.
 	 * 
 	 * @param bullets
 	 * 		  The collection of bullets to add to this ship.
 	 * @effect For each bullet in the given collection, the loadBullet function is called upon.
-	 * 		   That means that for each adding, the documentation of loadBullet applies.
 	 * 		   |@see implementation.
 	 */
 	public void loadBullets(Collection<Bullet> bullets) throws IllegalBulletException, IllegalPositionException{
@@ -766,6 +700,10 @@ public class Ship extends Entity {
 	 * 			the given bullet no longer references any ship.
 	 * 		  | if (hasBullet(bullet){
 	 * 		  |       (bullet.getShip() == null)
+	 * 
+	 * @throws IllegalEntityException
+	 * 	       If this ship doesn't even have the given bullet as
+	 * 		   one of its bullets, this exception is thrown.
 	 */
 	public void removeBullet(Bullet bullet) throws IllegalEntityException{
 		if (this.hasBullet(bullet)){
@@ -802,11 +740,8 @@ public class Ship extends Entity {
 	 *			|		then bullet.terminate();
 	 *			|		 	 entity.terminate();
 	 * 
-	 * 
 	 * @throws IllegalPositionException 
 	 * 		   The position to which the bullet is set must be legal.
-	 * @throws IllegalRadiusException
-	 * 		   The radius of the fired bullet must be legal.
 	 * @throws IllegalShipException 
 	 * 		   The ship must be a valid source to the fired bullet.
 	 */
@@ -826,10 +761,8 @@ public class Ship extends Entity {
 			this.removeBullet(bullet);
 			bullet.setPosition(bulletXPos, bulletYPos);
 			bullet.setSource(this);
-//			bullet.setShip(null);
 			
 			//bullet is now set to where it will start its movement, after some checks.
-			
 			
 			// Check whether the bullet is within the worlds' boundaries, if not: terminate it.
 			if (!(this.getWorld().withinWorldBoundaries(bullet))){
@@ -884,9 +817,6 @@ public class Ship extends Entity {
 	 * This method handles the collision in case one of the colliding
 	 * entities is a ship. It checks what kind of collision we our dealing with 
 	 * and resolves (this side of) the collision. 
-	 * 
-	 * @param entity
-	 * 		  The entity with which this ship collides.
 	 * 
 	 * @effect If this ship collides with another ship, 
 	 * 		  the collision is handled as a casual collision.
@@ -951,6 +881,31 @@ public class Ship extends Entity {
         }	
 	}
 	
+
+//-----------------------------------
+// PROGRAMS
+//------------------------------------
+
+
+
+	private Program program = null;
+
+	public void setProgram(Program program){
+		System.out.println("SETTING PROGRAM ON SHIP");
+		program.setShip( this );
+		this.program = program;
+	}
+
+	public Program getProgram(){
+		return this.program;
+	}
+
+	public List<Object> executeProgram(double dt){
+		System.out.println("SHIP EXECUTEPROGRAM");
+		return this.getProgram().run(dt);
+	}
+
+	
     
 // -----------------------  VARIABLES (DEFAULTS & FINAL) --------
 	
@@ -967,16 +922,17 @@ public class Ship extends Entity {
 
 	/**
 	 * Variable registering the radius of this Ship.
+	 * Default value set to the radius
 	 */
 	private double radius = min_Radius;
-
+	
 	/**
 	 * Variable registering the minimum allowed Radius.
 	 * The minimum radius may change in the future. 
 	 * But it will always remain the same for all Ships.
 	 *
 	 */
-	private static double min_Radius = 10.0;
+	private final static double min_Radius = 10.0;
 	
 	/**
 	 * Variable registering the orientation of this ship.
@@ -1014,32 +970,5 @@ public class Ship extends Entity {
 	 * A variable defining the force that an active thruster can exert on a ship.
 	 */
 	private double thrustforce = 1.1E18;
-	
-		
-		
-		
-		//-----------------------------------
-		// PROGRAMS
-		//------------------------------------
-		
-		
-		
-		private Program program = null;
-		
-		public void setProgram(Program program){
-			System.out.println("SETTING PROGRAM ON SHIP");
-			program.setShip( this );
-			this.program = program;
-		}
-		
-		public Program getProgram(){
-			return this.program;
-		}
-		
-		public List<Object> executeProgram(double dt){
-			System.out.println("SHIP EXECUTEPROGRAM");
-			return this.getProgram().run(dt);
-		}
-		
 
 }

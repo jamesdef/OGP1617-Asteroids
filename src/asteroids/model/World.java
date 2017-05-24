@@ -28,9 +28,8 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar   Every world must have proper entities.
  * 			|hasProperEntities();
  *          
- * @version 2.0         
+ * @version 3.0     
  * @author James Defauw & Michiel De Koninck
- *
  */
 
 
@@ -53,14 +52,14 @@ public class World {
 		setHeight(height);
 	}
 	
-	/*
+	/**
 	 * Default constructor, creates a world of maximum size.
 	 * 
 	 * @effect An empty world is created, with maximum size.
 	 * 	       | @see implementation
 	 */
 	public World() {
-		this(upper_bound, upper_bound);
+		this(World.getUpperBound(), World.getUpperBound());
 	}
 	
 
@@ -175,7 +174,8 @@ public class World {
 	 * 
 	 * @post if the given width is greater than the upper bound
 	 * 		 the width is set to be equal to the upper bound.
-	 * 	     TODO
+	 * 	     |if (widthpositive  > World.getUpperBound())
+	 *		 |		then this.width = World.getUpperBound();
 	 * @post if the given width is negative, it's opposite value is set.
 	 * 	     Via the absolute
 	 * 		|widthpositive = Math.abs(width);
@@ -184,17 +184,15 @@ public class World {
 	 *       | new.getWidth() == width
 	 *
 	 */
-	public final void setWidth(double width){
+	public void setWidth(double width){
 		double widthpositive = Math.abs(width);
-		if (widthpositive  > upper_bound) {
-			this.width = upper_bound;
+		if (widthpositive  > World.getUpperBound()) {
+			this.width = World.getUpperBound();
 		}
 		else if (widthpositive  >=0){
 			this.width = widthpositive;
 		}
 	}
-	
-	// TODO kan samennemen; exact zelfde
 	
 	/**
 	 * Sets the height of this world to the absolute of the given value.
@@ -204,7 +202,8 @@ public class World {
 	 * 
 	 * @post if the given height is greater than the upper bound
 	 * 		 the height is set to be equal to the upper bound.
-	 * 
+	 * 		|if (heightpositive > World.getUpperBound()) 
+			|			then this.height = World.getUpperBound();
 	 * @post if the given height is negative, it's opposite value is set. 
 	 * 		 Via it's absolute.
 	 * 		 | heightpositive = Math.abs(height);
@@ -213,16 +212,37 @@ public class World {
 	 *       the height is changed to the given value.
 	 *       | new.getHeight() == height
 	 */
-	public final void setHeight(double height){
+	public void setHeight(double height){
 		double heightpositive = Math.abs(height);
-		if (heightpositive > upper_bound) {
-			this.height = upper_bound;
+		if (heightpositive > World.getUpperBound()) {
+			this.height = World.getUpperBound();
 		}
 		else if (heightpositive >=0){
 			this.height = heightpositive;
 		}
 	}
 	
+	/**
+	 * Method that sets the upperbound for the width 
+	 * and height of this world to the given value.
+	 * 
+	 * @param upperbound
+	 * 		  The new value for the upper bound
+	 * @post  If the given value is bigger than zero
+	 * 		  and smaller than the current upper bound;
+	 * 		  it is set as the new upper bound.
+	 * 		  |if (0< upperbound && upperbound < this.getUpperBound()){
+			  |			then new.upper_bound = upperbound;
+	 */
+	public void setUpperBound(double upperbound){
+		if (0< upperbound && upperbound < World.getUpperBound()){
+			World.upper_bound = upperbound;
+		}
+	}
+	
+	public static double getUpperBound(){
+		return World.upper_bound;
+	}
 	
 //--------------- ASSOCIATIONS WITH ENTITIES -------------------------
 	
@@ -411,10 +431,10 @@ public class World {
 		double radius = object.getRadius();
 		
 			return (
-				((width - x) >= 0.99*radius) &&
-				(x >= 0.99*radius) &&
-				((height - y) >= 0.99*radius) &&
-				(y >= 0.99*radius)
+				((width - x) >= roundingFactor*radius) &&
+				(x >= roundingFactor*radius) &&
+				((height - y) >= roundingFactor*radius) &&
+				(y >= roundingFactor*radius)
 				);
 	}
 	
@@ -437,13 +457,13 @@ public class World {
 	public void moveAllEntities( double Dt) throws IllegalPositionException, IllegalDurationException{
 		
 		for(Entity entity: this.getAllEntities()){
-			// The values are first removed from the map of entities, 
+			// The objects with value 'entity' 
+			// are first removed from the map of entities, 
 			// before the entities are moved.
 			this.getEntities().values().remove(entity);
 			entity.move(Dt);
-			// After moving an entity, its key changes. 
-			// And thus we must update this.
-			//TODO
+			// We removed the object from the entity map, 
+			// and so now we add it again with its updated position.
 			this.entities.put((StringMaker(entity.getPosition())), entity);
 			if(entity instanceof Ship){
 				((Ship) entity).accelerate(Dt);
@@ -706,6 +726,11 @@ public class World {
 	
 	
 // ----------------------------------  VARIABLES --------
+	
+	/**
+	 * Variable registering the value for a roundingfactor.
+	 */
+	private final double roundingFactor = 0.99;
 	
 	/**
 	 * A map containing the different entities (values) in this world,

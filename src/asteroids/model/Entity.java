@@ -18,9 +18,11 @@ import be.kuleuven.cs.som.annotate.Raw;
 // TODO: Postcondities en classe invarianten niet herhalen bij subklassen en overriding
 
 
+//TODO: parameters niet herhalen bij substition liskov: override
+
 /** 
  *  A class for dealing with entities. 
- *  We could define these as 'objects that can move through space'.
+ *  We could define these as 'circular objects that can move through space'.
  *  Entities can interact with each other upon collision.
  *  It can belong to a certain world.
  *  Properties described are: position, velocity,radius, density and mass.
@@ -30,6 +32,9 @@ import be.kuleuven.cs.som.annotate.Raw;
  * 
  * @invar 	The radius of each entity must be a valid value.
  * 			|isValidRadius(getRadius())
+ * 
+  @invar   The mass of each entity must be valid.
+ * 		  	|this.getMass() > 0
  * 
  * @invar   The coordinates of an entity must be valid.
  * 			|isValidPosition(getxPosition,getyPosition);
@@ -182,15 +187,14 @@ public abstract class Entity {
 	}
 
 	/**
-	 * Return the total velocity of this Entity.
+	 * Return the "total velocity" of this Entity.
 	 * 
 	 * @return the total velocity of this Entity.
 	 * @note The total velocity of a Entity is computed:
 	 * 		 by taking the norm of the velocity-vector.
 	 */
-	//TODO naam veranderen vd functie
 	@Basic
-	public double getTotalVelocity(){
+	public double getVelocityNorm(){
 		Vector speedVector = new Vector(getXVelocity(),getYVelocity());
 		return speedVector.norm();
 		
@@ -278,15 +282,14 @@ public abstract class Entity {
 	/**
 	 * Check whether this entity belongs to a proper world.
 	 * 
-	 * @return true if and only if this entity can be rightly associated with it's world and if this world is
-	 * 		   either not effective or if it has this entity as one of its entities.
-	 * 		   |result == (   (canHaveAsWorld(getWorld()) &&
-	 * 						  ((getWorld() == null) || getWorld().hasEntity(this)))   )
+	 * @return true if and only if this entity can 
+	 * 		   be rightly associated with it's world 
+	 * 		   or if it has this entity as one of its entities.
+	 * 		   |result == (   (canHaveAsWorld(getWorld())|| getWorld().hasEntity(this)))   )
 	 */
-	//TODO
 	@Raw
 	public boolean hasProperWorld(){
-		return (getWorld().hasEntity(this));
+		return (this.canHaveAsWorld(getWorld()) || getWorld().hasEntity(this));
 	}
 
 	//--------------POSITION-----------------------
@@ -412,21 +415,40 @@ public abstract class Entity {
 		Vector speedVector = new Vector(xVelocity, yVelocity);	
 		return (speedVector.norm() > getMaxVelocity());
 	}
+	
+	// TODO probleem:: hoe zorg je ervoor dat maxvelocity
+	// een default value heeft maar toch final is. 
+	// --> hoeft niet echt final te zijn maar
+	// minorplanet vormt wel een probleem want daar mag
+	// de max snelheid nooit veranderen
+	
+	/**
+	 * Set the maximum velocity to the given value.
+	 * 
+	 * @post If  the given value is greater than
+	 * 		 zero and smaller than the speed of light,
+	 * 		 the new maximum velocity is now equal to the given value.
+	 * 		|if (0.0 < newMaxVelocity && newMaxVelocity < 300000)
+	 * 		|	 then new.getMaxVelocity() == newMaxVelocity
+	 */
+	public void setMaxVelocity(double newMaxVelocity){
+		if (0.0 < newMaxVelocity && newMaxVelocity < speedoflight){
+			this.max_Velocity = newMaxVelocity;
+		}
+	}
 
 	/**
 	 * Return the maximum velocity an entity can have.
 	 */
-	@Basic @Immutable
-	public static double getMaxVelocity(){
-		return Entity.max_Velocity;
+	@Basic
+	public double getMaxVelocity(){
+		return this.max_Velocity;
 	}
-	
-	//TODO
 
 	/**
 	 * Return the minimum velocity an entity can have.
 	 */
-	@Basic
+	@Basic @Immutable
 	public static double getMinVelocity(){
 		return Entity.min_Velocity;
 	}
@@ -454,8 +476,8 @@ public abstract class Entity {
 		this.xVelocity = xVelocity;
 		this.yVelocity = yVelocity;
 
-		double scaledxVelocity = (xVelocity*getMaxVelocity())/this.getTotalVelocity();
-		double scaledyVelocity = (yVelocity*getMaxVelocity())/this.getTotalVelocity();
+		double scaledxVelocity = (xVelocity*getMaxVelocity())/this.getVelocityNorm();
+		double scaledyVelocity = (yVelocity*getMaxVelocity())/this.getVelocityNorm();
 
 
 		this.xVelocity = scaledxVelocity;
@@ -620,7 +642,7 @@ public abstract class Entity {
 	 * 		  The other of two enitities that might overlap.
 	 * @return True only if they overlap significantly. 
 	 * 		   We first calculate the distance between the two entities.
-	 * 		   Then we check whether this distance is smaller than 0.999 times the sum of the radii of both.	
+	 * 		   Then we check whether this distance is smaller than 0.99 times the sum of the radii of both.	
 	 * 		 | @see implementation
 	 * 		  
 	 */
@@ -631,8 +653,7 @@ public abstract class Entity {
 
 		double centerDistance = this.getCenterDistance(other);
 		
-		//TODO: rounding variable
-		return (centerDistance < 0.99*(this.getRadius() + other.getRadius()));
+		return (centerDistance < roundingFactor*(this.getRadius() + other.getRadius()));
 	}
 	
 	/**
@@ -1021,12 +1042,17 @@ public abstract class Entity {
 
 
 
-	// -----------------------  VARIABLES (DEFAULTS & FINAL) --------
-
+	// -----------------------  VARIABLES (& DEFAULTS) --------
+	
+	/**
+	 * Variable registering the value for a roundingfactor.
+	 */
+	private final double roundingFactor = 0.99;
+	
 	/**
 	 * Variable registering the speed of light; 300000 km/s.
 	 */
-	private static final double speedoflight = 300000.0;
+	private final double speedoflight = 300000.0;
 
 	/**
 	 * Variable registering the xPosition of this Entity.
@@ -1058,10 +1084,10 @@ public abstract class Entity {
 
 	/**
 	 * Variable registering the maximum allowed velocity.
+	 * The default value is set to the speedoflight.
 	 */
-	private static final double max_Velocity = speedoflight;
+	private double max_Velocity = speedoflight;
 	
-	//TODO
 
 	/**
 	 * Variable registering the radius of this Entity.
