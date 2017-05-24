@@ -22,13 +22,9 @@ public abstract class UnaryExpression<U> extends Expression {
 
 	}
 	
-	protected Object getOperandResult(Function function, List<Expression> arguments) {
+	protected Object getOperandResult() {
 		((Expression) this.getOperand()).setProgram(this.getProgram());
-		return ((Expression) this.getOperand()).getResult(function, arguments);
+		return ((Expression) this.getOperand()).getResult();
 	}
-
-	
-	
-	
 	
 }

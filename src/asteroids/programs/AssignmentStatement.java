@@ -37,19 +37,19 @@ public class AssignmentStatement extends Statement {
 	
 	
 	//RUN
-	public boolean isValidVariable(String name, Expression expression, List<Expression> arguments){
+	public boolean isValidVariable(String name, Expression expression){
 		expression.setProgram(getProgram());
 		return 
 				((!this.getProgram().getFunctions().containsKey(name)) &&
-				(expression.getResult(null, arguments) instanceof Double));
+				(expression.getResult() instanceof Double));
 		//TODO
 	}
 	
 	@Override
-	public void run(List<Expression> arguments) {
-		if (isValidVariable(this.getName(), this.getExpression(), arguments)){
+	public void run() {
+		if (isValidVariable(this.getName(), this.getExpression())){
 			this.getProgram().addVariable(this.getName(), 
-					this.getExpression().getResult(null, arguments));
+					this.getExpression().getResult());
 		}
 		else{
 			System.out.println("throwing illegal argument for "

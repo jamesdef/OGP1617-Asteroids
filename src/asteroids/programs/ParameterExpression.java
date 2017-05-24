@@ -24,9 +24,9 @@ public class ParameterExpression extends Expression {
 
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 
-		return arguments.get(getParameterNumber() - 1).getResult(function, arguments);
+		return null;
 	}
 
 	protected int getParameterNumber() {

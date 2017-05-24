@@ -10,22 +10,13 @@ public class FunctionExpression extends Expression {
 	}
 	
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
-		Map<String, Object> globalVariables = this.getProgram().getVariables();
-		
-
-		//this.getFunction().updateLocalVariables
-
-		
+	protected Object getResult() {
 		return null;
 	}
 	
 	
 	private Function getFunction() {
-		if (getProgram().getFunctions().containsKey(getName()))
-			return getProgram().getFunctions().get((getName()));
-		
-		throw new IllegalArgumentException();
+	return null;
 	}
 	
 	//NAME

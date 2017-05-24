@@ -9,7 +9,7 @@ import asteroids.model.Ship;
 public class ShipEntityExpression extends EntityExpression{
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 		
 		
 		Set<Ship> ships = this.getWorld().getSpecificEntities(Ship.class);

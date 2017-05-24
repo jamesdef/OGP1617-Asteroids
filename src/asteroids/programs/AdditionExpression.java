@@ -9,9 +9,9 @@ public class AdditionExpression extends BinaryExpression<DoubleExpression> imple
 	}
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
-		Double left = (Double) this.getLeftOperandResult(function, arguments);
-		Double right = (Double) this.getRightOperandResult(function, arguments);
+	protected Object getResult() {
+		Double left = (Double) this.getLeftOperandResult();
+		Double right = (Double) this.getRightOperandResult();
 
 		return (left+right);
 	}

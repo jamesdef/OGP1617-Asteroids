@@ -11,7 +11,7 @@ public class ReturnStatement extends Statement {
 
 
 	@Override
-	public void run(List<Expression> arguments) {
+	public void run() {
 		throw new IllegalArgumentException();
 		
 	}

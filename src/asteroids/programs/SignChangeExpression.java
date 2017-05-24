@@ -11,10 +11,10 @@ public class SignChangeExpression extends UnaryExpression<DoubleExpression> impl
 	}
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 		// TODO Auto-generated method stub
 		
-		Double operand = (Double) this.getOperandResult(function, arguments);
+		Double operand = (Double) this.getOperandResult();
 		
 		return - operand;
 	}

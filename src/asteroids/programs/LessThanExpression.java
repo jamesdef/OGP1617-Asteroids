@@ -11,9 +11,9 @@ public class LessThanExpression extends BinaryExpression<DoubleExpression> imple
 	}
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
-		Double leftOperand = (Double) this.getLeftOperandResult(function, arguments);
-		Double rightOperand = (Double) this.getRightOperandResult(function, arguments);
+	protected Object getResult() {
+		Double leftOperand = (Double) this.getLeftOperandResult();
+		Double rightOperand = (Double) this.getRightOperandResult();
 		
 		
 		return (leftOperand < rightOperand);

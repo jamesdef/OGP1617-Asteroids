@@ -14,21 +14,21 @@ public class IfElseStatement extends Statement{
 	
 	private Boolean getConditionResult(){
 		((Expression) this.getCondition()).setProgram(getProgram());
-		boolean conditionResult = (boolean) ((Expression) this.getCondition()).getResult(null, null);
+		boolean conditionResult = (boolean) ((Expression) this.getCondition()).getResult();
 		return conditionResult;
 		
 	}
 
 	@Override
-	public void run(List<Expression> arguments) {
+	public void run() {
 		System.out.println("IFELSESTATEMENT > RUN");
 		if(this.getConditionResult()){
 			this.getThenStatement().setProgram(this.getProgram());
-			this.getThenStatement().run(arguments);
+			this.getThenStatement().run();
 		} else {
 			if(this.getElseStatement() != null){
 				this.getElseStatement().setProgram(this.getProgram());
-				this.getElseStatement().run(arguments);
+				this.getElseStatement().run();
 			}
 		}
 	}
@@ -75,13 +75,13 @@ public class IfElseStatement extends Statement{
 	}
 	
 	@Override
-	public boolean navigateToAction(Bookmark bookmark, List<Expression> arguments){
+	public boolean navigateToAction(Bookmark bookmark){
 		if(this.getConditionResult()){
 			System.out.println("IFELSESTATEMENT > NAVIGATETOACTION thenStatement");
-			return this.getThenStatement().navigateToAction(bookmark, arguments);
+			return this.getThenStatement().navigateToAction(bookmark);
 		} else {
 			System.out.println("IFELSESTATEMENT > NAVIGATETOACTION elseStatement");
-			return this.getElseStatement().navigateToAction(bookmark, arguments);
+			return this.getElseStatement().navigateToAction(bookmark);
 		}
 		
 	}

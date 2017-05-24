@@ -21,13 +21,13 @@ public class PrintStatement extends Statement {
 
 
 	@Override
-	public void run(List<Expression> arguments) {
+	public void run() {
 		// TODO Auto-generated method stub ille
 		if (expression instanceof ParameterExpression)
 			throw new IllegalArgumentException();
 		
 		this.getExpression().setProgram(this.getProgram());
-		Object printResult = this.getExpression().getResult(null, arguments);
+		Object printResult = this.getExpression().getResult();
 		
 		this.getProgram().addToPrints(printResult);
 		System.out.println("RUN PRINTSTATEMENT: " + printResult);

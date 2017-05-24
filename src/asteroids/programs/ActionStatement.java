@@ -14,14 +14,10 @@ import asteroids.model.exceptions.IllegalRadiusException;
 import asteroids.model.exceptions.IllegalShipException;
 import asteroids.part3.programs.SourceLocation;
 
-public abstract class ActionStatement extends Statement {
-	
-	
-	public final static double actionTime = 0.2;
-	
+public abstract class ActionStatement extends Statement {	
 	
 	@Override
-	public void run(List<Expression> arguments){
+	public void run(){
 		System.out.println("ACTIONSTATEMENT > RUNNING TRY " + this);
 		
 		if(enoughTimeLeft()){
@@ -57,4 +53,7 @@ public abstract class ActionStatement extends Statement {
 	}
 	
 	public abstract void executeAction(Program program) throws IllegalPositionException, IllegalRadiusException, IllegalShipException;
+
+	public final static double actionTime = 0.2;
+
 }

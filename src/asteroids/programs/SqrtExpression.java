@@ -11,9 +11,9 @@ public class SqrtExpression extends UnaryExpression<DoubleExpression> implements
 	}
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 		
-		Double operandResult = (Double) this.getOperandResult(function, arguments);
+		Double operandResult = (Double) this.getOperandResult();
 		
 		if (operandResult >= 0)
 			return Math.sqrt(operandResult);

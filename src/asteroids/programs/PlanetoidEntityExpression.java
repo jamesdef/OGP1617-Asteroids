@@ -8,7 +8,7 @@ import asteroids.model.Planetoid;
 public class PlanetoidEntityExpression extends EntityExpression{
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 		
 		Set<Planetoid> planetoids = getWorld().getSpecificEntities(Planetoid.class);
 		

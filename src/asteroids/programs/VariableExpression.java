@@ -25,7 +25,7 @@ public class VariableExpression extends Expression implements DoubleExpression{
 
 	
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 		Object resultExpression = this.getProgram().getVariables().get(this.getName());
 	
 		if (resultExpression == null)

@@ -8,7 +8,7 @@ import asteroids.model.Bullet;
 public class BulletEntityExpression extends EntityExpression {
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 
 		Set<? extends Bullet> bullets = getWorld().getSpecificEntities(Bullet.class);
 

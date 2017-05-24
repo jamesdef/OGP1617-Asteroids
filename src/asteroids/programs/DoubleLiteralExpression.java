@@ -22,7 +22,7 @@ class DoubleLiteralExpression extends Expression implements DoubleExpression  {
 	}
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 		return (Double) this.getValue();
 	}
 

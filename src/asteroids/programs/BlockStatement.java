@@ -29,19 +29,19 @@ public class BlockStatement extends Statement {
 	
 	//RUN
 	@Override
-	public void run(List<Expression> arguments) {
+	public void run() {
 		System.out.println("BLOCKSTATEMENT > RUN");
 
 		for (Statement statement : statementsList) {
 			System.out.println("BLOCKSTATEMENT > RUN STATEMENT : " +statement);
 
 			statement.setProgram(this.getProgram());
-			statement.run(arguments);
+			statement.run();
 		}
 	}
 	
 	
-	public boolean navigateToAction(Bookmark bookmark, List<Expression> arguments){
+	public boolean navigateToAction(Bookmark bookmark){
 		System.out.println("BLOCKSTATEMENT > NAVIGATETOACTION");
 		ActionStatement failedAction = bookmark.getFailedAction();
 		System.out.println("BLOCKSTATEMENT > FAILEDACTION IS " + failedAction);
@@ -55,7 +55,7 @@ public class BlockStatement extends Statement {
 				System.out.println("BLOCKSTATEMENT > RUNNING ");
 
 				statement.setProgram(this.getProgram());
-				statement.run(arguments);
+				statement.run();
 			} else {
 				
 				if(statement instanceof ActionStatement){
@@ -67,7 +67,7 @@ public class BlockStatement extends Statement {
 						runFromHere = true;
 
 						statement.setProgram(this.getProgram());
-						statement.run(arguments);
+						statement.run();
 						
 					} else {
 						System.out.println("BLOCKSTATEMENT > this action is not failedAction");
@@ -78,7 +78,7 @@ public class BlockStatement extends Statement {
 				if(statement instanceof IfElseStatement){
 					System.out.println("BLOCKSTATEMENT > FOUND IFELSESTATEMENT IN BLOCK, DIGGING INTO IT " + statement);
 
-					boolean inStatement = ((IfElseStatement) statement).navigateToAction(bookmark, arguments);
+					boolean inStatement = ((IfElseStatement) statement).navigateToAction(bookmark);
 					
 					if(inStatement){
 						System.out.println("BLOCKSTATEMENT > FOUND failedAction in this IFELSESTATEMENT " + statement);
@@ -89,7 +89,7 @@ public class BlockStatement extends Statement {
 				if(statement instanceof WhileStatement){
 					System.out.println("BLOCKSTATEMENT > FOUND WHILESTATEMENT IN BLOCK, DIGGING INTO IT " + statement);
 
-					boolean inStatement = ((WhileStatement) statement).navigateToAction(bookmark, arguments);
+					boolean inStatement = ((WhileStatement) statement).navigateToAction(bookmark);
 					
 					if(inStatement){
 						System.out.println("BLOCKSTATEMENT > FOUND failedAction in this WhileStatement " + statement);
