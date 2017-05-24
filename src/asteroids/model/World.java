@@ -112,14 +112,7 @@ public class World {
 		return new HashSet<>(this.entities.values());
 	}
 	
-	// Je wilt een set terug geven die enkel die elementen bevat die van dat classetype zijn
-	// dat je opvraagt.
-	// Hiervoor maken we een (TODO stream) stream van alle entities in deze wereld.
-	// We filteren daaruit (TODO met lambda) die entiteiten die van de opgegeven klasse zijn.
-	// Tenslotte voegen we dezen allemaal samen in een set (die natuuurlijk enkel objecten
-	// van de specifieke klasse bevat)
 	
-	// TODO: vragen: moet c erbij als parameter in de documentatie?
 	/**
 	 * Returns a set of specific entities of class c, that  belong to this world.
 	 * 
@@ -129,9 +122,9 @@ public class World {
 	 * 		   |  @see implementation
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends  Entity> Set<T> getSpecificEntities(Class<T> c){
+	public <T extends  Entity> Set<T> getSpecificEntities(Class<T> subClass){
 		// This cast is unchecked, but this causes no problems because we KNOW it is right.
-		return (Set<T>)this.getAllEntities().stream().filter(c::isInstance).collect(Collectors.toSet());
+		return (Set<T>)this.getAllEntities().stream().filter(subClass::isInstance).collect(Collectors.toSet());
 	}
 	
 	/**

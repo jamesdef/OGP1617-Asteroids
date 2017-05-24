@@ -254,34 +254,6 @@ public class Bullet extends Entity {
 	
 // ----------------- RADIUS ---------------------------------------------
 	
-	
-	// TODO is dit nu goed of niet, eigenlijk niet want dat moet final zijn; die min_radius
-	
-//	 /**
-//     * This method makes it possible for the user to change the lower bound
-//     * imposed upon bullets.
-//     * 
-//     * @param lowerbound
-//     * 		  The new minimum radius.
-//     * 
-//     * @post The new universal lower bound for the radius is equal to the given value.
-//     * 		 |new.getMinRadius() == Lower_Bound
-//     * 
-//     * @throws IllegalRadiusException 
-//     * 		   The given lowerbound is not valid.
-//     * 		   | !(isValidMinimumRadius(lowerbound))
-//     */
-//	@Raw
-//    public static void setMin_Radius(double lowerbound) throws IllegalRadiusException{
-//    	if (isValidMinimumRadius(lowerbound)){
-//    		Bullet.min_Radius = lowerbound;
-//    	}
-//    	else{
-//    		throw new IllegalRadiusException(lowerbound);
-//    	}
-//    }
-	
-	
     
 	/**
 	 * Check whether the given minimum radius is a valid limit.
@@ -447,11 +419,11 @@ public class Bullet extends Entity {
 	 */
 	private int bounces_left = max_Bounces;
 	
-	//TODO moet eigenlijk final zijn
 	
 	/**
 	 * Variable registering the minimum allowed Radius.
-	 * The minimum radius may change in the future. 
+	 * The minimum radius may change in the future, 
+	 * but not during the lifetime of a bullet.
 	 * But it will always remain the same for all Bullets.
 	 */
 	private final static double min_Radius = 1.0;

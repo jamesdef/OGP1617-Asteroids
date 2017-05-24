@@ -849,12 +849,6 @@ public class Ship extends Entity {
 	/**
 	 * This method teleports this ship to a random
 	 * place in this world.
-	 * 
-	 * @post If the ship overlaps with another entity
-	 * 		 upon placement, the ship is immediatly terminated.
-	 * 		 The other entity is left untouched.
-	 * 		 | if(new.overlapsWithOther())
-	 *		 |		 then this.terminate()
 	 *
 	 * @post If the ship does not overlap in its new position,
 	 * 		 if takes on the random position as its new position.
@@ -863,22 +857,33 @@ public class Ship extends Entity {
 	 *	     |rancomYCoord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
 	 * 		 | new.getXPosition = randomXCoord
 	 * 		 | new.getYPosition = randomYCoord
+	 * 
+	 * @post If the ship cannot be added to the world on its new position, or its
+	 * 		 new position is not valid it is terminated.
+	 * 		 | @see implementation
 	 */
 	public void teleport(){
-		
 		double radius = this.getRadius();
 		double randomXCoord = radius + Math.random()*(this.getWorld().getWidth()-2*radius);
-		double rancomYCoord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
+		double randomYCoord = radius + Math.random()*(this.getWorld().getHeight()-2*radius);
 		
-		try{
-			this.setPosition(randomXCoord, rancomYCoord);
-			
-			if(this.overlapsWithOther()){
-				this.terminate();
-			}
-		} catch (Exception exception) {
+		//We make a copy of the world this ship was in
+		World worldToAddTo = this.getWorld();
+		// We now remove it from this world and give it its new positon and then
+		// we try to add it again.
+		this.getWorld().removeEntity(this);
+		
+		try {
+			this.setPosition(randomXCoord, randomYCoord);
+		} catch (IllegalPositionException e1) {
+			this.terminate();
+		}
+        try {
+        	worldToAddTo.addEntity(this);
+        }catch (IllegalEntityException e2) {
             this.terminate();
-        }	
+        }
+		
 	}
 	
 
@@ -891,7 +896,6 @@ public class Ship extends Entity {
 	private Program program = null;
 
 	public void setProgram(Program program){
-		System.out.println("SETTING PROGRAM ON SHIP");
 		program.setShip( this );
 		this.program = program;
 	}
@@ -901,7 +905,6 @@ public class Ship extends Entity {
 	}
 
 	public List<Object> executeProgram(double dt){
-		System.out.println("SHIP EXECUTEPROGRAM");
 		return this.getProgram().run(dt);
 	}
 
@@ -929,6 +932,7 @@ public class Ship extends Entity {
 	/**
 	 * Variable registering the minimum allowed Radius.
 	 * The minimum radius may change in the future. 
+	 * But not during the lifetime of a ship.
 	 * But it will always remain the same for all Ships.
 	 *
 	 */

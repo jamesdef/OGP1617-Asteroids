@@ -63,7 +63,7 @@ public abstract class MinorPlanet extends Entity {
 	 */
 	@Override
 	public boolean isValidRadius(double radius){
-		return super.isValidRadius(radius) && radius>=5;
+		return super.isValidRadius(radius) && radius>=5.0;
 	}
 
 }

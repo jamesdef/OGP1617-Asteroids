@@ -11,15 +11,6 @@ import be.kuleuven.cs.som.annotate.Model;
 import be.kuleuven.cs.som.annotate.Raw;
 
 
-
-// TODO: Basic methoden vereisen geen echte specificatie
-// TODO: oppassen met finals
-// TODO: Throws moeten enkel in de specifactie staan als ze uitermate relevant zijn
-// TODO: Postcondities en classe invarianten niet herhalen bij subklassen en overriding
-
-
-//TODO: parameters niet herhalen bij substition liskov: override
-
 /** 
  *  A class for dealing with entities. 
  *  We could define these as 'circular objects that can move through space'.
@@ -33,7 +24,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar 	The radius of each entity must be a valid value.
  * 			|isValidRadius(getRadius())
  * 
-  @invar   The mass of each entity must be valid.
+  @invar    The mass of each entity must be valid.
  * 		  	|this.getMass() > 0
  * 
  * @invar   The coordinates of an entity must be valid.
@@ -416,12 +407,6 @@ public abstract class Entity {
 		return (speedVector.norm() > getMaxVelocity());
 	}
 	
-	// TODO probleem:: hoe zorg je ervoor dat maxvelocity
-	// een default value heeft maar toch final is. 
-	// --> hoeft niet echt final te zijn maar
-	// minorplanet vormt wel een probleem want daar mag
-	// de max snelheid nooit veranderen
-	
 	/**
 	 * Set the maximum velocity to the given value.
 	 * 
@@ -647,10 +632,7 @@ public abstract class Entity {
 	 * 		  
 	 */
 	public Boolean significantOverlap (Entity other){
-		if (this.equals(other)){
-			return true;
-		}
-
+		
 		double centerDistance = this.getCenterDistance(other);
 		
 		return (centerDistance < roundingFactor*(this.getRadius() + other.getRadius()));
