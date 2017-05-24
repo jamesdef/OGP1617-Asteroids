@@ -9,8 +9,8 @@ public class NegationExpression extends UnaryExpression<BooleanExpression> imple
 	}
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) throws IllegalArgumentException{
-		return ! (Boolean) getOperandResult(function, arguments);
+	protected Object getResult() throws IllegalArgumentException{
+		return ! (Boolean) getOperandResult();
 		
 	}
 

@@ -23,7 +23,7 @@ public abstract class EntityPropertyExpression extends Expression {
 	
 	protected Entity getOperandResultingEntity(){
 		this.getOperand().setProgram(getProgram());
-		return (Entity) this.getOperand().getResult(null, null);
+		return (Entity) this.getOperand().getResult();
 	}
 	
 	

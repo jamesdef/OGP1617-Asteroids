@@ -11,7 +11,7 @@ import asteroids.model.Planetoid;
 public class PlanetEntityExpression extends EntityExpression {
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 		
 		Set<MinorPlanet> planets = this.getWorld().getSpecificEntities(MinorPlanet.class);
 

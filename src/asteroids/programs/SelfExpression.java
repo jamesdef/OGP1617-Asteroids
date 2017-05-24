@@ -6,7 +6,7 @@ public class SelfExpression extends EntityExpression{
 
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 		// TODO Auto-generated method stub
 		return this.getShip();
 	}

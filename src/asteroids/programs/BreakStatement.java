@@ -5,7 +5,7 @@ import java.util.List;
 public class BreakStatement extends Statement {
 
 	@Override
-	public void run(List<Expression> arguments) {
+	public void run() {
 		throw new IllegalAccessError();
 		
 	}

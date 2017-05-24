@@ -77,7 +77,6 @@ public class Part3CustomTests {
 	 
 	  @Test
 	  public void testCreateAsteroid() throws ModelException, IllegalPositionException, IllegalRadiusException {
-		  
 	      World world = facade.createWorld(1000, 1000);
 
 		  Asteroid asteroid = new Asteroid(10, 10, 10, 10, 10);
@@ -90,7 +89,7 @@ public class Part3CustomTests {
 	
 	  
 	//-------------------------------------------
-	// SHIP ASTEROID COLLISIONS TESTS
+	// ASTEROID COLLISIONS TESTS
 	//-------------------------------------------
 	  
 	  @Test
@@ -107,7 +106,7 @@ public class Part3CustomTests {
 		  facade.evolve(world, 10, null);
 		  
 		  assertTrue(facade.isTerminatedShip(ship));
-		  assertTrue(!facade.isTerminatedAsteroid(asteroid));
+		  assertFalse(facade.isTerminatedAsteroid(asteroid));
 
 	      
 	   }
@@ -118,25 +117,209 @@ public class Part3CustomTests {
 	      World world = facade.createWorld(1000, 1000);
 
 		  Asteroid asteroid1 = new Asteroid(200, 100, 0, 0, 10);
-		  Asteroid asteroid1 = new Asteroid(200, 100, 0, 0, 10);
+		  Asteroid asteroid2 = new Asteroid(100, 100, 10, 0, 10);
 		  
 		  facade.addAsteroidToWorld(world, asteroid1);
 		  facade.addAsteroidToWorld(world, asteroid2);
 		  
 		  facade.evolve(world, 10, null);
 		  
-		  assertTrue(facade.isTerminatedShip(ship));
-		  assertTrue(!facade.isTerminatedAsteroid(asteroid));
+		  assertFalse(facade.isTerminatedAsteroid(asteroid2));
+		  assertFalse(facade.isTerminatedAsteroid(asteroid1));
 
 	      
 	   }
-		 
+	  
+	  @Test
+	  public void testAsteroidBulletCollision() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+		  Asteroid asteroid = new Asteroid(200, 100, 0, 0, 10);
+		  Bullet bullet = new Bullet(100, 100, 10, 0, 10);
+		  
+		  facade.addAsteroidToWorld(world, asteroid);
+		  facade.addBulletToWorld(world, bullet);
+		  
+		  facade.evolve(world, 1, null);
+		  assertFalse(facade.isTerminatedAsteroid(asteroid));
+		  assertFalse(facade.isTerminatedBullet(bullet));
+		  
+		  facade.evolve(world, 9, null);
+		  assertTrue(facade.isTerminatedAsteroid(asteroid));
+		  assertTrue(facade.isTerminatedBullet(bullet));  
+		
+
+	      
+	   }
+		
+	  
+	  @Test
+	  public void testAsteroidBoundaryCollision() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+		  Asteroid asteroid = new Asteroid(210, 100, -10, 0, 10);
+		  
+		  facade.addAsteroidToWorld(world, asteroid);
+		  
+		  facade.evolve(world, 20, null);
+		  
+		  assertFalse(facade.isTerminatedAsteroid(asteroid));
+		  double xPos = facade.getAsteroidPosition(asteroid)[0];
+		  assertEquals(10, xPos, EPSILON);
+		  
+		  facade.evolve(world, 10, null);
+		  double newXPos = facade.getAsteroidPosition(asteroid)[0];
+		  assertEquals(110, newXPos, EPSILON);
+	      
+	   }
 	  
 	//-------------------------------------------
 	// PLANETOID TESTS
 	//-------------------------------------------
 
+
+	  @Test
+	  public void testCreatePlanetoid() throws ModelException, IllegalPositionException, IllegalRadiusException {
+	      World world = facade.createWorld(1000, 1000);
+
+		 Planetoid planetoid = new Planetoid(10, 10, 10, 10, 10, 0);
+		  
+		  facade.addPlanetoidToWorld(world, planetoid);
+		  
+		  assert(world == facade.getPlanetoidWorld(planetoid));
+	      
+	   }
 	  
+	  @Test
+	  public void testMovingPlanetoid() throws ModelException, IllegalPositionException, IllegalRadiusException {
+	     World world = facade.createWorld(1000, 1000);
+
+		 Planetoid planetoid = new Planetoid(10, 10, 10, 0, 10, 0);
+
+		  
+		 facade.addPlanetoidToWorld(world, planetoid);
+		 
+		 facade.evolve(world, 100, null);
+		 double planetoidRadius = facade.getPlanetoidRadius(planetoid);
+		 assertEquals(9.999, planetoidRadius, EPSILON);
+
+	   }
+	  
+	
+	  
+	  
+	//-------------------------------------------
+	// PLANETOID COLLISIONS TESTS
+	//-------------------------------------------
+		  
+	  @Test
+	  public void testPlanetoidShipCollision() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+	      Ship ship = facade.createShip(100, 100, 10, 0, 10, 0, 1.0E20);
+		  Planetoid planetoid = new Planetoid(200, 100, 0, 0, 10, 0);
+		  
+		  facade.addShipToWorld(world, ship);
+		  facade.addPlanetoidToWorld(world, planetoid);
+		  
+		  facade.evolve(world, 10, null);
+		  
+		  assertTrue(facade.isTerminatedShip(ship));
+		  assertFalse(facade.isTerminatedPlanetoid(planetoid));
+
+	      
+	   }
+	  
+	  @Test
+	  public void testPlanetoidplanetoidCollision() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+		  Planetoid planetoid1 = new Planetoid(200, 100, 0, 0, 10, 0);
+		  Planetoid planetoid2 = new Planetoid(100, 100, 10, 0, 10, 0);
+		  
+		  facade.addPlanetoidToWorld(world, planetoid1);
+		  facade.addPlanetoidToWorld(world, planetoid2);
+		  
+		  facade.evolve(world, 10, null);
+		  
+		  assertFalse(facade.isTerminatedPlanetoid(planetoid2));
+		  assertFalse(facade.isTerminatedPlanetoid(planetoid1));
+
+	      
+	   }
+	  
+	  @Test
+	  public void testPlanetoidBulletCollision() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+		  Planetoid planetoid = new Planetoid(200, 100, 0, 0, 10, 0);
+		  Bullet bullet = new Bullet(100, 100, 10, 0, 10);
+		  
+		  facade.addPlanetoidToWorld(world, planetoid);
+		  facade.addBulletToWorld(world, bullet);
+		  
+		  facade.evolve(world, 1, null);
+		  assertFalse(facade.isTerminatedPlanetoid(planetoid));
+		  assertFalse(facade.isTerminatedBullet(bullet));
+		  
+		  facade.evolve(world, 9, null);
+		  assertTrue(facade.isTerminatedPlanetoid(planetoid));
+		  assertTrue(facade.isTerminatedBullet(bullet));  
+		
+
+	      
+	   }
+		
+	  
+	  @Test
+	  public void testPlanetoidBoundaryCollision() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+		  Planetoid planetoid = new Planetoid(210, 100, -10, 0, 10, 0);
+		  
+		  facade.addPlanetoidToWorld(world, planetoid);
+		  
+		  facade.evolve(world, 20, null);
+		  
+		  assertFalse(facade.isTerminatedPlanetoid(planetoid));
+		  double xPos = facade.getPlanetoidPosition(planetoid)[0];
+		  assertEquals(10, xPos, EPSILON);
+		  
+		  facade.evolve(world, 10, null);
+		  double newXPos = facade.getPlanetoidPosition(planetoid)[0];
+		  assertEquals(110, newXPos, EPSILON);
+	      
+	   }
+  
+	  
+	//-------------------------------------------
+	// PLANETOID-ASTEROID COLLISIONS TESTS
+	//-------------------------------------------
+	  
+	  @Test
+	  public void testAsteroidPlanetoidCollision() throws ModelException, IllegalPositionException, IllegalRadiusException {
+		  
+	      World world = facade.createWorld(1000, 1000);
+
+		  Planetoid planetoid = new Planetoid(200, 100, 0, 0, 10, 0);
+		  Asteroid asteroid = new Asteroid(100, 100, 10, 0, 10);
+		  
+		  facade.addPlanetoidToWorld(world, planetoid);
+		  facade.addAsteroidToWorld(world, asteroid);
+		  
+		  facade.evolve(world, 10, null);
+		  
+		  assertFalse(facade.isTerminatedPlanetoid(planetoid));
+		  assertFalse(facade.isTerminatedAsteroid(asteroid));
+
+	      
+	   }
 	  
 	 
 }

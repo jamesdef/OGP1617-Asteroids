@@ -40,7 +40,7 @@ public class Program {
 		try {
 			System.out.println("RUN WITH BOOKMARK: " + this.getBookmark());		
 			this.getMainStatement().setProgram(this);
-			this.getMainStatement().runAt(this.getBookmark(), null);
+			this.getMainStatement().runAt(this.getBookmark());
 			
 			System.out.println("RETURNING GETPRINTS: " + getPrints());
 			return getPrints();

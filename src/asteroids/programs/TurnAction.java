@@ -11,7 +11,7 @@ class TurnAction extends ActionStatement {
 	/// CONSTRUCTOR ///
 
 	public TurnAction(Expression angle) {
-		System.out.println("TURN ACTION with angle: " + angle.getResult(null, null));
+		System.out.println("TURN ACTION with angle: " + angle.getResult());
 		setAngle(angle);
 	}
 
@@ -25,7 +25,7 @@ class TurnAction extends ActionStatement {
 
 	private void setAngle(Expression angle) {
 		this.angle = angle;
-		System.out.println("angle set as: " + angle.getResult(null, null));
+		System.out.println("angle set as: " + angle.getResult());
 
 	}
 
@@ -36,7 +36,7 @@ class TurnAction extends ActionStatement {
 			throws IllegalPositionException, IllegalRadiusException, IllegalShipException
 	{
 		System.out.println("EXECUTING TURN ACTION, program is: " + program);
-		Double angleValue = (Double) this.getAngle().getResult(null, null);
+		Double angleValue = (Double) this.getAngle().getResult();
 		System.out.println("ANGLE VALUE IS: " + angleValue);
 
 		try {

@@ -8,16 +8,16 @@ import asteroids.model.Ship;
 public abstract class Statement {
 
 
-	public void runAt(Bookmark bookmark, List<Expression> arguments){
+	public void runAt(Bookmark bookmark){
 		System.out.println("STATEMENT " + this +" Runat");
 
 		if(bookmark.getFailedAction() == null){
 			System.out.println("STATEMENT > failedAction is null, RUN STATEMENT from beginning ");
-			this.run(arguments);
+			this.run();
 		} else {
 			System.out.println("STATEMENT > failedAction not null, RUN STATEMENT from navigate ");
 
-			this.navigateToAction(bookmark, arguments);
+			this.navigateToAction(bookmark);
 		}
 
 	}
@@ -25,7 +25,7 @@ public abstract class Statement {
 	
 
 	//RUN
-	public abstract void run(List<Expression> arguments);
+	public abstract void run();
 	
 	
 	//PROGRAM
@@ -47,7 +47,7 @@ public abstract class Statement {
 	}
 	
 
-	public boolean navigateToAction(Bookmark bookmark, List<Expression> arguments) {
+	public boolean navigateToAction(Bookmark bookmark) {
 		Boolean failedIsThis = (bookmark.getFailedAction() == this);
 		System.out.println("SIMPEL STATEMENT > NAVIGATETOACTION, failedAction is this: " + failedIsThis);
 		return (failedIsThis);

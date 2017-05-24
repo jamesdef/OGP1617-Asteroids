@@ -26,11 +26,5 @@ public abstract class Expression {
 	}
 	
 	
-	protected abstract Object getResult(Function function, List<Expression> arguments);
-	
-	protected Object getArgumentExpression(Expression operand, List<Expression> actualArgs) {
-		return null;
-		//return getArgument(operand, actualArgs).getExpressionResult(getProgram(), actualArgs);
-	}
-	
+	protected abstract Object getResult();
 }

@@ -1,7 +1,5 @@
 package asteroids.programs;
 
-import java.util.List;
-
 public abstract class BinaryExpression<B> extends Expression{
 
 
@@ -36,14 +34,14 @@ public abstract class BinaryExpression<B> extends Expression{
 		return rightOperand;
 	}
 	
-	protected Object getLeftOperandResult(Function function, List<Expression> arguments) {
+	protected Object getLeftOperandResult() {
 		((Expression) this.getLeftOperand()).setProgram(getProgram());
-		return ((Expression) this.getLeftOperand()).getResult(function, arguments);
+		return ((Expression) this.getLeftOperand()).getResult();
 	}
 
-	protected Object getRightOperandResult(Function function, List<Expression> arguments) {
+	protected Object getRightOperandResult() {
 		((Expression) this.getRightOperand()).setProgram(getProgram());
-		return ((Expression) this.getRightOperand()).getResult(function, arguments);
+		return ((Expression) this.getRightOperand()).getResult();
 	}
 	
 	

@@ -1,7 +1,5 @@
 package asteroids.programs;
 
-import java.util.List;
-
 public class WhileStatement extends Statement {
 
 	public WhileStatement(BooleanExpression condition, Statement bodyStatement){
@@ -10,12 +8,12 @@ public class WhileStatement extends Statement {
 	}
 	
 	@Override
-	public void run(List<Expression> arguments) {
+	public void run() {
 		removeConditionError();
 		while ((boolean) this.getConditionResult() && !conditionError()) {
 			try {
 				this.getBodyStatement().setProgram(getProgram());
-				this.getBodyStatement().run(arguments);
+				this.getBodyStatement().run();
 			} catch (IllegalAccessError error) {
 				setConditionError();
 			}
@@ -69,7 +67,7 @@ public class WhileStatement extends Statement {
 	private Boolean getConditionResult(){
 		((Expression) this.getCondition()).setProgram(getProgram());
 
-		boolean conditionResult = (boolean) ((Expression) this.getCondition()).getResult(null, null);
+		boolean conditionResult = (boolean) ((Expression) this.getCondition()).getResult();
 		System.out.println("WHILESTATEMENT > conditionresult: " + conditionResult);
 
 		return conditionResult;
@@ -77,7 +75,7 @@ public class WhileStatement extends Statement {
 	}
 	
 	@Override
-	public boolean navigateToAction(Bookmark bookmark, List<Expression> arguments){
+	public boolean navigateToAction(Bookmark bookmark){
 		System.out.println("WHILESTATEMENT > NAVIGATETOACTION");
 
 		removeConditionError();
@@ -91,11 +89,11 @@ public class WhileStatement extends Statement {
 				if(foundBookmark){
 					System.out.println("WHILESTATEMENT > FOUNDBOOKMARK, running ");
 
-					this.getBodyStatement().run(arguments);
+					this.getBodyStatement().run();
 				} else {
 					System.out.println("WHILESTATEMENT > searching foundBookmark ");
 
-					foundBookmark = this.getBodyStatement().navigateToAction(bookmark, arguments);
+					foundBookmark = this.getBodyStatement().navigateToAction(bookmark);
 
 				}
 			} catch (IllegalAccessError error) {

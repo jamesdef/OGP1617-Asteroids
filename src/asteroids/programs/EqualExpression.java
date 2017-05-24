@@ -9,10 +9,10 @@ public class EqualExpression extends BinaryExpression<Expression> implements Boo
 	}
 
 	@Override
-	protected Object getResult(Function function, List<Expression> arguments) {
+	protected Object getResult() {
 
-		Object leftOperand = this.getLeftOperandResult(function, arguments);
-		Object rightOperand = this.getRightOperandResult(function, arguments);
+		Object leftOperand = this.getLeftOperandResult();
+		Object rightOperand = this.getRightOperandResult();
 		
 		
 		return (leftOperand == rightOperand);
