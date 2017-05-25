@@ -114,9 +114,9 @@ public class World {
 	
 	
 	/**
-	 * Returns a set of specific entities of class c, that  belong to this world.
+	 * Returns a set of specific entities of a given class, that  belong to this world.
 	 * 
-	 * @param c  The type of the entities that we want to collect.
+	 * @param subClass  The type of the entities that we want to collect.
 	 * 
 	 * @return A collection of all the entities of the given type, that belong to this world.
 	 * 		   |  @see implementation
@@ -749,7 +749,7 @@ public class World {
 	 */
 	private double height;
 	
-	/*
+	/**
 	 * Variable registering whether this casual collision is handled.
 	 * Initialized as false.
 	 */
